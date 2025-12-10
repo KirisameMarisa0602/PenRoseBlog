@@ -4,7 +4,6 @@ target/
 
 # 敏感配置文件 (保留 sample 文件，忽略真实配置)
 src/main/resources/application.properties
-!src/main/resources/application.properties.sample
 
 # STS / Eclipse
 .apt_generated
