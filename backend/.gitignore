@@ -1,0 +1,24 @@
+﻿# Maven 编译产物
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# 敏感配置文件 (保留 sample 文件，忽略真实配置)
+src/main/resources/application.properties
+!src/main/resources/application.properties.sample
+
+# STS / Eclipse
+.apt_generated
+.factorypath
+.sts4-cache
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+
+# 帮助文档
+HELP.md
+application-prod.properties

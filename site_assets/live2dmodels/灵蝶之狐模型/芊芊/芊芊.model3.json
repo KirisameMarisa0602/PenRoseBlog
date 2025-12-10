@@ -1,0 +1,157 @@
+{
+	"Version": 3,
+	"FileReferences": {
+		"Moc": "芊芊.moc3",
+		"Textures": [
+			"芊芊.4096/texture_00.png",
+			"芊芊.4096/texture_01.png",
+			"芊芊.4096/texture_02.png",
+			"芊芊.4096/texture_03.png",
+			"芊芊.4096/texture_04.png"
+		],
+		"Physics": "芊芊.physics3.json",
+		"DisplayInfo": "芊芊.cdi3.json",
+		"Expressions": [
+			{
+				"Name": "星星眼",
+				"File": "xingxingyan.exp3.json"
+			},
+			{
+				"Name": "脸红1",
+				"File": "lianhong.exp3.json"
+			},
+			{
+				"Name": "脸红2",
+				"File": "lianhong2.exp3.json"
+			},
+			{
+				"Name": "黑脸",
+				"File": "heilian.exp3.json"
+			},
+			{
+				"Name": "流泪",
+				"File": "yanlei.exp3.json"
+			},
+			{
+				"Name": "问号1",
+				"File": "wenhao.exp3.json"
+			},
+			{
+				"Name": "问号2",
+				"File": "wenhao2.exp3.json"
+			},
+			{
+				"Name": "流汗",
+				"File": "liuhan.exp3.json"
+			},
+			{
+				"Name": "无语",
+				"File": "wuyu.exp3.json"
+			},
+			{
+				"Name": "钱钱",
+				"File": "qianyan.exp3.json"
+			},
+			{
+				"Name": "爱心眼",
+				"File": "aixinyan.exp3.json"
+			},
+			{
+				"Name": "轮回眼",
+				"File": "lunhuiyan.exp3.json"
+			},
+			{
+				"Name": "空白眼",
+				"File": "kongbaiyan.exp3.json"
+			},
+			{
+				"Name": "星星",
+				"File": "xingxing.exp3.json"
+			},
+			{
+				"Name": "生气",
+				"File": "shengqi.exp3.json"
+			},
+
+
+			{
+				"Name": "眼珠",
+				"File": "yanzhu.exp3.json"
+			},
+			{
+				"Name": "长发",
+				"File": "changfa.exp3.json"
+			},
+			{
+				"Name": "双马尾",
+				"File": "shuangmawei.exp3.json"
+			},
+			{
+				"Name": "垂耳",
+				"File": "chuier.exp3.json"
+			},
+			{
+				"Name": "镜子",
+				"File": "jingzi.exp3.json"
+			},
+			{
+				"Name": "狐狸",
+				"File": "huli.exp3.json"
+			},
+			{
+				"Name": "笔记本",
+				"File": "bijiben2.exp3.json"
+			},
+
+
+			{
+				"Name": "吐舌",
+				"File": "tushe.exp3.json"
+			},
+			{
+				"Name": "嘟嘴",
+				"File": "duzui.exp3.json"
+			},
+			{
+				"Name": "鼓嘴",
+				"File": "guzui.exp3.json"
+			},
+			{
+				"Name": "打游戏",
+				"File": "dayouxi.exp3.json"
+			},
+			{
+				"Name": "抱狐狸",
+				"File": "baohuli.exp3.json"
+			},
+			{
+				"Name": "扇子",
+				"File": "shanzi.exp3.json"
+			},
+			{
+				"Name": "话筒",
+				"File": "huatong.exp3.json"
+			},
+			{
+				"Name": "比心",
+				"File": "bixin.exp3.json"
+			}
+		]
+	},
+	"Groups": [
+		{
+			"Target": "Parameter",
+			"Name": "LipSync",
+			"Ids": []
+		},
+		{
+			"Target": "Parameter",
+			"Name": "EyeBlink",
+			"Ids": [
+				"ParamEyeLOpen",
+				"ParamEyeROpen"
+			]
+		}
+	],
+	"HitAreas": []
+}

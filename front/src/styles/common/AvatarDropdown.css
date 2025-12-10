@@ -1,0 +1,94 @@
+/* 美化下拉菜单，宽度12.5vw，高度20vh，紧贴右侧 */
+.avatar-dropdown {
+  position: absolute;
+  top: 1vh;
+  right: -4.2vw;
+  width: 12.5vw !important;
+  height: 20vh !important;
+  background: #fff;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  display: flex;
+  flex-direction: column;
+  z-index: 9999;
+  gap: 10px;
+  animation: fadeIn .2s;
+  align-items: center;
+  justify-content: flex-start;
+  border-top: none;
+  overflow-y: auto;
+  /* 隐藏滚动条 */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+.avatar-dropdown::-webkit-scrollbar {
+  display: none;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px);}
+  to { opacity: 1; transform: translateY(0);}
+}
+.dropdown-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 22px 12px 22px;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 2px;
+}
+
+.dropdown-avatar {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #f5f6fa;
+  border: 1.5px solid #eaeaea;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.dropdown-userinfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.dropdown-name {
+  font-weight: 600;
+  font-size: 0.7rem;
+  color: #222;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 5vw;
+}
+.sex-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  margin-top: 2px;
+}
+.dropdown-btn {
+  background: none;
+  border: none;
+  color: #333;
+    font-size: 0.8rem;
+    padding: 12px 2vw;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  border-radius: 8px;
+  margin: 0 1vw;
+}
+.dropdown-btn:hover {
+  background: #f5f6fa;
+}
+.dropdown-header.no-avatar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 22px 12px 22px;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 2px;
+}
+

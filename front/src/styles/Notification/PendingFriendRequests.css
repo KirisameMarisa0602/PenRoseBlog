@@ -1,0 +1,145 @@
+/* PendingFriendRequests.css - 通知中心（好友/点赞/评论）样式 */
+
+.pf-page { min-height: 100vh; }
+.pf-container {
+  max-width: 900px;
+  margin: 24px auto 60px;
+  padding: 24px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 6px 28px rgba(50,80,140,0.06);
+  position: relative;
+}
+
+.pf-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #2a3550;
+  text-align: center;
+  margin: 0 0 18px;
+}
+
+/* layout: left selector + center list */
+.pf-main {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+}
+
+/* 左侧选择栏 */
+.pf-left {
+  width: 140px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 8px;
+  align-items: stretch;
+}
+.pf-tab-btn {
+  background: #fff;
+  color: #222;
+  border: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.pf-tab-btn:hover { transform: translateY(-1px); }
+.pf-tab-btn.active {
+  background: linear-gradient(90deg,#6a8cff,#8fd3f4);
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(107,138,255,0.12);
+}
+.pf-tab-count {
+  background: rgba(255,255,255,0.18);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  min-width: 28px;
+  text-align: center;
+}
+
+/* 中间区域：列表 */
+.pf-center {
+  flex: 1;
+  min-height: 200px;
+}
+
+.pf-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 单条样式 */
+.pf-item {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #f0f3fa;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  cursor: pointer;
+  align-items: flex-start;
+}
+.pf-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(50,80,140,0.06);
+}
+
+.pf-avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 1px solid #eef3fb; }
+.pf-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.pf-nick { font-weight: 700; color: #2a3550; }
+.pf-title-line { font-size: 14px; font-weight: 600; color: #333; margin-top: 4px; }
+.pf-message { color: #666; margin-top: 6px; font-size: 13px; }
+.pf-created { color: #999; font-size: 12px; margin-top: 6px; }
+
+/* 评论预览模块 */
+.pf-comment-preview {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 6px;
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+}
+.pf-comment-meta { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+.pf-preview-avatar { width:24px; height:24px; border-radius: 50%; object-fit:cover; border:1px solid #eceef6; }
+.pf-preview-nick { font-weight:600; font-size:13px; color:#333; }
+.pf-preview-time { font-size:12px; color:#999; margin-left:6px; }
+.pf-preview-content { font-size:13px; color:#444; margin-bottom:4px; }
+.pf-preview-post { font-size:12px; color:#999; }
+
+/* 好友请求按钮组 */
+.pf-actions { display:flex; gap:8px; align-items:center; margin-left:12px; }
+.pf-btn { padding:6px 10px; border-radius:8px; border:0; cursor:pointer; font-weight:600; }
+.pf-accept { background: linear-gradient(90deg,#6a8cff,#8fd3f4); color:#fff; }
+.pf-reject { background: #fff; color:#c44; border:1px solid #f5d5d5; }
+
+/* 空状态 / 错误 */
+.pf-empty, .pf-empty-list { color:#666; padding:18px; text-align:center; font-size:14px; }
+.pf-error { color: red; padding:12px; text-align:center; }
+
+/* 分页 */
+.pf-pagination { display:flex; gap:12px; justify-content:center; align-items:center; margin-top:14px; }
+.pf-page-btn {
+  background: #4c79ff; color: #fff; border: none; border-radius: 8px; padding: 8px 14px; cursor: pointer;
+}
+.pf-page-btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+.pf-page-indicator { font-weight:700; color:#222; }
+
+/* small responsive */
+@media (max-width: 800px) {
+  .pf-main { flex-direction: column; }
+  .pf-left { width: 100%; flex-direction: row; gap: 8px; }
+  .pf-tab-btn { flex: 1; text-align:center; }
+  .pf-container { margin: 12px; padding: 16px; }
+}

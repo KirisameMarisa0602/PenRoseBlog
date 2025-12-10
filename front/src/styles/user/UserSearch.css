@@ -1,0 +1,92 @@
+.user-search-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f0f4ff 0%, #eef6ea 100%);
+  /* 抵消 body 的全局 padding-top，使背景色延伸至顶部 */
+  margin-top: calc(var(--navH) * -1);
+  padding-top: var(--navH);
+}
+.user-search-container {
+  max-width: 900px;
+  margin: 40px auto;
+  background: rgba(255, 255, 255, 0.85);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+.user-search-container h2 {
+  margin-top: 0;
+  margin-bottom: 24px;
+  color: #333;
+  font-size: 24px;
+  text-align: center;
+}
+.user-search-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 24px;
+  justify-content: center;
+}
+.user-search-controls select,
+.user-search-controls input {
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid #d6dfe9;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.user-search-controls input:focus {
+  border-color: #6a8cff;
+}
+.user-search-controls button {
+  padding: 10px 20px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #6a8cff 0%, #4f6ef5 100%);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 0.1s, box-shadow 0.2s;
+}
+.user-search-controls button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(106, 140, 255, 0.3);
+}
+.user-search-controls button:active {
+  transform: translateY(0);
+}
+.user-search-results { list-style: none; padding: 0; margin: 0; }
+.user-item { 
+  display:flex; 
+  align-items:center; 
+  gap:16px; 
+  padding:16px; 
+  border-bottom:1px solid rgba(0,0,0,0.05); 
+  transition: background 0.2s;
+  border-radius: 8px;
+}
+.user-item:hover {
+  background: rgba(255,255,255,0.5);
+}
+.user-avatar { 
+  width:64px; 
+  height:64px; 
+  border-radius:50%; 
+  object-fit:cover; 
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.user-info { flex:1 }
+.user-nick { font-weight:600; color: #1a202c; font-size: 16px; margin-bottom: 4px; }
+.user-username { color:#718096; font-size:14px }
+.user-actions { display:flex; gap:10px }
+.btn { padding:6px 10px; background:#6a8cff; color:#fff; border-radius:6px; text-decoration:none }
+.btn.outline { background:transparent; color:#6a8cff; border:1px solid #d6dfe9 }
+.follow-btn { padding:6px 10px; background: linear-gradient(90deg,#55c2a3,#2f9d80); border: none; color: #fff; border-radius:6px; cursor:pointer }
+.friend-request-btn { padding:6px 10px; background: linear-gradient(90deg,#6a8cff,#8fd3f4); border: none; color: #fff; border-radius:6px; cursor: pointer }
+.friend-request-btn.sent { background: #e6eefb; color: #6a8cff; border: 1px solid #d6dfe9 }
+.empty { padding:20px; color:#666; text-align:center }

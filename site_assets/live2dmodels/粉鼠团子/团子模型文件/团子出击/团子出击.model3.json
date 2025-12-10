@@ -1,0 +1,55 @@
+{
+	"Version": 3,
+	"FileReferences": {
+		"Moc": "团子出击.moc3",
+		"Textures": [
+			"团子出击.4096/texture_00.png",
+			"团子出击.4096/texture_01.png",
+			"团子出击.4096/texture_02.png",
+			"团子出击.4096/texture_03.png",
+			"团子出击.4096/texture_04.png",
+			"团子出击.4096/texture_05.png",
+			"团子出击.4096/texture_06.png"
+		],
+		"Physics": "团子出击.physics3.json",
+		"DisplayInfo": "团子出击.cdi3.json",
+		"Motions": {
+			"Idle": [
+				{
+					"File": "待机动画.motion3.json",
+					"FadeInTime": 0.5,
+					"FadeOutTime": 0.5
+				}
+			]
+		},
+		"Expressions": [
+			{ "Name": "爱心眼", "File": "爱心眼.exp3.json" },
+			{ "Name": "打米了", "File": "打米了.exp3.json" },
+			{ "Name": "生气", "File": "生气.exp3.json" },
+			{ "Name": "脸红", "File": "脸红.exp3.json" },
+			{ "Name": "流泪", "File": "流泪.exp3.json" },
+			{ "Name": "流汗", "File": "流汗.exp3.json" },
+			{ "Name": "晕", "File": "晕.exp3.json" },
+
+			{ "Name": "抱枕", "File": "抱枕.exp3.json" },
+
+			{ "Name": "捏抱枕", "File": "捏抱枕.exp3.json" },
+			{ "Name": "唱歌手", "File": "唱歌手.exp3.json" }
+		]
+	},
+	"Groups": [
+		{
+			"Target": "Parameter",
+			"Name": "LipSync",
+			"Ids": []
+		},
+		{
+			"Target": "Parameter",
+			"Name": "EyeBlink",
+			"Ids": [
+				"ParamEyeLOpen",
+				"ParamEyeROpen"
+			]
+		}
+	]
+}

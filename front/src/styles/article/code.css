@@ -1,0 +1,77 @@
+/* Minimal code block styles for Markdown-rendered content */
+
+.article-content pre {
+  background: #0f172a; /* slate-900 */
+  color: #e5e7eb; /* gray-200 */
+  border-radius: 8px;
+  padding: 14px 18px;
+  overflow: auto;
+  max-width: 100%;
+  border: 1px solid rgba(148,163,184,0.25); /* gray-400 alpha */
+}
+
+.article-content code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.95em;
+  line-height: 1.6;
+  word-break: break-word;
+}
+
+/* Inline code */
+.article-content p code, .article-content li code {
+  background: rgba(148,163,184,0.2);
+  color: #111827; /* gray-900 */
+  border-radius: 6px;
+  padding: 0.1em 0.35em;
+  border: 1px solid rgba(148,163,184,0.35);
+}
+
+/* Language hint tag (if renderer produces it) */
+.article-content pre[class*="language-"] { position: relative; }
+
+/* Scrollbar aesthetics */
+.article-content pre::-webkit-scrollbar { height: 10px; }
+.article-content pre::-webkit-scrollbar-thumb {
+  background: rgba(148,163,184,0.45);
+  border-radius: 8px;
+}
+
+/* Optional basic token colors if classes exist */
+.article-content .token.comment,
+.article-content .token.prolog,
+.article-content .token.doctype,
+.article-content .token.cdata { color: #9CA3AF; }
+
+.article-content .token.punctuation { color: #E5E7EB; }
+.article-content .token.property,
+.article-content .token.tag,
+.article-content .token.constant,
+.article-content .token.symbol,
+.article-content .token.deleted { color: #FCA5A5; }
+
+.article-content .token.boolean,
+.article-content .token.number { color: #FDE68A; }
+
+.article-content .token.selector,
+.article-content .token.attr-name,
+.article-content .token.string,
+.article-content .token.char,
+.article-content .token.builtin,
+.article-content .token.inserted { color: #86EFAC; }
+
+.article-content .token.operator,
+.article-content .token.entity,
+.article-content .token.url,
+.language-css .token.string,
+.style .token.string { color: #93C5FD; }
+
+.article-content .token.atrule,
+.article-content .token.attr-value,
+.article-content .token.keyword { color: #A5B4FC; }
+
+.article-content .token.function,
+.article-content .token.class-name { color: #FBCFE8; }
+
+.article-content .token.regex,
+.article-content .token.important,
+.article-content .token.variable { color: #FDBA74; }

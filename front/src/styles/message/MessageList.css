@@ -1,0 +1,105 @@
+/* MessageList 样式 */
+.message-list-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e3e8f0 0%, #c9d6ff 100%);
+}
+.message-list-container {
+  max-width: 700px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(80,120,200,0.10);
+  padding: 32px 28px;
+}
+.message-list-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #2a3550;
+  margin-bottom: 24px;
+  text-align: center;
+}
+.message-list-ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.message-list-item {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #e3e8f0;
+  padding: 16px 0;
+}
+/* action buttons in pending requests */
+.message-list-item button {
+  background: linear-gradient(90deg,#6a8cff,#8fd3f4);
+  border: none;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.message-list-item button:nth-child(2) {
+  background: transparent;
+  color: #666;
+  border: 1px solid #e6eefb;
+}
+.message-list-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  width: 100%;
+}
+.message-list-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 16px;
+  border: 2px solid #bfc8da;
+}
+.message-list-nickname {
+  font-size: 18px;
+  font-weight: 600;
+  color: #23272f;
+  margin-right: 16px;
+}
+.message-list-lastmsg {
+  font-size: 15px;
+  color: #888;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.message-list-empty {
+  text-align: center;
+  color: #aaa;
+  padding: 32px 0;
+}
+.message-list-linkbtn {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 12px;
+  background: #4c79ff;
+  color: #fff;
+  font-size: 12px;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.message-list-linkbtn:hover { background: #3b65e6; }
+.message-badge{
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: #ff4d4f;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.8);
+}

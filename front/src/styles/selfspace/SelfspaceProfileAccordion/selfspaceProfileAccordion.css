@@ -1,0 +1,133 @@
+/*
+  Selfspace Profile Accordion - Consolidated styles
+  - 合并基础样式并删除冗余定义
+  - 编辑面板的差异通过 `.editing` 或特定选择器覆盖
+*/
+
+.profilepanel-container {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.profilepanel-section {
+  width: 100%;
+  min-height: 0;
+  height: 100%;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.1);
+  overflow: hidden;
+  transition: height .35s ease, min-height .35s ease;
+  will-change: height, min-height;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 16px 40px rgba(15,23,42,0.16);
+}
+
+.profilepanel-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: stretch;
+}
+
+.selfspace-profilepanel-container { display: block; width:100%; height:100%; }
+
+/* 表单与编辑区基础样式 */
+.profilepanel-useredit-panel { padding: 12px 0 0 0; }
+.profilepanel-useredit-form { display:flex; flex-direction:column; gap:18px; }
+.form-group { display:flex; flex-direction:column; align-items:flex-start; gap:6px; }
+.form-group label { min-width:48px; color:#222; font-weight:500; margin-bottom:2px; }
+
+.profilepanel-avatar-preview { margin-top:4px; }
+.profilepanel-avatar-img {
+  width:96px; height:96px; border-radius:50%; object-fit:cover;
+  border:1px solid #ccc; background:#fff; display:block;
+}
+
+.profilepanel-bg-preview { margin-top:4px; }
+
+/* 背景媒体：默认不带边框，第一模块铺满 */
+.profilepanel-bg-img,
+.profilepanel-bg-video {
+  object-fit: cover;
+  background: #fff;
+  border: none;
+  border-radius: 0;
+  display:block;
+}
+
+/* 第一模块专用：铺满整个面板（背景） */
+.profilepanel-section:first-child .profilepanel-bg-img,
+.profilepanel-section:first-child .profilepanel-bg-video {
+  position: absolute; left:0; top:0; width:100%; height:100%; z-index:0;
+}
+
+/* 其他模块的预览默认尺寸（编辑模式下可覆盖） */
+.profilepanel-bg-preview .profilepanel-bg-img,
+.profilepanel-bg-preview .profilepanel-bg-video {
+  width: auto; max-height:160px; position:static; border-radius:0;
+}
+
+.form-msg { color:#1a8917; margin-top:4px; font-size:14px; }
+
+/* === 编辑模式覆盖：将 preview 变为固定小图，带圆角与边框 === */
+/* 使用方式：组件在编辑时给根节点添加 .editing 类，或直接在编辑页面额外引入此文件 */
+.editing .profilepanel-bg-preview .profilepanel-bg-img,
+.editing .profilepanel-bg-preview .profilepanel-bg-video,
+.profilepanel-bg-preview.editing .profilepanel-bg-img,
+.profilepanel-bg-preview.editing .profilepanel-bg-video {
+  width: 220px; max-height: 160px; object-fit: cover;
+  border: 1px solid #ccc; background:#fff; border-radius:8px; display:block;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+
+/* -------------------------------------------------- */
+/* 编辑面板（覆盖/增强规则）                             */
+/* 放在文件末尾以覆盖上方的基础样式，便于在同一文件中管理 */
+/* 如果需要条件生效，可在组件中向根节点添加 `.editing` 类 */
+/* -------------------------------------------------- */
+
+/* 编辑面板：预览图带边框与圆角 */
+.profilepanel-bg-preview .profilepanel-bg-img,
+.profilepanel-bg-preview .profilepanel-bg-video {
+  width: 220px;
+  max-height: 160px;
+  object-fit: cover;
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 8px;
+}
+
+/* 保持第一模块铺满的样式不变（编辑覆盖不影响首模块） */
+.profilepanel-section:first-child .profilepanel-bg-img,
+.profilepanel-section:first-child .profilepanel-bg-video {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 0;
+}
+
+/* 可选：当组件处于编辑模式时，使用 `.editing` 根类加强显示 */
+.editing .profilepanel-bg-preview .profilepanel-bg-img,
+.editing .profilepanel-bg-preview .profilepanel-bg-video {
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+/* 仅当滚动型面板处于激活状态时，允许纵向滚动，避免内容被裁切 */
+.profilepanel-scroll-section.profilepanel-section-active {
+  overflow-y: auto;
+}
+
+/* 让滚动面板里的内容从顶部开始排布（覆盖基础居中样式） */
+.profilepanel-scroll-content {
+  align-items: flex-start;
+}

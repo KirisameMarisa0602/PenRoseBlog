@@ -1,0 +1,71 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: blog-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-20050602}
+      MYSQL_DATABASE: blogdb
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - blog-network
+    restart: always
+
+  redis:
+    image: redis:alpine
+    container_name: blog-redis
+    networks:
+      - blog-network
+    restart: always
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: blog-rabbitmq
+    ports:
+      - "15672:15672" # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-guest}
+    networks:
+      - blog-network
+    restart: always
+
+  backend:
+    build: ./backend
+    container_name: blog-backend
+    environment:
+      DB_PASSWORD: ${DB_PASSWORD:-20050602}
+      RABBITMQ_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_PASS: ${RABBITMQ_PASS:-guest}
+    volumes:
+      - ./sources:/app/sources # Mount local sources to container
+    depends_on:
+      - mysql
+      - redis
+      - rabbitmq
+    networks:
+      - blog-network
+    restart: always
+
+  frontend:
+    build: ./front
+    container_name: blog-frontend
+    ports:
+      - "80:80"
+    volumes:
+      - ./sources:/app/sources # User uploads
+      - ./site_assets:/app/site_assets # Static site assets
+    depends_on:
+      - backend
+    networks:
+      - blog-network
+    restart: always
+
+networks:
+  blog-network:
+    driver: bridge
+
+volumes:
+  mysql_data:

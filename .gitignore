@@ -1,0 +1,11 @@
+# Global ignores
+.idea/
+.vscode/
+*.log
+.DS_Store
+
+# User content (large files)
+sources/
+
+# OS generated
+Thumbs.db

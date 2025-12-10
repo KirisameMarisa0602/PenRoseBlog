@@ -1,0 +1,106 @@
+# application.properties.sample - example config (do NOT commit real secrets)
+
+spring.application.name=blog
+
+# =============================
+# Database (MySQL) — example
+# =============================
+# In production, prefer env variables and secret managers.
+# spring.datasource.url=jdbc:mysql://localhost:3306/blogdb?useSSL=false&serverTimezone=UTC&characterEncoding=utf8&allowPublicKeyRetrieval=true
+# spring.datasource.username=root
+# spring.datasource.password=changeme
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# JPA/Hibernate
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.open-in-view=false
+
+# Flyway (optional)
+# spring.flyway.enabled=true
+# spring.flyway.baseline-on-migrate=true
+
+# =============================
+# Web server
+# =============================
+# server.port=8080
+
+# =============================
+# Logging
+# =============================
+# logging.level.root=INFO
+# logging.level.com.kirisamemarisa.blog=DEBUG
+
+# =============================
+# Spring AI (OpenAI-compatible)
+# =============================
+# Prefer using environment variables:
+#   OPENAI_API_KEY or DEEPSEEK_API_KEY
+#   SPRING_AI_OPENAI_API_BASE_URL
+# spring.ai.openai.api-key=${OPENAI_API_KEY}
+# spring.ai.openai.model=gpt-4o-mini
+# For DeepSeek (OpenAI-compatible): https://api.deepseek.com
+# spring.ai.openai.api-base-url=https://api.deepseek.com
+
+# =============================
+# JWT — DO NOT store real secret in VCS
+# =============================
+# jwt.secret=please-change-me
+
+# =============================
+# Blog base URL (used for generating absolute links in previews)
+# Leave empty to return relative path like /post/{id}
+# =============================
+# blog.base-url=http://localhost:5173
+
+# =============================
+# Static resource locations
+# All locations should use file: prefix.
+# You can define a common root and compose subpaths below.
+# =============================
+# 基础资源目录（用于博客媒体等）
+# resource.sources-location=file:D:/Projects/selfprojects/blog/sources/
+
+# 头像、背景与博客资源（基于 sources-location 拼接），也可直接写绝对路径
+# resource.avatar-location=${resource.sources-location}avatar/
+# resource.background-location=${resource.sources-location}background/
+# resource.blogpostcover-location=${resource.sources-location}blogpostcover/
+# resource.blogpostcontent-location=${resource.sources-location}blogpostcontent/
+
+# 私信媒体物理存储目录（绝对路径或相对路径；若无 file: 前缀会自动补全）
+# resource.message-media-location=D:/Projects/selfprojects/blog/sources/messages/
+# 私信媒体对外访问 URL 前缀（访问路径前缀）
+# resource.message-media-access-prefix=/files/messages
+
+# =============================
+# RabbitMQ (notifications fanout by topic)
+# =============================
+# Exchange name used by the app (producer + consumer binding)
+# app.rabbitmq.exchange=blog.notifications
+# Optional: connection parameters (default guest/guest@localhost:5672)
+# spring.rabbitmq.host=localhost
+# spring.rabbitmq.port=5672
+# spring.rabbitmq.username=guest
+# spring.rabbitmq.password=guest
+
+# =============================
+# Redis (for verification codes and caching)
+# =============================
+# spring.data.redis.host=localhost
+# spring.data.redis.port=6379
+# spring.data.redis.password=
+# spring.data.redis.database=0
+
+# =============================
+# OAuth2 - QQ Login
+# =============================
+# oauth2.qq.app-id=YOUR_QQ_APP_ID
+# oauth2.qq.app-key=YOUR_QQ_APP_KEY
+# oauth2.qq.redirect-uri=http://localhost:5173/auth/qq/callback
+
+# =============================
+# OAuth2 - WeChat Login
+# =============================
+# oauth2.wechat.app-id=YOUR_WECHAT_APP_ID
+# oauth2.wechat.app-secret=YOUR_WECHAT_APP_SECRET
+# oauth2.wechat.redirect-uri=http://localhost:5173/auth/wechat/callback

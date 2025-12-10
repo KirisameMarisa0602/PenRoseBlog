@@ -1,0 +1,66 @@
+{
+	"Version": 3,
+	"FileReferences": {
+		"Moc": "A苹果小狐狸.moc3",
+		"Textures": [
+			"A苹果小狐狸.4096/texture_00.png",
+			"A苹果小狐狸.4096/texture_01.png",
+			"A苹果小狐狸.4096/texture_02.png",
+			"A苹果小狐狸.4096/texture_03.png",
+			"A苹果小狐狸.4096/texture_04.png",
+			"A苹果小狐狸.4096/texture_05.png",
+			"A苹果小狐狸.4096/texture_06.png",
+			"A苹果小狐狸.4096/texture_07.png",
+			"A苹果小狐狸.4096/texture_08.png",
+			"A苹果小狐狸.4096/texture_09.png",
+			"A苹果小狐狸.4096/texture_10.png",
+			"A苹果小狐狸.4096/texture_11.png",
+			"A苹果小狐狸.4096/texture_12.png"
+		],
+		"Physics": "A苹果小狐狸.physics3.json",
+		"DisplayInfo": "A苹果小狐狸.cdi3.json",
+		"Motions": {
+			"Idle": [
+				{
+					"File": "待机动画.motion3.json",
+					"FadeInTime": 0.5,
+					"FadeOutTime": 0.5
+				}
+			]
+		},
+		"Expressions": [
+		
+			{ "Name": "爱心", "File": "爱心.exp3.json" },
+			{ "Name": "生气", "File": "生气.exp3.json" },
+			{ "Name": "流泪", "File": "流泪.exp3.json" },
+			{ "Name": "星星", "File": "星星.exp3.json" },
+			{ "Name": "脸红", "File": "脸红.exp3.json" },
+			{ "Name": "脸黑", "File": "脸黑.exp3.json" },
+			{ "Name": "钱钱", "File": "钱钱.exp3.json" },
+
+			{ "Name": "背景1", "File": "背景1.exp3.json" },
+			{ "Name": "背景2", "File": "背景2.exp3.json" },
+			{ "Name": "背景3", "File": "背景3.exp3.json" },
+			
+			{ "Name": "宠物", "File": "宠物.exp3.json" },
+			{ "Name": "尾巴", "File": "尾巴.exp3.json" },
+			{ "Name": "睫毛", "File": "睫毛.exp3.json" },
+			{ "Name": "棕发", "File": "棕发.exp3.json" },
+
+			{ "Name": "口红", "File": "口红.exp3.json" },
+			{ "Name": "手势", "File": "手势.exp3.json" }			
+		]
+	},
+	"Groups": [
+		{
+			"Target": "Parameter",
+			"Name": "EyeBlink",
+			"Ids": []
+		},
+		{
+			"Target": "Parameter",
+			"Name": "LipSync",
+			"Ids": []
+		}
+	]
+}

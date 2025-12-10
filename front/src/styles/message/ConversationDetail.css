@@ -1,0 +1,540 @@
+/* ConversationDetail 样式 */
+.conversation-detail-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e3e8f0 0%, #c9d6ff 100%);
+  box-sizing: border-box;
+}
+.conversation-detail-container {
+  max-width: 1040px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(80,120,200,0.10);
+  padding: 24px 28px; 
+  display: flex;
+  flex-direction: column;
+  min-height: 600px;
+}
+.conversation-detail-container.two-columns {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  grid-template-rows: minmax(240px, 1fr) auto;
+  /* 原来是 gap: 16px; 会产生“行间距”导致上下不贴合 */
+  column-gap: 16px;
+  row-gap: 0;
+  align-items: stretch;
+  min-height: calc(100vh - 15vh - 50px);
+  height: calc(100vh - 15vh - 50px);
+}
+
+/* 横幅收起时，容器占满视口高度，底边与页面齐平 */
+.banner-is-hidden .conversation-detail-container.two-columns {
+  min-height: calc(100vh - 50px);
+  height: calc(100vh - 50px);
+}
+
+/* 左侧会话用户栏 */
+.conversation-sidebar {
+  grid-column: 1;
+  grid-row: 1 / 3;                /* 跨两行，底部与右侧输入栏齐平 */
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(80,120,200,0.08);
+  padding: 12px 10px;
+  overflow-y: auto;                /* 独立滚动 */
+  height: 100%;                    /* 占满容器高度 */
+  max-height: none;                /* 不设 70vh，上下齐平由网格行控制 */
+}
+.conversation-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  position: relative; 
+}
+.conversation-sidebar-item:hover { background: rgba(191,200,218,0.18); }
+.conversation-sidebar-item.active { background: rgba(106,140,255,0.18); }
+.conversation-sidebar-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(191,200,218,0.9);
+}
+.conversation-sidebar-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2a3550;
+}
+
+/* 左侧会话未读徽标 */
+.conversation-sidebar-badge {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 12px;
+  background: #ff4d4f;
+  color: #fff;
+  font-size: 12px;
+  line-height: 20px;
+  text-align: center;
+  box-shadow: 0 0 0 2px #fff;
+}
+
+/* 右侧会话栏：仅自身滚动，小滚轮 */
+.conversation-detail-list {
+  grid-column: 2;
+  grid-row: 1;
+  overflow-y: auto;
+  /* 去掉额外底部外边距，防止与输入栏之间出现空白 */
+  margin-bottom: 0;
+  padding-right: 4px;
+  /* 改为撑满第1行高度，避免高度计算误差 */
+  height: 100%;
+  max-height: none;
+}
+
+/* 小滚轮（WebKit 内核） */
+.conversation-detail-list::-webkit-scrollbar,
+.conversation-sidebar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.conversation-detail-list::-webkit-scrollbar-thumb,
+.conversation-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(42,53,80,0.3);
+  border-radius: 6px;
+}
+.conversation-detail-list::-webkit-scrollbar-track,
+.conversation-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* 去掉顶部标题占位 */
+.conversation-detail-title { display: none; }
+.conversation-detail-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #2a3550;
+  margin-bottom: 18px;
+  text-align: center;
+}
+.conversation-detail-msg {
+  background: #f7faff;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  padding: 10px 16px;
+  box-shadow: 0 2px 8px #e5e7eb;
+  color: #23272f;
+  max-width: 78%;
+  word-break: break-all;
+  position: relative;
+}
+.conversation-detail-msgtext {
+  white-space: pre-wrap;   /* 保留换行和空白 */
+  word-break: break-word;  /* 长词换行 */
+}
+.conversation-detail-msg-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.conversation-detail-msg-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(191,200,218,0.9);
+}
+.conversation-detail-msg-nickname {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2a3550;
+}
+.conversation-detail-msg.self {
+  background: linear-gradient(90deg, #e3e8f0 0%, #c9d6ff 100%);
+  margin-left: auto;
+  text-align: right;
+}
+.conversation-detail-msg.self .conversation-detail-msg-meta {
+  justify-content: flex-end;
+}
+.conversation-detail-msg.self .conversation-detail-msg-nickname {
+  text-align: right;
+}
+.conversation-detail-msgtime {
+  font-size: 12px;
+  color: #888;
+  margin-top: 4px;
+}
+
+/* 底部输入区域整体布局：左侧输入容器 + 右侧发送按钮 */
+.conversation-detail-form {
+  grid-column: 2;
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: stretch;             /* 让输入容器可拉伸填满本行高度 */
+  margin-top: 0;
+}
+
+/* 输入容器（与图示一致：浅灰描边圆角） */
+.conversation-inputbox {
+  /* 两行文本最小：输入框两行≈48px + 上下内边距 38px = 86px */
+  /* 最大高度略微加长（可自行再调，如 420px / 460px） */
+  --effective-input-height: clamp(86px, var(--input-height, 120px), 460px);
+  display: flex;
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #e2e5ea;
+  background: #fff;
+  border-radius: 10px;
+  padding: 28px 12px 10px 12px;
+  align-items: stretch;
+  box-sizing: border-box;
+  height: var(--effective-input-height);
+  min-height: 86px;
+  max-height: 460px;
+}
+
+/* 上边界线（可拖拽） */
+.conversation-inputbox-resize {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 12px;
+  border-top: 1px solid #e2e5ea;
+  cursor: ns-resize;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.03), rgba(0,0,0,0));
+}
+
+/* 左上图标按钮（灰色小图标） */
+.icon-btn {
+  position: absolute;
+  top: 6px;
+  width: 22px;
+  height: 22px;
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  opacity: .85;
+  filter: grayscale(100%);
+}
+.icon-btn:hover { opacity: 1; }
+.icon-image {
+  left: 10px;
+  background-image: url("data:image/svg+xml;utf8,<svg width='22' height='22' viewBox='0 0 24 24' fill='%239099a5' xmlns='http://www.w3.org/2000/svg'><path d='M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14h18ZM5 3h14a2 2 0 0 1 2 2v12H3V5a2 2 0 0 1 2-2Zm3.5 6.5A2.5 2.5 0 1 0 6 7a2.5 2.5 0 0 0 2.5 2.5ZM4 18l5.5-7 4 5 2.5-3 4 5H4Z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.icon-video {
+  left: 42px;
+  background-image: url("data:image/svg+xml;utf8,<svg width='22' height='22' viewBox='0 0 24 24' fill='%239099a5' xmlns='http://www.w3.org/2000/svg'><path d='M17 10.5V7a2 2 0 0 0-2-2H5C3.895 5 3 5.895 3 7v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5l4 3v-9l-4 3Z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* 多行输入框（容器内无边框，三行起步，可继续上拉） */
+.conversation-detail-input {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  height: calc(var(--effective-input-height) - 38px);
+  min-height: calc(86px - 38px);   /* 48px → 两行文字区 */
+  max-height: calc(460px - 38px);
+  max-height: none;
+  resize: none;
+  overflow: auto;
+  border: none;
+  outline: none;
+  appearance: none;
+  background: transparent;
+  font-size: 15px;
+  line-height: 20px;
+  padding: 4px 2px;
+  color: #222;
+  box-sizing: border-box; 
+}
+
+/* 输入框滚轮（无色底，普通箭头） */
+.conversation-detail-input::-webkit-scrollbar {
+  width: 10px;
+  cursor: default;
+}
+.conversation-detail-input::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.25);
+  border-radius: 6px;
+  border: 2px solid transparent;
+  cursor: default;
+}
+.conversation-detail-input::-webkit-scrollbar-track {
+  background: transparent;
+  cursor: default;
+}
+.conversation-detail-input {
+  /* 自定义滚动条在部分浏览器中的表现：Chrome/Safari 使用 ::-webkit-scrollbar，Firefox 将退回默认样式 */
+}
+
+/* 按钮 */
+.conversation-detail-sendbtn {
+  height: 40px;
+  padding: 0 24px;
+  border-radius: 8px;
+  background: linear-gradient(90deg,#6a8cff 0%, #8fb6ff 100%);
+  border: 1px solid #6a8cff;
+  color: #fff;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(106,140,255,0.35);
+  transition: background .15s,border-color .15s,box-shadow .15s;
+}
+.conversation-detail-sendbtn:hover {
+  background: linear-gradient(90deg,#5a7cff 0%, #7fa8ff 100%);
+  border-color: #5a7cff;
+  box-shadow: 0 3px 10px rgba(106,140,255,0.45);
+}
+.conversation-detail-sendbtn:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.conversation-detail-uploadbtn {
+  padding: 0 12px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1.5px solid #bfc8da;
+  background: #f7faff;
+  color: #2a3550;
+  font-weight: 600;
+  cursor: pointer;
+}
+.conversation-detail-uploadbtn:hover {
+  background: #eef3ff;
+}
+.conversation-detail-uploadbtn:disabled,
+.conversation-detail-sendbtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 上传进度条 */
+.conversation-detail-uploadprogress {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+}
+.conversation-detail-uploadprogress .bar {
+  height: 6px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #6a8cff, #8fd3f4);
+  transition: width 0.2s ease;
+}
+.conversation-detail-uploadprogress .pct {
+  font-size: 12px;
+  color: #2a3550;
+}
+
+/* 媒体消息样式 */
+.conversation-detail-msgmedia {
+  max-width: 100%;
+  max-height: 360px;
+  border-radius: 8px;
+  display: block;
+}
+.clickable { cursor: pointer; }
+
+/* 撤回消息的样式 */
+.conversation-detail-msg.recalled {
+  background: #f0f2f7;
+  color: #666;
+  font-style: italic;
+}
+
+/* 撤回提示：一行居中小文字（可“重新编辑”+右侧小×） */
+.conversation-detail-recall {
+  width: 100%;
+  display: flex;                
+  justify-content: center;     
+  align-items: center;           
+  gap: 8px;                      
+  color: #9aa1b2;
+  font-size: 12px;
+  line-height: 20px;
+  margin: 8px 0;
+  -webkit-user-select: none;
+  user-select: none;
+  text-align: center;
+}
+.conversation-detail-recall .txt { margin: 0; }
+.conversation-detail-recall .reedit {
+  border: none;
+  background: transparent;
+  color: #6a8cff;
+  font-size: 12px;
+  padding: 0 2px;
+  cursor: pointer;
+}
+.conversation-detail-recall .reedit:hover { text-decoration: underline; }
+.conversation-detail-recall .recall-close {
+  display: inline-flex;          
+  align-items: center;           
+  justify-content: center;        
+  width: 18px;                   
+  height: 18px;
+  padding: 0;                  
+  line-height: 1;               
+  font-size: 12px;          
+  border-radius: 50%;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #9aa1b2;
+  cursor: pointer;
+  vertical-align: middle;
+}
+.conversation-detail-recall .recall-close:hover {
+  color: #6a7080;
+  border-color: #d8dce6;
+}
+
+/* 右键菜单 */
+.msg-context-menu {
+  position: fixed;
+  z-index: 9999;
+  background: #fff;
+  border: 1px solid #d0d7e2;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  padding: 6px 0;
+  min-width: 140px;
+}
+.msg-context-menu button {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  color: #2a3550;
+}
+.msg-context-menu button:hover {
+  background: #eef3ff;
+}
+
+
+/* ����Ԥ����Ƭ��ʽ */
+.pm-blog-preview-card {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border: 1px solid #eee;
+  max-width: 300px;
+  transition: transform 0.2s;
+  text-align: left; /* ȷ����������� */
+}
+
+.pm-blog-preview-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.pm-blog-preview-cover {
+  width: 100%;
+  height: 140px;
+  background: #f5f5f5;
+  overflow: hidden;
+  position: relative;
+}
+
+.pm-blog-preview-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pm-blog-preview-cover-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-size: 1.2rem;
+  background: #eee;
+}
+
+.pm-blog-preview-body {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pm-blog-preview-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.pm-blog-preview-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.pm-blog-preview-actions {
+  margin-top: 6px;
+  text-align: right;
+}
+
+.pm-blog-preview-open {
+  background: #4a90e2;
+  color: #fff;
+  border: none;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.pm-blog-preview-open:hover {
+  background: #357abd;
+}
+
+/* �����Լ�������Ϣ */
+.conversation-detail-msg.self .pm-blog-preview-card {
+  border-color: #d0e1f5;
+}
+

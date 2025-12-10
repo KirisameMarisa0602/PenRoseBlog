@@ -1,0 +1,52 @@
+/* 全局重置与基础样式 */
+html, body, #root {
+	width: 100%;
+	min-height: 100vh;
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	/* background: linear-gradient(135deg, #e3e8f0 0%, #c9d6ff 100%); 移除全局背景，由各页面自行决定 */
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+/* 防止水平滚动条由局部元素引起 */
+body { overflow-x: hidden; }
+
+/* 基础链接/图片行为 */
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; height: auto; display: block; }
+
+/* 全局预留导航栏高度变量 */
+:root {
+	--navH: 15vh;
+}
+
+/* 移除 body 的全局 padding-top，避免强制所有页面下移。
+   各页面应自行处理顶部留白。
+*/
+/* body {
+	padding-top: var(--navH);
+} */
+
+/* 应用整体布局：左侧主内容 + 右侧 AI 辅助栏 */
+.app-layout {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	min-height: 100vh;
+	overflow: visible;
+}
+
+.app-main {
+	min-width: 0;
+	overflow: visible;
+    /* 默认不加 padding，由 MainLayout 或具体页面控制 */
+}
+
+.app-ai-sidebar {
+	position: relative;
+	display: flex;
+	align-items: stretch;
+	width: var(--maid-sidebar-width, 0px);
+	overflow: visible;
+}

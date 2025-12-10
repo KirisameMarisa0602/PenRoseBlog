@@ -1,0 +1,4 @@
+.loading-overlay { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.96); z-index: 9999; }
+.loading-spinner { width: 48px; height: 48px; border: 4px solid rgba(0,0,0,0.1); border-top-color: #7c3aed; border-radius: 50%; animation: loading-spin 1s linear infinite; }
+.loading-text { margin-top: 12px; font-size: 14px; color: #333; }
+@keyframes loading-spin { to { transform: rotate(360deg); } }

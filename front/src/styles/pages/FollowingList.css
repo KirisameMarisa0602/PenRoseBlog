@@ -1,0 +1,27 @@
+.error-text {
+  color: red;
+}
+
+.avatar-link {
+  display: inline-block;
+}
+
+.user-info-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.user-bio {
+  color: #666;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.unfollow-btn {
+  background: #ffa940;
+}

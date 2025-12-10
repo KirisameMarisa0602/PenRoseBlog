@@ -1,0 +1,62 @@
+{
+	"Version": 3,
+	"FileReferences": {
+		"Moc": "小书仙青兔.moc3",
+		"Textures": [
+			"小书仙青兔.4096/texture_00.png",
+			"小书仙青兔.4096/texture_01.png",
+			"小书仙青兔.4096/texture_02.png",
+			"小书仙青兔.4096/texture_03.png",
+			"小书仙青兔.4096/texture_04.png",
+			"小书仙青兔.4096/texture_05.png",
+			"小书仙青兔.4096/texture_06.png"
+		],
+		"Physics": "小书仙青兔.physics3.json",
+		"DisplayInfo": "小书仙青兔.cdi3.json",
+		"Expressions": [
+			{ "Name": "变小", "File": "变小.exp3.json" },
+			{ "Name": "关耳朵", "File": "关耳朵.exp3.json" },
+			{ "Name": "关飘带", "File": "关飘带.exp3.json" },
+			{ "Name": "扇子", "File": "扇子.exp3.json" },
+			
+			{ "Name": "吐舌", "File": "吐舌.exp3.json" },
+			{ "Name": "唱歌", "File": "唱歌.exp3.json" },
+			{ "Name": "看书", "File": "看书.exp3.json" },
+			{ "Name": "看书写字", "File": "看书写字.exp3.json" },
+			{ "Name": "笔的点击按键", "File": "笔的点击按键.exp3.json" },
+			
+			{ "Name": "星星", "File": "星星.exp3.json" },
+			{ "Name": "流汗", "File": "流汗.exp3.json" },
+			{ "Name": "流汗2", "File": "流汗2.exp3.json" },
+			{ "Name": "爱心眼", "File": "爱心眼.exp3.json" },
+			{ "Name": "生气", "File": "生气.exp3.json" },
+			{ "Name": "困困", "File": "困困.exp3.json" },
+			{ "Name": "惊讶", "File": "惊讶.exp3.json" },
+			{ "Name": "哭哭1", "File": "哭哭1.exp3.json" },
+			{ "Name": "哭哭2", "File": "哭哭2.exp3.json" },
+			{ "Name": "脸红", "File": "脸红.exp3.json" },
+			{ "Name": "脸黑", "File": "脸黑.exp3.json" },
+			{ "Name": "钱钱", "File": "钱钱.exp3.json" },
+			{ "Name": "问号", "File": "问号.exp3.json" },
+			{ "Name": "黑眼", "File": "黑眼.exp3.json" }
+		]
+	},
+	"Motions": {
+		"待机动画": [ { "File": "Scene1.motion3.json" } ]
+	},
+	"Groups": [
+		{
+			"Target": "Parameter",
+			"Name": "LipSync",
+			"Ids": []
+		},
+		{
+			"Target": "Parameter",
+			"Name": "EyeBlink",
+			"Ids": [
+				"ParamEyeLOpen",
+				"ParamEyeROpen"
+			]
+		}
+	]
+}

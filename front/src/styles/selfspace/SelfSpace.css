@@ -1,0 +1,421 @@
+.selfspace-page {
+  width: 100%;
+  display: flex;
+  flex-direction: row; /* 左侧手风琴 + 右侧内容并列 */
+  position: relative;
+  /* 页面背景由全局 `index.css` 管理，避免局部覆盖引起左右空白 */
+  /* 顶部导航占位已由全局 `index.css` 的 `padding-top: var(--navH)` 提供 */
+  box-sizing: border-box;
+}
+
+/* 左侧面板：固定在最左侧，宽度 25vw */
+.selfspace-left-panel {
+  /* 固定在视口左侧，始终悬浮在页面左边 */
+  position: fixed;
+  left: 0;
+  top: var(--navH, 15vh); /* 与导航栏高度保持一致，优先使用 --navH */
+  width: 25vw;
+  min-width: 260px;
+  max-width: 420px;
+  height: calc(100vh - var(--navH, 15vh));
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  z-index: 50;
+  overflow: auto; /* 若内容超高则左右侧独立滚动 */
+}
+
+/* 当导航栏收起时，使左侧面板延伸至整页高度（从顶端到页底） */
+.banner-is-hidden .selfspace-left-panel {
+  top: 0; /* 拉到视口顶端 */
+  height: 100vh; /* 占满整个视口高度 */
+}
+
+/* 左侧内部：信息条在上，手风琴占满剩余高度 */
+.selfspace-left-panel-inner {
+  width: 100%;
+  height: 100%;
+  /* 用列方向的弹性布局替代 grid，避免只有一个子节点时高度不足的问题 */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: stretch;
+  gap: 0; /* 信息条与手风琴贴紧 */
+}
+
+/* 手风琴容器填满左侧剩余空间，使第三块能顶到页面下方 */
+.selfspace-left-panel-inner .selfspace-profilepanel-container {
+  display: block;
+  width: 100%;
+  height: auto;
+  flex: 1;       /* 关键：无信息条时也能占满剩余高度 */
+  min-height: 0; /* 允许内部滚动 */
+}
+
+/* 右侧内容区：占据剩余空间 */
+.selfspace-right-panel {
+  /* 给主内容区留出左侧固定面板的空间，避免重叠 */
+  margin-left: 25vw;
+  min-width: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+/* 新增：查看他人主页时，左侧手风琴上方的简要信息条 */
+.selfspace-user-brief {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  margin: 0;        /* 顶到横幅、与手风琴无缝连接 */
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(80,120,200,0.10);
+  position: sticky; /* 仍保持吸顶 */
+  top: 0;
+  z-index: 2;
+}
+.selfspace-user-brief-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(191,200,218,0.6);
+}
+.selfspace-user-brief-info .nick {
+  font-weight: 700;
+  color: #2a3550;
+}
+.selfspace-user-brief-info .uname {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* 右侧文章列表容器 */
+.selfspace-articles-wrap {
+  margin: 0 auto 0 auto;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 18px 0 18px 0;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+  width: 880px;
+  min-height: calc(100vh - var(--navH, 15vh) - 100px); /* 保证下边界刚好贴底 */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+/* 顶部：标题 + 排序按钮（按钮在右侧） */
+.selfspace-articles-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  margin-left: 40px;
+  width: 800px;
+}
+.selfspace-articles-title h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #222;
+}
+
+/* 排序按钮组 */
+.selfspace-sort-group { display: flex; gap: 10px; }
+.selfspace-sort-btn {
+  background: #f3f6fb;
+  border: 1px solid rgba(0,0,0,0.06);
+  color: #334;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.selfspace-sort-btn.active {
+  background: linear-gradient(180deg,#3b65e6,#2f4fd8);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(59,101,230,0.14);
+}
+
+/* 文章列表：改为竖直排列，和首页一致（每条占一行） */
+.selfspace-articles-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: stretch;
+}
+
+/* 文章卡片在 SelfSpace 下占满整行，与 Home 中的竖直列表行为保持一致 */
+.home-article-card.selfspace-article-card {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  width: 100%;
+  min-height: 72px;
+  padding: 0;
+  border-radius: 10px;
+  margin-bottom: 0;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+
+/* 内容区为列布局，footer 保持在底部 */
+.home-article-card.selfspace-article-card .home-article-content {
+  padding: 12px 0 12px 18px;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 72px;
+  box-sizing: border-box;
+}
+
+/* 封面固定大小（右侧封面），和 Home 的视觉风格一致 */
+.home-article-card.selfspace-article-card .home-article-cover {
+  width: 120px;
+  height: 72px;
+  object-fit: cover;
+  flex: 0 0 120px;
+  margin: 8px 12px 8px 0;
+  border-radius: 8px;
+}
+
+/* 确保封面 img 本身不会被全局 img 样式破坏 */
+.home-article-card.selfspace-article-card .home-article-cover img,
+.home-article-card.selfspace-article-card img.home-article-cover {
+  width: 120px;
+  height: 72px;
+  object-fit: cover;
+  display: block;
+}
+
+/* footer 靠底、avatar 固定尺寸，避免刷新时跑位 */
+.home-article-card.selfspace-article-card .home-article-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  color: #666;
+  font-size: 12px;
+}
+
+.home-article-card.selfspace-article-card .home-article-author-avatar {
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+  display: inline-block !important;
+  flex: 0 0 28px !important;
+  border: 1px solid #e6edf6 !important;
+}
+
+/* 内容标题/预览稍作间距调整以适配更宽卡片 */
+.home-article-card.selfspace-article-card .home-article-title {
+  color: #111 !important;
+  font-weight: 900 !important;
+  font-size: 1.08rem !important;
+  margin-bottom: 8px;
+}
+
+/* 个人主页文章预览文本：字号比标题小一号，颜色保持次要 */
+.home-article-card.selfspace-article-card .home-article-preview {
+  font-size: 0.95rem !important;
+  color: #58626f !important;
+  line-height: 1.5;
+  margin-bottom: 0;
+}
+
+/* 保证链接包裹时块级尺寸占满列（若 ArticleCard 被 Link 包裹） */
+.home-article-card.selfspace-article-card a,
+.home-article-card.selfspace-article-card > a {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* 空状态与分页 */
+.selfspace-articles-empty {
+  padding: 48px;
+  text-align: center;
+  color: #8b94a3;
+}
+
+/* 分页：蓝色圆角按钮 + 中间页码 */
+.selfspace-pagination {
+  display: flex;
+  justify-content: center;
+  gap: 32px;               /* 按钮与页码间距更大，参考图示 */
+  align-items: center;
+  margin-top: 10px;
+  margin-bottom: 0;
+}
+
+.selfspace-pagination button {
+  padding: 10px 20px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(180deg,#4c79ff,#3b65e6);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(59,101,230,0.18);
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1;
+  min-width: 92px;        /* 保持按钮宽度一致 */
+  transition: transform .12s ease, box-shadow .12s ease, filter .08s ease;
+}
+
+.selfspace-pagination button:hover {
+  transform: translateY(-3px);
+  filter: brightness(1.03);
+}
+
+.selfspace-pagination button:active {
+  transform: translateY(0);
+}
+
+.selfspace-pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* 中间页码样式 */
+.selfspace-pagination span {
+  font-weight: 900;
+  font-size: 20px;
+  color: #111;
+}
+
+/* 在窄屏下退回为单列（兼容手机） */
+@media (max-width: 900px) {
+  .selfspace-articles-grid { gap: 14px; }
+  .home-article-card.selfspace-article-card .home-article-cover,
+  .home-article-card.selfspace-article-card .home-article-cover img {
+    width: 80px;
+    height: 54px;
+    flex: 0 0 80px;
+    margin-right: 8px;
+  }
+  .selfspace-articles-top { padding: 0 8px; }
+  .selfspace-articles-wrap {
+    width: 98vw;
+    min-width: 0;
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+/* Search Box & Header Row */
+.selfspace-articles-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.selfspace-search-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.selfspace-search-box input {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  width: 200px;
+}
+
+.selfspace-search-box button {
+  padding: 0.5rem 1rem;
+  background-color: #333;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.selfspace-search-box button:hover {
+  background-color: #555;
+}
+
+/* Directory List */
+.selfspace-directory-list {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.selfspace-dir-btn {
+  padding: 0.4rem 0.8rem;
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.selfspace-dir-btn:hover {
+  background-color: #f5f5f5;
+}
+
+.selfspace-dir-btn.active {
+  background-color: #333;
+  color: #fff;
+  border-color: #333;
+}
+
+/* ��ͼ�л���ť�� */
+.selfspace-view-toggle {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.selfspace-toggle-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #888;
+  cursor: pointer;
+  padding: 0.5rem 0;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.selfspace-toggle-btn:hover {
+  color: #555;
+}
+
+.selfspace-toggle-btn.active {
+  color: #333;
+}
+
+.selfspace-toggle-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #ff9a9e 0%, #fad0c4 100%);
+  border-radius: 2px;
+}
+

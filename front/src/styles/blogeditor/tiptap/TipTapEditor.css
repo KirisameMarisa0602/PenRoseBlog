@@ -1,0 +1,634 @@
+/* TipTapEditor 样式优化 */
+.tiptap-editor {
+  border: 1px solid #cbd5e1; /* 加深边框 */
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* 加深阴影 */
+  display: flex;
+  flex-direction: column;
+  /* overflow: hidden;  移除 hidden，防止下拉菜单被裁剪 */
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  position: relative; /* 确保 z-index 生效 */
+}
+
+.tiptap-editor:focus-within {
+  border-color: var(--primary-color, #3b82f6);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.tiptap-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  background: #f1f5f9; /* 加深工具栏背景 */
+  border-bottom: 1px solid #cbd5e1; /* 加深工具栏边框 */
+  flex-wrap: wrap; /* 允许换行，防止下拉菜单被裁剪 */
+  overflow: visible; /* 允许下拉菜单溢出 */
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  border-radius: 12px 12px 0 0;
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+@supports (scrollbar-width: none) {
+  .tiptap-toolbar {
+    scrollbar-width: none;
+  }
+}
+
+.tiptap-toolbar::-webkit-scrollbar {
+  display: none; /* Chrome/Safari 隐藏滚动条 */
+}
+
+.tt-toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  position: relative;
+  background: transparent; /* 移除背景 */
+  padding: 0;
+  border-radius: 0;
+  border: none; /* 移除边框 */
+  flex-shrink: 0; /* 防止被压缩 */
+}
+
+/* 添加分隔线 */
+.tt-toolbar-group:not(:last-child)::after {
+  content: '';
+  display: block;
+  width: 1px;
+  height: 20px;
+  background: #e5e7eb;
+  margin: 0 8px;
+}
+
+.tt-btn {
+  height: 32px; /* 稍微减小高度 */
+  min-width: 32px;
+  padding: 0 6px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.tt-btn:hover:not(:disabled) {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.tt-btn[aria-pressed="true"] {
+  background: #eff6ff;
+  color: #3b82f6;
+}
+
+.tt-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.tt-font-btn {
+  min-width: 60px;
+}
+
+.tt-sep {
+  display: none; /* 隐藏分隔符，使用分组样式代替 */
+}
+
+.tt-grow {
+  flex: 1;
+}
+
+/* Dropdown styles */
+.tt-dropdown {
+  position: relative;
+}
+
+.tt-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px); /* 稍微靠近一点 */
+  left: 0;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); /* 更柔和的阴影 */
+  min-width: 180px; /* 稍微加宽 */
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000; /* 确保在最上层 */
+  animation: slideDown 0.2s ease;
+}
+
+.tt-dropdown-menu button {
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  background: white;
+  color: #374151;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s;
+  font-size: 14px;
+  display: block;
+}
+
+.tt-dropdown-menu button:hover {
+  background: #f3f4f6;
+}
+
+.tt-dropdown-menu button.is-active {
+  background: #eff6ff;
+  color: var(--primary-color, #3b82f6);
+  font-weight: 600;
+}
+
+/* Color picker styles */
+.tt-color-picker {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  min-width: 240px;
+  z-index: 1000;
+  animation: slideDown 0.2s ease;
+}
+
+.tt-color-section {
+  margin-bottom: 16px;
+}
+
+.tt-color-section:last-child {
+  margin-bottom: 0;
+}
+
+.tt-color-section label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.tt-color-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+}
+
+.tt-color-btn {
+  width: 32px;
+  height: 32px;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0;
+}
+
+.tt-color-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.tt-color-btn.tt-color-clear {
+  background: white;
+  border: 2px dashed #d1d5db;
+  color: #6b7280;
+  font-size: 20px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tiptap-wrap {
+  min-height: 400px;
+  max-height: 600px;
+  overflow-y: auto;
+  padding: 24px 32px;
+  background: #ffffff;
+  cursor: text;
+  border-radius: 0 0 12px 12px; /* 底部圆角 */
+}
+
+.tiptap-content {
+  min-height: 350px;
+  outline: none;
+  font-size: 16px;
+  line-height: 1.75;
+  color: #374151;
+}
+
+.tiptap-content p {
+  margin: 0 0 1.2em;
+}
+
+.tiptap-content h1, 
+.tiptap-content h2, 
+.tiptap-content h3 {
+  color: #111827;
+  font-weight: 700;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+
+.tiptap-content h1 { font-size: 2em; }
+.tiptap-content h2 { font-size: 1.5em; }
+.tiptap-content h3 { font-size: 1.25em; }
+
+.tiptap-content ul, 
+.tiptap-content ol {
+  padding-left: 1.5em;
+  margin-bottom: 1.2em;
+}
+
+.tiptap-content li {
+  margin-bottom: 0.5em;
+}
+
+.tiptap-content blockquote {
+  border-left: 4px solid var(--primary-color, #3b82f6);
+  margin: 1.5em 0;
+  padding-left: 1em;
+  font-style: italic;
+  color: #4b5563;
+  background: linear-gradient(to right, #f0f9ff, transparent);
+  padding: 16px 20px;
+  border-radius: 0 8px 8px 0;
+}
+
+.tiptap-content pre {
+  background: #282c34; /* Atom One Dark background */
+  color: #abb2bf;
+  border-radius: 12px;
+  padding: 20px;
+  overflow-x: auto;
+  margin: 1.5em 0;
+  font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+  font-size: 0.9em;
+  line-height: 1.6;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Ensure highlight.js classes are visible in TipTap */
+.hljs-comment,
+.hljs-quote {
+  color: #5c6370;
+  font-style: italic;
+}
+
+.hljs-doctag,
+.hljs-keyword,
+.hljs-formula {
+  color: #c678dd;
+}
+
+.hljs-section,
+.hljs-name,
+.hljs-selector-tag,
+.hljs-deletion,
+.hljs-subst {
+  color: #e06c75;
+}
+
+.hljs-literal {
+  color: #56b6c2;
+}
+
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-attribute,
+.hljs-meta .hljs-string {
+  color: #98c379;
+}
+
+.hljs-attr,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-type,
+.hljs-selector-class,
+.hljs-selector-attr,
+.hljs-selector-pseudo,
+.hljs-number {
+  color: #d19a66;
+}
+
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-meta,
+.hljs-selector-id,
+.hljs-title {
+  color: #61aeee;
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: bold;
+}
+
+.hljs-link {
+  text-decoration: underline;
+}
+
+/* Code copy button */
+.code-copy-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  color: #e5e7eb;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+.code-copy-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.code-copy-btn.copied {
+  background: rgba(16, 185, 129, 0.3);
+  border-color: #10b981;
+  color: #10b981;
+}
+
+.code-copy-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.tiptap-content code {
+  font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+  background: #f3f4f6;
+  padding: 3px 6px;
+  border-radius: 4px;
+  color: #ef4444;
+  font-size: 0.9em;
+  font-weight: 600;
+}
+
+.tiptap-content pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+  font-weight: normal;
+}
+
+.tiptap-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  margin: 1.5em 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+
+.tiptap-content img:hover {
+  transform: scale(1.02);
+}
+
+.tiptap-content a {
+  color: var(--primary-color, #3b82f6);
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.tiptap-content a:hover {
+  color: #2563eb;
+}
+
+/* Highlight colors */
+.tiptap-content mark {
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+/* Text alignment */
+.tiptap-content [style*="text-align: center"] {
+  text-align: center;
+}
+
+.tiptap-content [style*="text-align: right"] {
+  text-align: right;
+}
+
+.tiptap-content [style*="text-align: left"] {
+  text-align: left;
+}
+
+/* Placeholder */
+.tiptap-content p.is-editor-empty:first-child::before {
+  color: #9ca3af;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  font-style: italic;
+}
+
+/* Modal Styles */
+.tt-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  animation: fadeIn 0.2s ease;
+}
+
+.tt-modal {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  animation: slideUp 0.2s ease;
+}
+
+.tt-modal h3 {
+  margin: 0 0 16px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.tt-modal input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.tt-modal input:focus {
+  border-color: var(--primary-color, #3b82f6);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.tt-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.tt-modal-actions button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background: white;
+  color: #374151;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.tt-modal-actions button:hover {
+  background: #f3f4f6;
+}
+
+.tt-modal-actions button.primary {
+  background: var(--primary-color, #3b82f6);
+  color: white;
+  border-color: var(--primary-color, #3b82f6);
+}
+
+.tt-modal-actions button.primary:hover {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+
+/* Bubble Menu & Floating Menu */
+.tt-bubble-menu,
+.tt-floating-menu {
+  display: flex;
+  background-color: #ffffff;
+  padding: 4px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e5e7eb;
+  gap: 4px;
+}
+
+.tt-bubble-menu button,
+.tt-floating-menu button {
+  border: none;
+  background: none;
+  color: #4b5563;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.tt-bubble-menu button:hover,
+.tt-floating-menu button:hover {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+.tt-bubble-menu button.is-active,
+.tt-floating-menu button.is-active {
+  background-color: #eff6ff;
+  color: var(--primary-color, #3b82f6);
+}
+
+.tt-bubble-menu button svg,
+.tt-floating-menu button svg {
+  width: 16px;
+  height: 16px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .tiptap-toolbar {
+    padding: 8px 10px;
+    gap: 3px;
+  }
+
+  .tt-btn {
+    height: 32px;
+    min-width: 32px;
+    padding: 0 6px;
+  }
+
+  .tt-sep {
+    margin: 0 4px;
+  }
+
+  .tiptap-wrap {
+    padding: 16px 20px;
+  }
+
+  .tt-color-picker {
+    min-width: 200px;
+  }
+
+  .tt-dropdown-menu {
+    min-width: 140px;
+  }
+}

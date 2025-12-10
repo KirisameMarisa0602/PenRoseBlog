@@ -1,0 +1,15 @@
+{
+    "Type": "Live2D Expression",
+    "Parameters": [
+        {
+            "Id": "ParamZHeshan1",
+            "Value": 1.0,
+            "Blend": "Add"
+        },
+        {
+            "Id": "ParamZHeshan2",
+            "Value": 1.0,
+            "Blend": "Add"
+        }
+    ]
+}

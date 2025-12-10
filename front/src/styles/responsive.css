@@ -1,0 +1,102 @@
+/* Global responsive enhancements without altering existing component styles */
+
+/* 1) Fluid design tokens */
+:root {
+  /* Viewport-based scale factor: 1.0 at ~1280px, clamps between 0.9 and 1.1 */
+  --scale: clamp(0.9, 1vw + 0.5, 1.1);
+
+  /* Fluid typography sizes */
+  --font-xs: clamp(10px, 0.75rem * var(--scale), 12px);
+  --font-sm: clamp(12px, 0.875rem * var(--scale), 14px);
+  --font-md: clamp(14px, 1rem * var(--scale), 16px);
+  --font-lg: clamp(16px, 1.125rem * var(--scale), 18px);
+  --font-xl: clamp(18px, 1.25rem * var(--scale), 22px);
+  --font-2xl: clamp(22px, 1.5rem * var(--scale), 26px);
+  --font-3xl: clamp(26px, 2rem * var(--scale), 32px);
+
+  /* Spacing scale (works with existing margins/paddings via utility classes) */
+  --space-1: clamp(4px, 0.25rem * var(--scale), 6px);
+  --space-2: clamp(8px, 0.5rem * var(--scale), 10px);
+  --space-3: clamp(12px, 0.75rem * var(--scale), 14px);
+  --space-4: clamp(16px, 1rem * var(--scale), 18px);
+  --space-5: clamp(20px, 1.25rem * var(--scale), 22px);
+  --space-6: clamp(24px, 1.5rem * var(--scale), 26px);
+
+  /* Container widths */
+  --container-narrow: min(860px, 92vw);
+  --container-regular: min(1100px, 92vw);
+  --container-wide: min(1400px, 95vw);
+}
+
+/* 2) Normalize images and media to be responsive */
+img, svg, video, canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+/* 3) Make text scale more gracefully globally
+   This doesn’t override component-specific font sizes when they set explicit values.
+*/
+html { font-size: 16px; }
+body { font-size: var(--font-md); }
+
+h1 { font-size: var(--font-3xl); }
+h2 { font-size: var(--font-2xl); }
+h3 { font-size: var(--font-xl); }
+h4 { font-size: var(--font-lg); }
+
+/* 4) Utility classes: non-invasive helpers components can adopt optionally */
+.responsive-container { width: 100%; max-width: var(--container-regular); margin: 0 auto; }
+.responsive-container.narrow { max-width: var(--container-narrow); }
+.responsive-container.wide { max-width: var(--container-wide); }
+
+.stack-1 > * + * { margin-top: var(--space-1); }
+.stack-2 > * + * { margin-top: var(--space-2); }
+.stack-3 > * + * { margin-top: var(--space-3); }
+.stack-4 > * + * { margin-top: var(--space-4); }
+
+.pad-2 { padding: var(--space-2); }
+.pad-3 { padding: var(--space-3); }
+.pad-4 { padding: var(--space-4); }
+
+.gap-2 { gap: var(--space-2); }
+.gap-3 { gap: var(--space-3); }
+.gap-4 { gap: var(--space-4); }
+
+/* 5) Layout helpers */
+.grid-auto { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--space-3); }
+
+/* 6) Sensible breakpoints for legacy fixed dimensions */
+@media (max-width: 1200px) {
+  .hide-on-md { display: none !important; }
+  .text-md { font-size: var(--font-md) !important; }
+}
+
+@media (max-width: 992px) {
+  .hide-on-sm { display: none !important; }
+  .text-lg { font-size: var(--font-lg) !important; }
+  .responsive-container { padding-left: var(--space-2); padding-right: var(--space-2); }
+}
+
+@media (max-width: 768px) {
+  .stack-tight > * + * { margin-top: var(--space-2); }
+  .text-base { font-size: var(--font-md) !important; }
+}
+
+@media (max-width: 480px) {
+  .text-sm { font-size: var(--font-sm) !important; }
+  .pad-2 { padding: var(--space-2); }
+}
+
+/* 7) Tables and long content */
+.table-responsive { width: 100%; overflow-x: auto; }
+.table-responsive > table { width: 100%; border-collapse: collapse; }
+
+/* 8) Prevent overflow of long words */
+.wrap-long { overflow-wrap: anywhere; word-break: break-word; }
+
+/* 9) Form elements scaling */
+input, select, textarea, button { font-size: inherit; }
+
+/* 10) Safe area padding for mobile notch */
+.safe-area { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }

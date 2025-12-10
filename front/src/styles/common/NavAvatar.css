@@ -1,0 +1,46 @@
+.nav-avatar {
+    --size: clamp(3vw, 4vw, 5vw);
+    position: relative;
+    width: var(--size);
+    height: var(--size);
+    border-radius: 50%;
+    /*overflow:hidden;*/
+    justify-self: end;
+    align-self: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #eef2f7, #dbe2ea);
+    border: 2px solid rgba(255,255,255,.65);
+    box-shadow: 0 2px 8px rgba(0,0,0,.12);
+    cursor: default;
+    transition-property: box-shadow, transform, width, height;
+    transition-duration: .25s, .25s, 0s, 0s;
+}
+.nav-avatar:active{transform:scale(.94)}
+.nav-avatar[role="button"]{cursor:pointer}
+.nav-avatar__img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;border-radius:50%}
+
+/* 未登录状态 CTA */
+.nav-avatar--guest{background:linear-gradient(135deg,#fdfbfb,#ebedee);border-color:rgba(255,255,255,.8)}
+.nav-avatar__cta{padding:0 .6em;font-size:.62rem;line-height:1.05;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#334;gap:2px;font-weight:600}
+.nav-avatar__cta::before{content:'⇀';font-size:.85rem;opacity:.35}
+.nav-avatar--guest:hover .nav-avatar__cta{color:#111}
+
+/* 无头像占位（随机） */
+.nav-avatar--noavatar{background:linear-gradient(135deg,#eef2f7,#dbe2ea)}
+
+/* 有头像时去除多余背景层次 */
+.nav-avatar--withavatar{background:#ddd}
+
+@media (max-width:520px){
+    .nav-avatar{--size:clamp(30px,6vw,48px)}
+    .nav-avatar__cta{font-size:.54rem}
+}
+
+/* 登录状态下：悬停时轻微放大头像，增加交互感 */
+.nav-avatar.nav-avatar--withavatar:hover,
+.nav-avatar.nav-avatar--noavatar:hover{
+    transform: scale(1.5);
+}
+
