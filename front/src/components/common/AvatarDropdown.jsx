@@ -2,6 +2,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/common/AvatarDropdown.css";
+import resolveUrl from '@utils/resolveUrl';
 
 
 const sexIconMap = {
@@ -37,9 +38,17 @@ export default function AvatarDropdown({ user, onLogout }) {
 
   return (
     <div className="avatar-dropdown">
-      <div className="dropdown-header no-avatar">
-        <span className="dropdown-name">{displayName}</span>
-        <img className="sex-icon" src={sexIcon} alt={user.gender} />
+      <div className="dropdown-header">
+        <img
+          className="dropdown-avatar-img"
+          src={resolveUrl(user.avatar)}
+          alt={displayName}
+          onError={(e) => { e.target.style.display = 'none' }}
+        />
+        <div className="dropdown-user-info">
+          <span className="dropdown-name">{displayName}</span>
+          <img className="sex-icon" src={sexIcon} alt={user.gender} />
+        </div>
       </div>
       <button className="dropdown-btn" onClick={() => navigate('/friends')}>我的好友</button>
       <button className="dropdown-btn" onClick={() => navigate('/follows')}>我的关注</button>

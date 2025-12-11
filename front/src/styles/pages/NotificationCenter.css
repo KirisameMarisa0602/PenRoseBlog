@@ -284,3 +284,126 @@
         right: 1rem;
     }
 }
+
+.notification-page-wrapper {
+    display: flex;
+    max-width: 1200px;
+    margin: 2rem auto;
+    gap: 20px;
+    padding: 0 20px;
+}
+
+.notification-sidebar {
+    width: 250px;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 16px;
+    padding: 20px;
+    height: fit-content;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(20px);
+}
+
+.sidebar-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    padding-left: 10px;
+}
+
+.sidebar-item {
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #555;
+    font-weight: 500;
+}
+
+.sidebar-item:hover {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.sidebar-item.active {
+    background: #e6f7ff;
+    color: #1890ff;
+}
+
+.notification-center-container {
+    flex: 1;
+    margin: 0 !important;
+    min-height: 70vh;
+}
+
+/* Sidebar Layout */
+.notification-layout {
+    display: flex;
+    gap: 20px;
+    max-width: 1200px;
+    margin: 2rem auto;
+    align-items: flex-start;
+}
+
+.notification-sidebar {
+    width: 240px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+    padding: 10px 0;
+    flex-shrink: 0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(10px);
+}
+
+.notification-sidebar-item {
+    padding: 15px 24px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+    color: #555;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.notification-sidebar-item:hover {
+    background: rgba(0, 0, 0, 0.03);
+    color: #333;
+}
+
+.notification-sidebar-item.active {
+    background: #e6f7ff;
+    color: #1890ff;
+    font-weight: 600;
+}
+
+.notification-content-wrapper {
+    flex: 1;
+    min-width: 0; /* Prevent flex overflow */
+}
+
+/* Override container styles when inside layout */
+.notification-layout .notification-center-container {
+    margin: 0;
+    max-width: none;
+    min-height: 70vh;
+}
+
+/* Adjustments for embedded components */
+.notification-content-wrapper .message-list-page,
+.notification-content-wrapper .pf-page {
+    min-height: auto;
+    background: transparent;
+    padding: 0;
+}
+
+.notification-content-wrapper .message-list-container,
+.notification-content-wrapper .pf-container {
+    max-width: none;
+    margin: 0;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 24px;
+    padding: 2.5rem;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}

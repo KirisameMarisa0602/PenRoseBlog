@@ -30,13 +30,6 @@ export default function Welcome() {
   });
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
-  const [showPhoneLogin, setShowPhoneLogin] = useState(false);
-  const [phoneLoginData, setPhoneLoginData] = useState({
-    phoneNumber: '',
-    verificationCode: '',
-  });
-  const [sendingCode, setSendingCode] = useState(false);
-  const [countdown, setCountdown] = useState(0);
 
   useEffect(() => {
     if (!message) return;
@@ -47,12 +40,6 @@ export default function Welcome() {
     return () => clearTimeout(timer);
   }, [message]);
 
-  useEffect(() => {
-    if (countdown > 0) {
-      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [countdown]);
   const genderItems = [
     { key: '男', img: '/imgs/loginandwelcomepanel/1.png' },
     { key: '女', img: '/imgs/loginandwelcomepanel/2.png' },
@@ -179,147 +166,6 @@ export default function Welcome() {
     }
   };
 
-  // QQ登录
-  const handleQQLogin = () => {
-    const qqAppId = import.meta.env.VITE_QQ_APP_ID;
-    if (!qqAppId || qqAppId === 'YOUR_QQ_APP_ID') {
-      setMessage('QQ登录未配置，请联系管理员');
-      setMessageType('error');
-      return;
-    }
-    const redirectUri = encodeURIComponent(window.location.origin + '/auth/qq/callback');
-    const state = Math.random().toString(36).substring(7);
-    localStorage.setItem('oauth_state', state);
-    window.location.href = `https://graph.qq.com/oauth2.0/authorize?response_type=code&client_id=${qqAppId}&redirect_uri=${redirectUri}&state=${state}&scope=get_user_info`;
-  };
-
-  // GitHub登录
-  const handleGitHubLogin = () => {
-    const githubClientId = import.meta.env.VITE_GITHUB_CLIENT_ID;
-    if (!githubClientId || githubClientId === 'YOUR_GITHUB_CLIENT_ID') {
-      setMessage('GitHub登录未配置，请联系管理员');
-      setMessageType('error');
-      return;
-    }
-    const redirectUri = encodeURIComponent(window.location.origin + '/auth/github/callback');
-    const state = Math.random().toString(36).substring(7);
-    localStorage.setItem('oauth_state', state);
-    window.location.href = `https://github.com/login/oauth/authorize?client_id=${githubClientId}&redirect_uri=${redirectUri}&state=${state}&scope=read:user`;
-  };
-
-  // 微信登录
-  const handleWeChatLogin = () => {
-    const wechatAppId = import.meta.env.VITE_WECHAT_APP_ID;
-    if (!wechatAppId || wechatAppId === 'YOUR_WECHAT_APP_ID') {
-      setMessage('微信登录未配置，请联系管理员');
-      setMessageType('error');
-      return;
-    }
-    const redirectUri = encodeURIComponent(window.location.origin + '/auth/wechat/callback');
-    const state = Math.random().toString(36).substring(7);
-    localStorage.setItem('oauth_state', state);
-    window.location.href = `https://open.weixin.qq.com/connect/qrconnect?appid=${wechatAppId}&redirect_uri=${redirectUri}&response_type=code&scope=snsapi_login&state=${state}#wechat_redirect`;
-  };
-
-  // 发送验证码
-  const handleSendVerificationCode = async () => {
-    if (!phoneLoginData.phoneNumber.match(/^1[3-9]\d{9}$/)) {
-      setMessage('请输入正确的手机号');
-      setMessageType('error');
-      return;
-    }
-
-    setSendingCode(true);
-    try {
-      const response = await fetch('/api/auth/verification-code/send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phoneNumber: phoneLoginData.phoneNumber }),
-      });
-      const data = await response.json();
-
-      if (data.code === 200) {
-        setMessage('验证码已发送');
-        setMessageType('success');
-        setCountdown(60);
-      } else {
-        setMessage(data.msg || '发送失败');
-        setMessageType('error');
-      }
-    } catch {
-      setMessage('发送失败');
-      setMessageType('error');
-    } finally {
-      setSendingCode(false);
-    }
-  };
-
-  // 手机号登录
-  const handlePhoneLogin = async () => {
-    if (!phoneLoginData.phoneNumber.match(/^1[3-9]\d{9}$/)) {
-      setMessage('请输入正确的手机号');
-      setMessageType('error');
-      return;
-    }
-    if (!phoneLoginData.verificationCode.match(/^\d{6}$/)) {
-      setMessage('请输入6位验证码');
-      setMessageType('error');
-      return;
-    }
-
-    try {
-      const response = await fetch('/api/auth/phone/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(phoneLoginData),
-      });
-      const res = await response.json();
-
-      setMessage(res.msg);
-      setMessageType(res.code === 200 ? 'success' : 'error');
-
-      if (res.code === 200 && res.data) {
-        let token = res.data;
-        if (typeof token === 'object' && token !== null && token.token) {
-          token = token.token;
-        }
-        localStorage.clear();
-
-        let userId = null;
-        try {
-          const payload = jwtDecode(token);
-          userId = payload.userId || payload.id || payload.sub || null;
-        } catch {
-          // 解析失败
-        }
-
-        let profile = null;
-        if (userId) {
-          try {
-            const profileRes = await fetchUserProfile(userId);
-            profile = profileRes?.data || null;
-          } catch {
-            profile = null;
-          }
-        }
-
-        setAuthState({
-          token,
-          userId,
-          avatarUrl: profile?.avatarUrl,
-          nickname: profile?.nickname,
-          gender: profile?.gender,
-          backgroundUrl: profile?.backgroundUrl,
-        });
-
-        navigate('/home');
-      }
-    } catch {
-      setMessage('登录失败');
-      setMessageType('error');
-    }
-  };
-
   return (
     <div className="container">
       <div className="welcome">
@@ -379,50 +225,6 @@ export default function Welcome() {
               </div>
               <button className="button sumbit" type="submit">Login</button>
             </form>
-            <div className="third-party-login">
-              <p className="divider"><span>或使用第三方登录</span></p>
-              <div className="third-party-buttons">
-                <button type="button" className="qq-login-btn" onClick={handleQQLogin} title="QQ登录">
-                  <img src="/site_assets/icons/sign/qq登陆.svg" alt="QQ" className="icon" />
-                </button>
-                <button type="button" className="wechat-login-btn" onClick={handleWeChatLogin} title="微信登录">
-                  <img src="/site_assets/icons/sign/微信登陆.svg" alt="WeChat" className="icon" />
-                </button>
-                <button type="button" className="github-login-btn" onClick={handleGitHubLogin} title="GitHub登录">
-                  <img src="/site_assets/icons/sign/github登陆.svg" alt="GitHub" className="icon" />
-                </button>
-                <button type="button" className="phone-login-btn" onClick={() => setShowPhoneLogin(!showPhoneLogin)} title="手机验证码登录">
-                  <img src="/site_assets/icons/sign/手机号登陆.svg" alt="Phone" className="icon" />
-                </button>
-              </div>
-            </div>
-            {showPhoneLogin && (
-              <div className="phone-login-panel">
-                <input
-                  type="tel"
-                  placeholder="手机号"
-                  value={phoneLoginData.phoneNumber}
-                  onChange={e => setPhoneLoginData({ ...phoneLoginData, phoneNumber: e.target.value })}
-                />
-                <div className="verification-code-group">
-                  <input
-                    type="text"
-                    placeholder="验证码"
-                    value={phoneLoginData.verificationCode}
-                    onChange={e => setPhoneLoginData({ ...phoneLoginData, verificationCode: e.target.value })}
-                  />
-                  <button
-                    type="button"
-                    className="send-code-btn"
-                    onClick={handleSendVerificationCode}
-                    disabled={sendingCode || countdown > 0}
-                  >
-                    {countdown > 0 ? `${countdown}秒后重试` : sendingCode ? '发送中...' : '发送验证码'}
-                  </button>
-                </div>
-                <button type="button" className="button" onClick={handlePhoneLogin}>手机号登录</button>
-              </div>
-            )}
           </div>
           {message && (
             <p

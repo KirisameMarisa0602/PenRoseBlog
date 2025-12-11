@@ -38,7 +38,8 @@ public class NotificationController {
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestHeader(value = "X-User-Id", required = false) Long headerUserId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) java.util.List<String> types) {
 
         User currentUser = currentUserResolver.resolve(userDetails, headerUserId);
         if (currentUser == null) {
@@ -46,7 +47,13 @@ public class NotificationController {
         }
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<NotificationDTO> notifications = notificationService.getUserNotifications(currentUser.getId(), pageable);
+        org.springframework.data.domain.Page<NotificationDTO> notifications;
+        if (types != null && !types.isEmpty()) {
+            notifications = notificationService.getUserNotifications(currentUser.getId(), types, pageable);
+        } else {
+            notifications = notificationService.getUserNotifications(currentUser.getId(), pageable);
+        }
+
         PageResult<NotificationDTO> result = new PageResult<>(
                 notifications.getContent(),
                 notifications.getTotalElements(),

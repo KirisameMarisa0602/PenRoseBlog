@@ -12,6 +12,7 @@ import '@styles/message/ConversationDetail.css';
 import { useAuthState } from '@hooks/useAuthState';
 import { fetchConversationDetail, fetchConversations } from '@utils/api/messageService';
 import { fetchFriendsList } from '@utils/api/friendService';
+import SimpleEmojiPicker from '@components/common/SimpleEmojiPicker';
 
 // 本地缓存服务
 import {
@@ -88,6 +89,8 @@ export default function CommunicationPage() {
     // 来自 ?text= 的初始文本（用于从文章详情转发）
     const [initialSharedText, setInitialSharedText] = useState('');
     const [initialSharedTextSent, setInitialSharedTextSent] = useState(false);
+
+    const [showEmoji, setShowEmoji] = useState(false);
 
     /** ---------------- 工具方法 ---------------- */
 
@@ -1544,20 +1547,38 @@ export default function CommunicationPage() {
                                     onMouseDown={startResize}
                                 ></div>
 
-                                <button
-                                    type="button"
-                                    className="icon-btn icon-image"
-                                    onClick={onPickImageClick}
-                                    title="发送图片"
-                                    disabled={uploading}
-                                ></button>
-                                <button
-                                    type="button"
-                                    className="icon-btn icon-video"
-                                    onClick={onPickVideoClick}
-                                    title="发送视频"
-                                    disabled={uploading}
-                                ></button>
+                                <div className="conversation-toolbar">
+                                    <button
+                                        type="button"
+                                        className="icon-btn icon-image"
+                                        onClick={onPickImageClick}
+                                        title="发送图片"
+                                        disabled={uploading}
+                                    ></button>
+                                    <button
+                                        type="button"
+                                        className="icon-btn icon-video"
+                                        onClick={onPickVideoClick}
+                                        title="发送视频"
+                                        disabled={uploading}
+                                    ></button>
+                                    <button
+                                        type="button"
+                                        className="icon-btn icon-emoji"
+                                        onClick={() => setShowEmoji(!showEmoji)}
+                                        title="发送表情"
+                                        disabled={uploading}
+                                        style={{ fontSize: '1.2rem', lineHeight: 1, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                    >😊</button>
+                                </div>
+
+                                {showEmoji && (
+                                    <div style={{ position: 'absolute', bottom: '100%', left: '10px', marginBottom: '10px' }}>
+                                        <SimpleEmojiPicker onSelect={(emoji) => {
+                                            setText(prev => prev + emoji);
+                                        }} />
+                                    </div>
+                                )}
 
                                 <textarea
                                     ref={inputRef}
@@ -1568,14 +1589,14 @@ export default function CommunicationPage() {
                                     className="conversation-detail-input"
                                     disabled={uploading}
                                 />
+                                <button
+                                    type="submit"
+                                    className="conversation-detail-sendbtn"
+                                    disabled={uploading}
+                                >
+                                    发送
+                                </button>
                             </div>
-                            <button
-                                type="submit"
-                                className="conversation-detail-sendbtn"
-                                disabled={uploading}
-                            >
-                                发送
-                            </button>
 
                             <input
                                 ref={imageInputRef}

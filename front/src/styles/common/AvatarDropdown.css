@@ -110,3 +110,15 @@
   border-bottom: 1px solid #eee;
   margin-bottom: 2px;
 }
+.dropdown-avatar-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.dropdown-user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

@@ -164,11 +164,7 @@
             <version>2.9.2</version>
         </dependency>
 
-        <!-- OAuth2 Client for third-party login -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-oauth2-client</artifactId>
-        </dependency>
+
 
         <!-- Redis for verification code storage -->
         <dependency>

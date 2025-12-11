@@ -32,6 +32,11 @@ public interface NotificationService {
     Page<NotificationDTO> getUserNotifications(Long userId, Pageable pageable);
 
     /**
+     * 获取用户的通知列表（分页），支持类型筛选
+     */
+    Page<NotificationDTO> getUserNotifications(Long userId, java.util.List<String> types, Pageable pageable);
+
+    /**
      * 获取未读通知数量
      */
     long getUnreadCount(Long userId);

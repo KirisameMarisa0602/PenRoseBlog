@@ -8,7 +8,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding-top: calc(var(--navH) + 20px);
 }
 
 .conversation-detail-container {
@@ -339,15 +338,24 @@
 }
 
 .conversation-detail-sendbtn {
-  padding: 8px 20px;
+  padding: 6px 16px;
+  /* Smaller padding */
   background: #1890ff;
   color: #fff;
   border: none;
-  border-radius: 18px;
+  border-radius: 16px;
+  /* Smaller radius */
   cursor: pointer;
   font-weight: 500;
   transition: background 0.2s;
   white-space: nowrap;
+  font-size: 13px;
+  /* Smaller font */
+  align-self: flex-end;
+  /* Align to bottom right if in flex container */
+  margin-right: 10px;
+  /* Add some margin */
+  margin-bottom: 5px;
 }
 
 .conversation-detail-sendbtn:hover {

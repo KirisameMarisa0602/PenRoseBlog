@@ -26,9 +26,14 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)// 跨站请求防护禁用
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/api/public/**", "/files/**", "/sources/**").permitAll()
+                        .requestMatchers("/api/public/**", "/files/**", "/sources/**", "/site_assets/**").permitAll()
                         .requestMatchers("/api/user/login", "/api/user/register").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/blog/posts/**", "/api/comments/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/user/profile/**", "/api/user/*/stats").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/blogpost/**", "/api/blogpost").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/comment/**", "/api/comment-reply/**").permitAll()
+                        .requestMatchers("/api/blogview/**").permitAll()
+                        .requestMatchers("/api/users/search").permitAll()
+                        .requestMatchers("/api/friends/subscribe", "/api/messages/subscribe/**").permitAll() // Allow SSE subscriptions
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

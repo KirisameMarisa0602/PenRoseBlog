@@ -88,14 +88,29 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
   }, [userId]);
 
   // 查看别人主页：组件挂载/切换用户时直接拉取其资料用于展示（背景、头像、昵称等）
+  // 即使是自己 (!hideEditPanel)，也应该拉取最新资料以更新 localStorage 和显示
   useEffect(() => {
-    if (!userId || !hideEditPanel) return;
+    if (!userId) return;
+    // 如果是查看别人，或者查看自己（为了刷新数据）
     httpClient.get(`/user/profile/${userId}`)
       .then(res => {
-        if (res?.data?.code === 200 && res.data.data) setProfile(res.data.data);
+        if (res?.data?.code === 200 && res.data.data) {
+          const data = res.data.data;
+          setProfile(data);
+          // 如果是自己，更新 localStorage
+          if (!hideEditPanel && isLoggedIn && String(userId) === String(user?.id)) {
+            if (typeof localStorage !== 'undefined') {
+              if (data.avatarUrl) localStorage.setItem('avatarUrl', data.avatarUrl);
+              if (data.backgroundUrl) localStorage.setItem('backgroundUrl', data.backgroundUrl);
+              if (data.nickname) localStorage.setItem('nickname', data.nickname);
+              if (data.gender) localStorage.setItem('gender', data.gender);
+              window.dispatchEvent(new Event('auth-changed'));
+            }
+          }
+        }
       })
       .catch(() => { });
-  }, [userId, hideEditPanel]);
+  }, [userId, hideEditPanel, isLoggedIn, user]);
 
   // 仅在第四个面板激活时加载用户信息
   useEffect(() => {

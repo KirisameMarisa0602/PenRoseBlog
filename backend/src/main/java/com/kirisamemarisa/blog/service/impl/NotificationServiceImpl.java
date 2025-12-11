@@ -109,6 +109,30 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
+    public Page<NotificationDTO> getUserNotifications(Long userId, java.util.List<String> types, Pageable pageable) {
+        if (types == null || types.isEmpty()) {
+            return getUserNotifications(userId, pageable);
+        }
+        java.util.List<NotificationType> typeEnums = types.stream()
+                .map(t -> {
+                    try {
+                        return NotificationType.valueOf(t);
+                    } catch (IllegalArgumentException e) {
+                        return null;
+                    }
+                })
+                .filter(java.util.Objects::nonNull)
+                .collect(java.util.stream.Collectors.toList());
+
+        if (typeEnums.isEmpty()) {
+            return Page.empty(pageable);
+        }
+
+        Page<Notification> notifications = notificationRepository.findByReceiverIdAndTypeInOrderByCreatedAtDesc(userId, typeEnums, pageable);
+        return notifications.map(this::convertToDTO);
+    }
+
+    @Override
     public Page<NotificationDTO> getUserNotifications(Long userId, Pageable pageable) {
         Page<Notification> notifications = notificationRepository.findByReceiverIdOrderByCreatedAtDesc(userId,
                 pageable);

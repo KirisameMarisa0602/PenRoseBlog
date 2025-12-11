@@ -3,9 +3,13 @@ import httpClient from './httpClient';
 const API_BASE_URL = '/notifications';
 
 export const notificationApi = {
-    getNotifications: async (page = 0, size = 20) => {
+    getNotifications: async (page = 0, size = 20, types = []) => {
+        const params = { page, size };
+        if (types && types.length > 0) {
+            params.types = types.join(',');
+        }
         const response = await httpClient.get(API_BASE_URL, {
-            params: { page, size }
+            params
         });
         return response.data;
     },

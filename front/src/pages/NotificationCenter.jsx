@@ -3,24 +3,44 @@ import { notificationApi } from '../utils/api/notificationApi';
 import { useNavigate } from 'react-router-dom';
 import resolveUrl from '../utils/resolveUrl';
 import '@styles/pages/NotificationCenter.css';
+import MessageList from './MessageList';
+import PendingFriendRequests from './PendingFriendRequests';
 
 export default function NotificationCenter() {
     const [notifications, setNotifications] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
+    const [activeTab, setActiveTab] = useState('ALL');
     const navigate = useNavigate();
 
-    useEffect(() => {
-        loadNotifications(0);
-        markAllRead();
-    }, []);
+    const getTypes = (tab) => {
+        switch (tab) {
+            case 'LIKES': return ['POST_LIKE', 'POST_FAVORITE', 'COMMENT_LIKE', 'REPLY_LIKE'];
+            case 'COMMENTS': return ['POST_COMMENT', 'COMMENT_REPLY'];
+            case 'FOLLOW': return ['FOLLOW', 'UNFOLLOW'];
+            case 'REQUESTS': return ['FRIEND_REQUEST', 'FRIEND_REQUEST_ACCEPTED', 'FRIEND_REQUEST_REJECTED'];
+            default: return [];
+        }
+    };
 
-    const loadNotifications = async (pageNum) => {
+    useEffect(() => {
+        if (activeTab === 'MESSAGES') {
+            return;
+        }
+        setNotifications([]);
+        setPage(0);
+        setHasMore(true);
+        loadNotifications(0, activeTab);
+    }, [activeTab]);
+
+    const loadNotifications = async (pageNum, tab) => {
+        if (loading) return;
+        setLoading(true);
         try {
-            const res = await notificationApi.getNotifications(pageNum, 20);
+            const types = getTypes(tab);
+            const res = await notificationApi.getNotifications(pageNum, 20, types);
             if (res.code === 200) {
-                // Support both PageImpl (content) and PageResult (list)
                 const newNotes = res.data.list || res.data.content || [];
                 if (pageNum === 0) {
                     setNotifications(newNotes);
@@ -28,7 +48,6 @@ export default function NotificationCenter() {
                     setNotifications(prev => [...prev, ...newNotes]);
                 }
 
-                // Calculate hasMore
                 let isLast = false;
                 if (res.data.last !== undefined) {
                     isLast = res.data.last;
@@ -48,10 +67,14 @@ export default function NotificationCenter() {
     const markAllRead = async () => {
         try {
             await notificationApi.markAllAsRead();
-            // Update local storage count if needed
             const userId = localStorage.getItem('userId');
             if (userId) {
                 localStorage.setItem(`notification_unread_count_${userId}`, '0');
+                window.dispatchEvent(new Event('pm-unread-refresh'));
+            }
+            if (activeTab !== 'MESSAGES') {
+                setPage(0);
+                loadNotifications(0, activeTab);
             }
         } catch (error) {
             console.error("Failed to mark all as read", error);
@@ -61,23 +84,22 @@ export default function NotificationCenter() {
     const handleLoadMore = () => {
         const nextPage = page + 1;
         setPage(nextPage);
-        loadNotifications(nextPage);
+        loadNotifications(nextPage, activeTab);
     };
 
     const handleNotificationClick = (note) => {
-        // Navigate based on type
         if (note.type === 'POST_LIKE' || note.type === 'POST_FAVORITE' || note.type === 'POST_COMMENT') {
             navigate(`/post/${note.referenceId}`);
         } else if (note.type === 'COMMENT_REPLY' || note.type === 'COMMENT_LIKE' || note.type === 'REPLY_LIKE') {
-            navigate(`/post/${note.referenceId}`); // Ideally scroll to comment
+            navigate(`/post/${note.referenceId}`);
         } else if (note.type === 'FRIEND_REQUEST') {
-            navigate(`/friends/pending`);
+            // Already in REQUESTS tab or will stay there
         } else if (note.type === 'FOLLOW') {
             navigate(`/selfspace?userId=${note.senderId}`);
         }
     };
 
-    const renderNotificationContent = (note) => {
+    const renderNotificationItem = (note) => {
         let iconSrc = '/site_assets/icons/message/notification.svg';
         let actionText = '';
 
@@ -133,7 +155,7 @@ export default function NotificationCenter() {
         }
 
         return (
-            <div className="notification-item" key={note.requestId || note.id} onClick={() => handleNotificationClick(note)}>
+            <div className={`notification-item ${!note.read ? 'unread' : ''}`} key={note.requestId || note.id} onClick={() => handleNotificationClick(note)}>
                 <div className="notification-avatar">
                     <img src={resolveUrl(note.senderAvatarUrl) || '/imgs/loginandwelcomepanel/1.png'} alt="avatar" onError={(e) => { e.target.onerror = null; e.target.src = '/imgs/loginandwelcomepanel/1.png' }} />
                 </div>
@@ -146,38 +168,67 @@ export default function NotificationCenter() {
                     {note.message && <div className="notification-message">{note.message}</div>}
                 </div>
                 <div className="notification-icon">
-                    <img src={iconSrc} alt="icon" style={{ width: 24, height: 24 }} />
+                    <img src={iconSrc} alt="icon" style={{ width: 24, height: 24 }} onError={(e) => { e.target.style.display = 'none'; }} />
                 </div>
             </div>
         );
     };
 
     return (
-        <div className="notification-center-container">
-            <div className="notification-center-header">
-                <h2>通知中心</h2>
-                <div style={{ display: 'flex', gap: '10px' }}>
-                    <button onClick={() => navigate('/friends/pending')} className="mark-read-btn" style={{ background: '#e6f7ff', color: '#1890ff' }}>
-                        好友申请
-                    </button>
-                    <button onClick={markAllRead} className="mark-read-btn">全部已读</button>
-                </div>
+        <div className="notification-layout">
+            <div className="notification-sidebar">
+                <div className="sidebar-title" style={{padding: '20px 24px', fontSize: '1.2rem', fontWeight: 'bold'}}>通知中心</div>
+                <div className={`notification-sidebar-item ${activeTab === 'ALL' ? 'active' : ''}`} onClick={() => setActiveTab('ALL')}>全部通知</div>
+                <div className={`notification-sidebar-item ${activeTab === 'LIKES' ? 'active' : ''}`} onClick={() => setActiveTab('LIKES')}>赞与收藏</div>
+                <div className={`notification-sidebar-item ${activeTab === 'COMMENTS' ? 'active' : ''}`} onClick={() => setActiveTab('COMMENTS')}>评论与回复</div>
+                <div className={`notification-sidebar-item ${activeTab === 'FOLLOW' ? 'active' : ''}`} onClick={() => setActiveTab('FOLLOW')}>关注通知</div>
+                <div className={`notification-sidebar-item ${activeTab === 'MESSAGES' ? 'active' : ''}`} onClick={() => setActiveTab('MESSAGES')}>好友消息</div>
+                <div className={`notification-sidebar-item ${activeTab === 'REQUESTS' ? 'active' : ''}`} onClick={() => setActiveTab('REQUESTS')}>好友申请</div>
             </div>
-            <div className="notification-list">
-                {notifications.length === 0 && !loading ? (
-                    <div className="no-notifications">
-                        <div className="no-notifications-icon">📭</div>
-                        <div>暂无通知</div>
-                    </div>
+
+            <div className="notification-content-wrapper">
+                {activeTab === 'MESSAGES' ? (
+                    <MessageList />
                 ) : (
-                    notifications.map(renderNotificationContent)
+                    <div className="notification-center-container">
+                        {activeTab === 'REQUESTS' && (
+                            <div style={{marginBottom: '2rem'}}>
+                                <PendingFriendRequests />
+                            </div>
+                        )}
+
+                        <div className="notification-center-header">
+                            <h2>
+                                {activeTab === 'ALL' && '全部通知'}
+                                {activeTab === 'LIKES' && '赞与收藏'}
+                                {activeTab === 'COMMENTS' && '评论与回复'}
+                                {activeTab === 'FOLLOW' && '关注通知'}
+                                {activeTab === 'REQUESTS' && '申请记录'}
+                            </h2>
+                            <button className="mark-read-btn" onClick={markAllRead}>
+                                <img src="/site_assets/icons/message/read.svg" alt="" style={{ width: 16, height: 16 }} onError={(e) => { e.target.style.display = 'none'; }} />
+                                全部已读
+                            </button>
+                        </div>
+
+                        <div className="notification-list">
+                            {notifications.length === 0 && !loading ? (
+                                <div className="no-notifications">
+                                    <div className="no-notifications-icon">📭</div>
+                                    <div>暂无通知</div>
+                                </div>
+                            ) : (
+                                notifications.map(renderNotificationItem)
+                            )}
+                        </div>
+                        {hasMore && notifications.length > 0 && (
+                            <button className="load-more-btn" onClick={handleLoadMore} disabled={loading}>
+                                {loading ? '加载中...' : '加载更多'}
+                            </button>
+                        )}
+                    </div>
                 )}
             </div>
-            {hasMore && notifications.length > 0 && (
-                <button className="load-more-btn" onClick={handleLoadMore} disabled={loading}>
-                    {loading ? '加载中...' : '加载更多'}
-                </button>
-            )}
         </div>
     );
 }
