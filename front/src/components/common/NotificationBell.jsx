@@ -48,7 +48,7 @@ export default function NotificationBell() {
         const tokenParam = token ? `?token=${encodeURIComponent(token)}` : `?token=`;
 
         try {
-            es = new EventSource(`/api/friends/subscribe${tokenParam}`);
+            es = new EventSource(`/api/notifications/subscribe/${userId}${tokenParam}`);
         } catch {
             es = null;
         }

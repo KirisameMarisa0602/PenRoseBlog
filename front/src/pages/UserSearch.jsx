@@ -63,7 +63,6 @@ export default function UserSearch() {
   return (
     <div className="user-search-page">
       <div className="user-search-container">
-        <h2>查找好友</h2>
         <div className="user-search-controls">
           <select value={mode} onChange={e => setMode(e.target.value)}>
             <option value="username">按用户名</option>

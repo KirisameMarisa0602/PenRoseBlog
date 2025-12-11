@@ -13,6 +13,7 @@ public class BlogPreviewDTO {
     private String coverImageUrl;
     private String url;
     private String authorNickname;
+    private String authorAvatarUrl;
     private LocalDateTime createdAt;
 
     public Long getBlogId() {
@@ -53,6 +54,14 @@ public class BlogPreviewDTO {
 
     public void setAuthorNickname(String authorNickname) {
         this.authorNickname = authorNickname;
+    }
+
+    public String getAuthorAvatarUrl() {
+        return authorAvatarUrl;
+    }
+
+    public void setAuthorAvatarUrl(String authorAvatarUrl) {
+        this.authorAvatarUrl = authorAvatarUrl;
     }
 
     public LocalDateTime getCreatedAt() {

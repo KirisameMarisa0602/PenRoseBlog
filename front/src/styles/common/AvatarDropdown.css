@@ -3,10 +3,12 @@
   position: absolute;
   top: 1vh;
   right: -4.2vw;
-  width: 12.5vw !important;
-  height: 20vh !important;
+  width: 14vw !important;
+  min-width: 220px;
+  height: auto !important;
+  max-height: 80vh;
   background: #fff;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
   display: flex;
   flex-direction: column;
   z-index: 9999;
@@ -16,16 +18,29 @@
   justify-content: flex-start;
   border-top: none;
   overflow-y: auto;
+  padding-bottom: 10px;
+  border-radius: 12px;
   /* 隐藏滚动条 */
-  -ms-overflow-style: none; /* IE 10+ */
+  -ms-overflow-style: none;
+  /* IE 10+ */
 }
+
 .avatar-dropdown::-webkit-scrollbar {
   display: none;
 }
+
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px);}
-  to { opacity: 1; transform: translateY(0);}
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
+
 .dropdown-header {
   display: flex;
   align-items: center;
@@ -42,7 +57,7 @@
   object-fit: cover;
   background: #f5f6fa;
   border: 1.5px solid #eaeaea;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .dropdown-userinfo {
@@ -57,32 +72,36 @@
   font-weight: 600;
   font-size: 0.7rem;
   color: #222;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 5vw;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 5vw;
 }
+
 .sex-icon {
   width: 20px;
   height: 20px;
   object-fit: contain;
   margin-top: 2px;
 }
+
 .dropdown-btn {
   background: none;
   border: none;
   color: #333;
-    font-size: 0.8rem;
-    padding: 12px 2vw;
+  font-size: 0.8rem;
+  padding: 12px 2vw;
   text-align: left;
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
   border-radius: 8px;
   margin: 0 1vw;
 }
+
 .dropdown-btn:hover {
   background: #f5f6fa;
 }
+
 .dropdown-header.no-avatar {
   display: flex;
   align-items: center;
@@ -91,4 +110,3 @@
   border-bottom: 1px solid #eee;
   margin-bottom: 2px;
 }
-

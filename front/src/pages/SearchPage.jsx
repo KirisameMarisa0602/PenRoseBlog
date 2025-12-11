@@ -25,7 +25,13 @@ export default function SearchPage() {
 
     // Fetch Articles
     useEffect(() => {
-        if (activeTab !== 'articles' || !executedQuery.trim()) return;
+        if (activeTab !== 'articles') return;
+
+        if (!executedQuery.trim()) {
+            setArticles([]);
+            setHasMore(false);
+            return;
+        }
 
         setLoading(true);
         fetch(`/api/blogpost?keyword=${encodeURIComponent(executedQuery)}&page=${page}&size=10`)

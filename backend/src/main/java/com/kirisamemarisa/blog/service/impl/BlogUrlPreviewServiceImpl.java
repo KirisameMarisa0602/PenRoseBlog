@@ -98,6 +98,10 @@ public class BlogUrlPreviewServiceImpl implements BlogUrlPreviewService {
             } else {
                 dto.setAuthorNickname("");
             }
+            
+            if (profile != null) {
+                dto.setAuthorAvatarUrl(profile.getAvatarUrl());
+            }
         } else {
             dto.setAuthorNickname("");
         }

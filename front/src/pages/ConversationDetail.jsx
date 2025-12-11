@@ -1368,38 +1368,41 @@ export default function ConversationDetail() {
 
                                 <div className="conversation-detail-msgtext">
                                     {/* 文本 / 媒体 */}
-                                    {msg?.type === 'IMAGE' && msg?.mediaUrl ? (
-                                        <img
-                                            className="conversation-detail-msgmedia"
-                                            src={toAbsUrl(msg.mediaUrl)}
-                                            alt="image"
-                                            onError={(ev) => {
-                                                const target = ev.target;
-                                                target.onerror = null;
-                                                target.src = '';
-                                            }}
-                                        />
-                                    ) : msg?.type === 'VIDEO' && msg?.mediaUrl ? (
-                                        <video
-                                            className="conversation-detail-msgmedia"
-                                            src={toAbsUrl(msg.mediaUrl)}
-                                            controls
-                                            preload="metadata"
-                                            playsInline
-                                            controlsList="nodownload"
-                                        />
-                                    ) : (
-                                        msg?.text ||
-                                        (msg?.type === 'IMAGE'
-                                            ? '[图片]'
-                                            : msg?.type === 'VIDEO'
-                                                ? '[视频]'
-                                                : '')
+                                    {!hasPreview && (
+                                        msg?.type === 'IMAGE' && msg?.mediaUrl ? (
+                                            <img
+                                                className="conversation-detail-msgmedia"
+                                                src={toAbsUrl(msg.mediaUrl)}
+                                                alt="image"
+                                                onError={(ev) => {
+                                                    const target = ev.target;
+                                                    target.onerror = null;
+                                                    target.src = '';
+                                                }}
+                                            />
+                                        ) : msg?.type === 'VIDEO' && msg?.mediaUrl ? (
+                                            <video
+                                                className="conversation-detail-msgmedia"
+                                                src={toAbsUrl(msg.mediaUrl)}
+                                                controls
+                                                preload="metadata"
+                                                playsInline
+                                                controlsList="nodownload"
+                                            />
+                                        ) : (
+                                            msg?.text ||
+                                            (msg?.type === 'IMAGE'
+                                                ? '[图片]'
+                                                : msg?.type === 'VIDEO'
+                                                    ? '[视频]'
+                                                    : '')
+                                        )
                                     )}
 
                                     {/* 博客预览卡片 */}
                                     {hasPreview && (
-                                        <div className="pm-blog-preview-card">
+                                        <div className="pm-blog-preview-card clickable"
+                                            onClick={() => navigate(`/post/${msg.blogPreview.blogId}`)}>
                                             <div className="pm-blog-preview-cover">
                                                 {msg.blogPreview.coverImageUrl ? (
                                                     <img
@@ -1418,37 +1421,17 @@ export default function ConversationDetail() {
                                                     {msg.blogPreview.title || '博客'}
                                                 </div>
                                                 <div className="pm-blog-preview-meta">
+                                                    {msg.blogPreview.authorAvatarUrl && (
+                                                        <img
+                                                            src={toAbsUrl(msg.blogPreview.authorAvatarUrl)}
+                                                            className="pm-blog-preview-avatar"
+                                                            alt=""
+                                                            onError={e => { e.target.onerror = null; e.target.src = '/imgs/loginandwelcomepanel/1.png'; }}
+                                                        />
+                                                    )}
                                                     <span className="pm-blog-preview-author">
                                                         {msg.blogPreview.authorNickname || ''}
                                                     </span>
-                                                    {msg.blogPreview.createdAt && (
-                                                        <span className="pm-blog-preview-time">
-                                                            {new Date(msg.blogPreview.createdAt).toLocaleString()}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                <div className="pm-blog-preview-actions">
-                                                    {msg.blogPreview && msg.blogPreview.blogId ? (
-                                                        <button
-                                                            type="button"
-                                                            className="pm-blog-preview-open"
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                navigate(`/post/${msg.blogPreview.blogId}`);
-                                                            }}
-                                                        >
-                                                            查看原文
-                                                        </button>
-                                                    ) : (
-                                                        <a
-                                                            href={msg.blogPreview?.url || '#'}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            onClick={(e) => e.stopPropagation()}
-                                                        >
-                                                            查看原文
-                                                        </a>
-                                                    )}
                                                 </div>
                                             </div>
                                         </div>
@@ -1490,13 +1473,13 @@ export default function ConversationDetail() {
                     onSubmit={handleSend}
                     style={{ ['--input-height']: inputHeight + 'px' }}
                 >
-                    <div className="conversation-inputbox">
-                        <div
-                            className="conversation-inputbox-resize"
-                            title="拖动上边界可加长输入框"
-                            onMouseDown={startResize}
-                        ></div>
+                    <div
+                        className="conversation-inputbox-resize"
+                        title="拖动上边界可加长输入框"
+                        onMouseDown={startResize}
+                    ></div>
 
+                    <div className="conversation-toolbar">
                         <button
                             type="button"
                             className="icon-btn icon-image"
@@ -1511,24 +1494,27 @@ export default function ConversationDetail() {
                             title="发送视频"
                             disabled={uploading}
                         ></button>
-
-                        <textarea
-                            ref={inputRef}
-                            value={text}
-                            onChange={(e) => setText(e.target.value)}
-                            onKeyDown={onInputKeyDown}
-                            placeholder="请输入消息内容..."
-                            className="conversation-detail-input"
-                            disabled={uploading}
-                        />
                     </div>
-                    <button
-                        type="submit"
-                        className="conversation-detail-sendbtn"
+
+                    <textarea
+                        ref={inputRef}
+                        value={text}
+                        onChange={(e) => setText(e.target.value)}
+                        onKeyDown={onInputKeyDown}
+                        placeholder=""
+                        className="conversation-detail-input"
                         disabled={uploading}
-                    >
-                        发送
-                    </button>
+                    />
+
+                    <div className="conversation-actions">
+                        <button
+                            type="submit"
+                            className="conversation-detail-sendbtn"
+                            disabled={uploading}
+                        >
+                            发送
+                        </button>
+                    </div>
 
                     <input
                         ref={imageInputRef}
