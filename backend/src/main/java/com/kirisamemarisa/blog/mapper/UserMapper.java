@@ -15,11 +15,7 @@ public interface UserMapper {
             @Mapping(target = "id", ignore = true),
             @Mapping(target = "username", source = "username"),
             @Mapping(target = "password", source = "password"),
-            @Mapping(target = "gender", source = "gender"),
-            @Mapping(target = "phoneNumber", ignore = true),
-            @Mapping(target = "qqOpenId", ignore = true),
-            @Mapping(target = "wechatUnionId", ignore = true),
-            @Mapping(target = "loginProvider", ignore = true)
+            @Mapping(target = "gender", source = "gender")
     })
     User toUser(UserRegisterDTO dto);
 
@@ -27,11 +23,7 @@ public interface UserMapper {
             @Mapping(target = "id", ignore = true),
             @Mapping(target = "username", source = "username"),
             @Mapping(target = "password", source = "password"),
-            @Mapping(target = "gender", ignore = true),
-            @Mapping(target = "phoneNumber", ignore = true),
-            @Mapping(target = "qqOpenId", ignore = true),
-            @Mapping(target = "wechatUnionId", ignore = true),
-            @Mapping(target = "loginProvider", ignore = true)
+            @Mapping(target = "gender", ignore = true)
     })
     User toUser(UserLoginDTO dto);
 
