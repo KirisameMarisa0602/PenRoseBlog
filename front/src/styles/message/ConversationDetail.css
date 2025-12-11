@@ -172,7 +172,7 @@
   border-radius: 12px;
   display: block;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   background: #f0f0f0;
 }
 
@@ -184,14 +184,14 @@
   border-radius: 12px;
   overflow: hidden;
   background: #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border: 1px solid #eee;
   cursor: pointer;
   transition: box-shadow 0.2s;
 }
 
 .pm-blog-preview-card:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .pm-blog-preview-cover {
@@ -362,17 +362,19 @@
 }
 
 /* Context Menu */
-.msg-context-menu, .sidebar-context-menu {
+.msg-context-menu,
+.sidebar-context-menu {
   position: fixed;
   background: #fff;
   border: 1px solid #eee;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   border-radius: 4px;
   padding: 4px 0;
   z-index: 1000;
 }
 
-.msg-context-menu button, .sidebar-context-menu button {
+.msg-context-menu button,
+.sidebar-context-menu button {
   display: block;
   width: 100%;
   padding: 8px 16px;
@@ -384,7 +386,8 @@
   color: #333;
 }
 
-.msg-context-menu button:hover, .sidebar-context-menu button:hover {
+.msg-context-menu button:hover,
+.sidebar-context-menu button:hover {
   background: #f5f5f5;
 }
 
@@ -433,6 +436,7 @@
   .conversation-detail-container.two-columns {
     grid-template-columns: 1fr;
   }
+
   .conversation-sidebar {
     display: none;
   }
