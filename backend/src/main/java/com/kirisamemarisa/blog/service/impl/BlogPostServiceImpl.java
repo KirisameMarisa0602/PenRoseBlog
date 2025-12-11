@@ -107,6 +107,11 @@ public class BlogPostServiceImpl implements BlogPostService {
         post.setDirectory(dto.getDirectory());
         post.setUser(userOpt.get());
         post.setRepost(false);
+        if (dto.getStatus() != null) {
+            post.setStatus(dto.getStatus());
+        } else {
+            post.setStatus("PUBLISHED");
+        }
         BlogPost saved = blogPostRepository.save(post);
         return new ApiResponse<>(200, "创建成功", saved.getId());
     }
@@ -164,6 +169,9 @@ public class BlogPostServiceImpl implements BlogPostService {
             post.setContent(dto.getContent().trim());
         if (dto.getDirectory() != null)
             post.setDirectory(dto.getDirectory());
+        if (dto.getStatus() != null) {
+            post.setStatus(dto.getStatus());
+        }
         // 支持后续字段扩展
         blogpostMapper.updateEntityFromDTO(dto, post);
         blogPostRepository.save(post);
@@ -307,16 +315,22 @@ public class BlogPostServiceImpl implements BlogPostService {
 
     @Override
     public PageResult<BlogPostDTO> pageList(int page, int size, Long currentUserId) {
-        return search(null, null, null, null, page, size, currentUserId);
+        return search(null, null, null, null, "PUBLISHED", page, size, currentUserId);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public PageResult<BlogPostDTO> search(String keyword, Long userId, String directory, String categoryName, int page,
+    public PageResult<BlogPostDTO> search(String keyword, Long userId, String directory, String categoryName, String status, int page,
             int size,
             Long currentUserId) {
+        
+        String statusFilter = "PUBLISHED";
+        if (userId != null && userId.equals(currentUserId)) {
+            statusFilter = status;
+        }
+
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<BlogPost> blogPage = blogPostRepository.search(keyword, userId, directory, categoryName, pageRequest);
+        Page<BlogPost> blogPage = blogPostRepository.search(keyword, userId, directory, categoryName, statusFilter, pageRequest);
         List<BlogPost> posts = blogPage.getContent();
         // 批量获取所有 userId
         List<Long> userIds = posts.stream()
@@ -396,7 +410,7 @@ public class BlogPostServiceImpl implements BlogPostService {
     @Override
     @Transactional
     public ApiResponse<Long> createWithCover(String title, String content, Long userId, String directory,
-            String categoryName, java.util.List<String> tags,
+            String categoryName, java.util.List<String> tags, String status,
             MultipartFile cover) {
         if (title == null || title.trim().isEmpty())
             return new ApiResponse<>(400, "标题不能为空", null);
@@ -413,6 +427,11 @@ public class BlogPostServiceImpl implements BlogPostService {
         post.setDirectory(directory);
         post.setUser(userOpt.get());
         post.setRepost(false);
+        if (status != null) {
+            post.setStatus(status);
+        } else {
+            post.setStatus("PUBLISHED");
+        }
 
         // Handle Category
         if (categoryName != null && !categoryName.trim().isEmpty()) {
@@ -488,7 +507,7 @@ public class BlogPostServiceImpl implements BlogPostService {
     @Override
     @Transactional
     public ApiResponse<Boolean> updateWithCover(Long id, String content, String directory, String categoryName,
-            java.util.List<String> tags, MultipartFile cover) {
+            java.util.List<String> tags, String status, MultipartFile cover) {
         Optional<BlogPost> opt = blogPostRepository.findById(id);
         if (opt.isEmpty())
             return new ApiResponse<>(404, "博客不存在", false);
@@ -497,6 +516,9 @@ public class BlogPostServiceImpl implements BlogPostService {
             post.setContent(content.trim());
         if (directory != null)
             post.setDirectory(directory);
+        if (status != null) {
+            post.setStatus(status);
+        }
 
         // Handle Category
         if (categoryName != null) {

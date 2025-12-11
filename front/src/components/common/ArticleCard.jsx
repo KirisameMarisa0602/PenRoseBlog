@@ -52,6 +52,22 @@ export default function ArticleCard({ post, className }) {
                     ) : (
                         <div className="article-card-cover-placeholder" />
                     )}
+                    {post.status === 'DRAFT' && (
+                        <div style={{
+                            position: 'absolute',
+                            top: '10px',
+                            right: '10px',
+                            backgroundColor: '#fbbf24',
+                            color: '#fff',
+                            padding: '4px 8px',
+                            borderRadius: '4px',
+                            fontSize: '12px',
+                            fontWeight: 'bold',
+                            zIndex: 10
+                        }}>
+                            草稿
+                        </div>
+                    )}
                 </div>
                 <div className="article-card-info">
                     <h3 className="article-card-title" title={post.title}>{truncateByUnits(post.title, 40)}</h3>

@@ -20,11 +20,13 @@ public interface BlogPostRepository extends JpaRepository<BlogPost, Long> {
                         "(:keyword IS NULL OR :keyword = '' OR b.title LIKE %:keyword% OR t.name LIKE %:keyword%) " +
                         "AND (:userId IS NULL OR b.user.id = :userId) " +
                         "AND (:directory IS NULL OR :directory = '' OR b.directory = :directory) " +
-                        "AND (:categoryName IS NULL OR :categoryName = '' OR c.name = :categoryName)")
+                        "AND (:categoryName IS NULL OR :categoryName = '' OR c.name = :categoryName) " +
+                        "AND (:status IS NULL OR :status = '' OR b.status = :status OR (:status = 'PUBLISHED' AND b.status IS NULL))")
         Page<BlogPost> search(@Param("keyword") String keyword,
                         @Param("userId") Long userId,
                         @Param("directory") String directory,
                         @Param("categoryName") String categoryName,
+                        @Param("status") String status,
                         Pageable pageable);
 
         // 获取用户的所有目录

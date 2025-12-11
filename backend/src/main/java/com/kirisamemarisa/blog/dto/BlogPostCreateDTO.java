@@ -10,6 +10,7 @@ public class BlogPostCreateDTO {
     private String directory;
     private String categoryName;
     private List<String> tags;
+    private String status;
 
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
@@ -31,4 +32,7 @@ public class BlogPostCreateDTO {
 
     public List<String> getTags() { return tags; }
     public void setTags(List<String> tags) { this.tags = tags; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

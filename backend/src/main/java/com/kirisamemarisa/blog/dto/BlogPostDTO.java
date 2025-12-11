@@ -26,6 +26,7 @@ public class BlogPostDTO {
     private String authorAvatarUrl;
     private String categoryName;
     private List<String> tags;
+    private String status;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -71,4 +72,6 @@ public class BlogPostDTO {
     public void setCategoryName(String categoryName) { this.categoryName = categoryName; }
     public List<String> getTags() { return tags; }
     public void setTags(List<String> tags) { this.tags = tags; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

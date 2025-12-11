@@ -9,6 +9,8 @@ services:
       MYSQL_DATABASE: blogdb
     volumes:
       - mysql_data:/var/lib/mysql
+    ports:
+      - "127.0.0.1:3306:3306"
     networks:
       - blog-network
     restart: always

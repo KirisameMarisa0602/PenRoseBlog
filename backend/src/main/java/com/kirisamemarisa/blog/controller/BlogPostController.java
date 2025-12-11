@@ -45,8 +45,9 @@ public class BlogPostController {
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) String directory,
             @RequestParam(required = false) String categoryName,
+            @RequestParam(required = false) String status,
             @RequestParam(required = false) Long currentUserId) {
-        PageResult<BlogPostDTO> result = blogPostService.search(keyword, userId, directory, categoryName, page, size,
+        PageResult<BlogPostDTO> result = blogPostService.search(keyword, userId, directory, categoryName, status, page, size,
                 currentUserId);
         return new ApiResponse<>(200, "获取成功", result);
     }
@@ -119,8 +120,9 @@ public class BlogPostController {
             @RequestParam(value = "directory", required = false) String directory,
             @RequestParam(value = "categoryName", required = false) String categoryName,
             @RequestParam(value = "tags", required = false) java.util.List<String> tags,
+            @RequestParam(value = "status", required = false) String status,
             @RequestParam(value = "cover", required = false) MultipartFile cover) {
-        return blogPostService.createWithCover(title, content, userId, directory, categoryName, tags, cover);
+        return blogPostService.createWithCover(title, content, userId, directory, categoryName, tags, status, cover);
     }
 
     @PutMapping("/{id}/withcover")
@@ -129,8 +131,9 @@ public class BlogPostController {
             @RequestParam(value = "directory", required = false) String directory,
             @RequestParam(value = "categoryName", required = false) String categoryName,
             @RequestParam(value = "tags", required = false) java.util.List<String> tags,
+            @RequestParam(value = "status", required = false) String status,
             @RequestParam(value = "cover", required = false) MultipartFile cover) {
-        return blogPostService.updateWithCover(id, content, directory, categoryName, tags, cover);
+        return blogPostService.updateWithCover(id, content, directory, categoryName, tags, status, cover);
     }
 
     // 新增：删除博客接口

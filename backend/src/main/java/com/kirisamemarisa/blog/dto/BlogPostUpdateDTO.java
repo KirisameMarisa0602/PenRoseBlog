@@ -8,6 +8,7 @@ public class BlogPostUpdateDTO {
     private String directory;
     private String categoryName;
     private List<String> tags;
+    private String status;
 
     public String getCoverImageUrl() { return coverImageUrl; }
     public void setCoverImageUrl(String coverImageUrl) { this.coverImageUrl = coverImageUrl; }
@@ -23,4 +24,7 @@ public class BlogPostUpdateDTO {
 
     public List<String> getTags() { return tags; }
     public void setTags(List<String> tags) { this.tags = tags; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

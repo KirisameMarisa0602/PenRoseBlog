@@ -48,6 +48,9 @@ public class BlogPost {
     @Column(name = "favorite_count", nullable = false)
     private Long favoriteCount = 0L;
 
+    @Column(nullable = false)
+    private String status = "PUBLISHED"; // Default to PUBLISHED for backward compatibility
+
     @Column(name = "repost_count", nullable = false)
     private Integer repostCount = 0;
 
@@ -227,5 +230,13 @@ public class BlogPost {
 
     public void setTags(Set<Tag> tags) {
         this.tags = tags;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

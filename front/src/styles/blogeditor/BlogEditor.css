@@ -1,7 +1,8 @@
 /* BlogEditor 样式优化 */
 .blog-editor-container {
   min-height: 100vh;
-  background-color: #e3e8ee; /* 加深背景色，增加对比度 */
+  background-color: #e3e8ee;
+  /* 加深背景色，增加对比度 */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -18,12 +19,13 @@
   width: 95%;
   margin: 0 auto;
   background: #ffffff;
-  min-height: calc(100vh - 140px); /* 调整最小高度计算 */
+  min-height: calc(100vh - 140px);
+  /* 调整最小高度计算 */
   display: flex;
   flex-direction: column;
   position: relative;
   z-index: 2;
-  
+
   /* Unified Tech Style */
   border-radius: 4px;
   border: 1px solid #cbd5e1;
@@ -41,7 +43,7 @@
     border: none;
     width: 100%;
   }
-  
+
   .blog-editor-container {
     padding-top: 0;
     padding-bottom: 0;
@@ -56,17 +58,21 @@
   font-weight: 700;
   padding: 15px 0;
   border: none;
-  border-bottom: 2px solid #cbd5e1; /* 加深边框 */
+  border-bottom: 2px solid #cbd5e1;
+  /* 加深边框 */
   border-radius: 0;
   margin-bottom: 30px;
-  margin-top: 60px; /* Push down to avoid overlap with Category Wheel */
+  margin-top: 60px;
+  /* Push down to avoid overlap with Category Wheel */
   background: transparent;
   outline: none;
-  color: #1e293b; /* 加深文字颜色 */
+  color: #1e293b;
+  /* 加深文字颜色 */
   transition: border-color 0.3s ease;
   line-height: 1.4;
-  text-align: center; /* 标题居中 */
-  
+  text-align: center;
+  /* 标题居中 */
+
   /* Unified Tech Style */
   font-family: 'Fira Code', 'Consolas', monospace;
   letter-spacing: -0.5px;
@@ -77,7 +83,8 @@
 }
 
 .blog-editor-title-input::placeholder {
-  color: #94a3b8; /* 加深 placeholder */
+  color: #94a3b8;
+  /* 加深 placeholder */
 }
 
 /* 封面区域 */
@@ -117,7 +124,7 @@
   max-height: 300px;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .blog-editor-cover-preview {
@@ -163,13 +170,13 @@
 .blog-editor-meta-input {
   background: #fff;
   border: 1px solid #e5e7eb;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .blog-editor-tags-wrapper {
   background: #fff;
   border: 1px solid #e5e7eb !important;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 /* Tag Input Styles */
@@ -301,8 +308,15 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .blog-editor-tag-chip {
@@ -376,7 +390,7 @@
 
 /* 移除旧的 toolbar 样式，如果不再使用 */
 .blog-editor-toolbar {
-  display: none; 
+  display: none;
 }
 
 .blog-editor-stats {
@@ -389,9 +403,9 @@
   border-radius: 20px;
 }
 
-.blog-editor-stats .over-limit { 
-  color: #ef4444; 
-  font-weight: 600; 
+.blog-editor-stats .over-limit {
+  color: #ef4444;
+  font-weight: 600;
 }
 
 .blog-editor-action-btn {
@@ -565,7 +579,7 @@
   margin-bottom: 30px;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   max-height: 400px;
   display: flex;
   justify-content: center;
@@ -583,7 +597,7 @@
   position: absolute;
   top: 10px;
   right: 10px;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0, 0, 0, 0.6);
   color: white;
   border: none;
   border-radius: 50%;
@@ -607,8 +621,14 @@
   min-height: 400px;
 }
 
-.blog-editor-submit-btn {
+.blog-editor-footer {
+  display: flex;
+  justify-content: flex-end;
   margin-top: 40px;
+  gap: 16px;
+}
+
+.blog-editor-submit-btn {
   padding: 14px 40px;
   background: linear-gradient(135deg, var(--primary-color, #3b82f6), #2563eb);
   color: white;
@@ -618,7 +638,6 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  align-self: flex-end;
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
   display: flex;
   align-items: center;
@@ -637,6 +656,34 @@
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+}
+
+.blog-editor-draft-btn {
+  padding: 14px 30px;
+  background: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #d1d5db;
+  border-radius: 30px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.blog-editor-draft-btn:hover:not(:disabled) {
+  background: #e5e7eb;
+  color: #1f2937;
+  border-color: #9ca3af;
+}
+
+.blog-editor-draft-btn:disabled {
+  background: #f9fafb;
+  color: #d1d5db;
+  border-color: #e5e7eb;
+  cursor: not-allowed;
 }
 
 .blog-editor-submit-btn svg {
@@ -661,7 +708,8 @@
   width: 160px;
   height: 140px;
   z-index: 10;
-  transform: scale(0.7); /* Scale down to be smaller */
+  transform: scale(0.7);
+  /* Scale down to be smaller */
   transform-origin: top left;
 }
 
@@ -677,7 +725,7 @@
     display: flex;
     justify-content: center;
   }
-  
+
   .blog-editor-header {
     padding-left: 0;
   }
@@ -695,16 +743,19 @@
   box-shadow: 8px 8px 0px #6ee7b7;
   font-family: 'Nunito', 'Segoe UI', sans-serif;
 }
+
 .blog-editor-main.layout-moment .blog-editor-title-input {
   font-family: 'Nunito', 'Segoe UI', sans-serif;
   border-bottom: 2px dashed #a7f3d0;
 }
+
 .blog-editor-main.layout-moment .blog-editor-action-btn {
   border-radius: 20px;
   background: #ecfdf5;
   color: #059669;
   border: 1px solid #a7f3d0;
 }
+
 .blog-editor-main.layout-moment .blog-editor-action-btn:hover {
   background: #d1fae5;
 }
@@ -716,11 +767,13 @@
   box-shadow: 0 10px 25px -5px rgba(244, 114, 182, 0.3);
   font-family: 'Merriweather', 'Georgia', serif;
 }
+
 .blog-editor-main.layout-artistic .blog-editor-title-input {
   font-family: 'Merriweather', 'Georgia', serif;
   font-style: italic;
   border-bottom: 1px solid #fbcfe8;
 }
+
 .blog-editor-main.layout-artistic .blog-editor-action-btn {
   background: #fff1f2;
   color: #db2777;
@@ -735,6 +788,7 @@
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   font-family: system-ui, -apple-system, sans-serif;
 }
+
 .blog-editor-main.layout-standard .blog-editor-title-input {
   font-family: system-ui, -apple-system, sans-serif;
 }
@@ -743,13 +797,13 @@
 .blog-editor-main.layout-paper {
   border-radius: 2px;
   border: 1px solid #d1d5db;
-  box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.05);
   background-image: linear-gradient(#f3f4f6 1px, transparent 1px);
   background-size: 100% 2rem;
   font-family: 'Courier New', Courier, monospace;
 }
+
 .blog-editor-main.layout-paper .blog-editor-title-input {
   font-family: 'Courier New', Courier, monospace;
   background: transparent;
 }
-

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import '@styles/blogeditor/BlogEditor.css';
 import httpClient from '@utils/api/httpClient';
 import TipTapEditor from '@components/blogeditor/TipTapEditor';
@@ -31,7 +31,7 @@ const BlogEditor = () => {
   const TITLE_MAX = 80;
   const CONTENT_MIN = 10;
   const TAG_MAX_COUNT = 5;
-  
+
   // 预设分类列表
   const PREDEFINED_CATEGORIES = BLOG_CATEGORIES;
 
@@ -97,6 +97,39 @@ const BlogEditor = () => {
 
   const userId = localStorage.getItem('userId');
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const editId = searchParams.get('id');
+
+  useEffect(() => {
+    if (editId && userId) {
+      httpClient.get(`/blogpost/${editId}?currentUserId=${userId}`)
+        .then(res => {
+          if (res.data && res.data.code === 200) {
+            const post = res.data.data;
+            // Verify ownership
+            if (String(post.userId) !== String(userId)) {
+              alert('无权编辑此文章');
+              navigate('/');
+              return;
+            }
+            setTitle(post.title || '');
+            setContent(post.content || '');
+            setTags(post.tags || []);
+            setCategory(post.categoryName || '');
+            setDirectory(post.directory || '');
+            if (post.coverImageUrl) {
+              setCoverPreview(post.coverImageUrl);
+            }
+            // Default to rich editor for existing posts as they are stored as HTML
+            setEditorMode('rich');
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          alert('加载文章失败');
+        });
+    }
+  }, [editId, userId, navigate]);
 
   // 获取用户已有的目录列表
   useEffect(() => {
@@ -167,8 +200,8 @@ const BlogEditor = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (e, status = 'PUBLISHED') => {
+    if (e && e.preventDefault) e.preventDefault();
     if (!userId) {
       alert('请先登录！');
       return;
@@ -188,7 +221,7 @@ const BlogEditor = () => {
     setSubmitting(true);
     const formData = new FormData();
     formData.append('title', title);
-    
+
     let finalContent = content;
     if (editorMode === 'markdown') {
       try {
@@ -203,36 +236,50 @@ const BlogEditor = () => {
       }
     }
     formData.append('content', finalContent);
-    
-    formData.append('userId', userId);
+
+    if (!editId) {
+      formData.append('userId', userId);
+    }
     if (cover) formData.append('cover', cover);
 
-    // Add tags, category, directory
+    // Add tags, category, directory, status
     tags.forEach(tag => formData.append('tags', tag));
     if (category) formData.append('categoryName', category);
     if (directory) formData.append('directory', directory);
+    formData.append('status', status);
 
     try {
-      const res = await httpClient.post('/blogpost/withcover', formData, {
+      const url = editId ? `/blogpost/${editId}/withcover` : '/blogpost/withcover';
+      const method = editId ? 'put' : 'post';
+
+      const res = await httpClient[method](url, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       if (res && (res.status === 200 || res.data?.code === 200)) {
-        alert('发布成功！');
+        alert(status === 'PUBLISHED' ? (editId ? '更新成功！' : '发布成功！') : '草稿保存成功！');
         try {
           localStorage.removeItem('blog.editor.title');
           localStorage.removeItem('blog.editor.content');
           localStorage.removeItem('blog.editor.tags'); // Clear tags
         } catch { /* ignore */ }
-        setTitle('');
-        setContent('');
-        setTags([]);
-        setCover(null);
-        setCoverPreview(null);
-        navigate('/');
+
+        if (status === 'PUBLISHED') {
+          setTitle('');
+          setContent('');
+          setTags([]);
+          setCover(null);
+          setCoverPreview(null);
+          navigate('/');
+        } else {
+          if (!editId && res.data.data) {
+            navigate(`/blog-edit?id=${res.data.data}`);
+          }
+        }
       } else {
-        alert('发布失败');
+        alert('操作失败');
       }
-    } catch {
+    } catch (e) {
+      console.error(e);
       alert('网络错误');
     } finally {
       setSubmitting(false);
@@ -307,16 +354,16 @@ const BlogEditor = () => {
   }, [previewMode, previewHtml]);
 
   return (
-    <div 
-      className="blog-editor-container" 
-      style={{ 
-        background: currentConfig.bgImage || currentThemeColor 
+    <div
+      className="blog-editor-container"
+      style={{
+        background: currentConfig.bgImage || currentThemeColor
       }}
     >
       <div className={`blog-editor-main layout-${currentLayout}`}>
         {/* Category Wheel Sidebar (Integrated) */}
         <div className="blog-category-sidebar">
-          <CategoryWheel 
+          <CategoryWheel
             categories={PREDEFINED_CATEGORIES}
             selected={category}
             onChange={setCategory}
@@ -325,12 +372,12 @@ const BlogEditor = () => {
 
         {/* Header removed - controls moved below */}
 
-        
+
         {previewMode ? (
           <div className="blog-editor-preview-container" style={{ width: '100%' }}>
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="blog-editor-action-btn blog-editor-preview-btn active"
                 onClick={() => setPreviewMode(false)}
               >
@@ -355,7 +402,7 @@ const BlogEditor = () => {
               required
               className="blog-editor-title-input"
             />
-            
+
             {/* 封面上传区域优化 */}
             <div className="blog-editor-cover-wrapper">
               {!coverPreview ? (
@@ -372,8 +419,8 @@ const BlogEditor = () => {
               ) : (
                 <div className="blog-editor-cover-preview-container">
                   <img src={coverPreview} alt="封面预览" className="blog-editor-cover-preview" />
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     className="blog-editor-cover-remove"
                     onClick={() => {
                       setCover(null);
@@ -389,7 +436,7 @@ const BlogEditor = () => {
 
             {/* Meta Info Inputs */}
             <div className="blog-editor-meta-inputs" style={{ display: 'flex', gap: '16px', marginBottom: '20px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
-              
+
               {/* Tag Input Area */}
               <div className="blog-editor-tags-wrapper" style={{ flex: '2 1 300px', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px', padding: '8px 12px', borderRadius: '8px', border: '1px solid #e5e7eb', minHeight: '46px', alignSelf: 'center' }}>
                 {tags.map(tag => (
@@ -415,20 +462,20 @@ const BlogEditor = () => {
                 )}
               </div>
 
-               <div style={{ flex: '1 1 200px', position: 'relative', alignSelf: 'center' }}>
-                 <input
+              <div style={{ flex: '1 1 200px', position: 'relative', alignSelf: 'center' }}>
+                <input
                   type="text"
                   placeholder="目录/文件夹 (可选)"
                   value={directory}
                   onChange={e => setDirectory(e.target.value)}
                   list="directory-options"
                   className="blog-editor-meta-input"
-                  style={{ 
-                    width: '100%', 
-                    padding: '12px', 
-                    borderRadius: '8px', 
-                    border: '1px solid #e5e7eb', 
-                    outline: 'none', 
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    borderRadius: '8px',
+                    border: '1px solid #e5e7eb',
+                    outline: 'none',
                     transition: 'border-color 0.2s',
                     color: '#1f2937', /* 显式设置深色文字 */
                     backgroundColor: '#ffffff'
@@ -441,43 +488,43 @@ const BlogEditor = () => {
                     <option key={idx} value={dir} />
                   ))}
                 </datalist>
-               </div>
+              </div>
             </div>
 
             {/* Controls Area (Moved from Header) */}
             <div className="blog-editor-controls-area" style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginBottom: '10px' }}>
-                <button
-                  type="button"
-                  className={`blog-editor-action-btn ${editorMode === 'markdown' ? 'active' : ''}`}
-                  onClick={async () => {
-                    if (editorMode === 'markdown') {
-                       // Markdown -> Rich Text (HTML)
-                       try {
-                         // Fix headers missing space (e.g. ##Title -> ## Title)
-                         const fixedContent = (content || '').replace(/(^|\n)(#{1,6})([^\s#])/g, '$1$2 $3');
-                         const html = await marked.parse(fixedContent);
-                         setContent(html);
-                       } catch(e) { console.error(e); }
-                       setEditorMode('rich');
-                    } else {
-                       // Rich Text (HTML) -> Markdown
-                       try {
-                         const md = turndownService.turndown(content);
-                         setContent(md);
-                       } catch(e) { console.error(e); }
-                       setEditorMode('markdown');
-                    }
-                  }}
-                >
-                  {editorMode === 'rich' ? 'Markdown模式' : '富文本模式'}
-                </button>
-                <button 
-                  type="button" 
-                  className={`blog-editor-action-btn blog-editor-preview-btn ${previewMode ? 'active' : ''}`}
-                  onClick={() => setPreviewMode(!previewMode)}
-                >
-                  {previewMode ? '返回编辑' : '预览文章'}
-                </button>
+              <button
+                type="button"
+                className={`blog-editor-action-btn ${editorMode === 'markdown' ? 'active' : ''}`}
+                onClick={async () => {
+                  if (editorMode === 'markdown') {
+                    // Markdown -> Rich Text (HTML)
+                    try {
+                      // Fix headers missing space (e.g. ##Title -> ## Title)
+                      const fixedContent = (content || '').replace(/(^|\n)(#{1,6})([^\s#])/g, '$1$2 $3');
+                      const html = await marked.parse(fixedContent);
+                      setContent(html);
+                    } catch (e) { console.error(e); }
+                    setEditorMode('rich');
+                  } else {
+                    // Rich Text (HTML) -> Markdown
+                    try {
+                      const md = turndownService.turndown(content);
+                      setContent(md);
+                    } catch (e) { console.error(e); }
+                    setEditorMode('markdown');
+                  }
+                }}
+              >
+                {editorMode === 'rich' ? 'Markdown模式' : '富文本模式'}
+              </button>
+              <button
+                type="button"
+                className={`blog-editor-action-btn blog-editor-preview-btn ${previewMode ? 'active' : ''}`}
+                onClick={() => setPreviewMode(!previewMode)}
+              >
+                {previewMode ? '返回编辑' : '预览文章'}
+              </button>
             </div>
 
             <div className="blog-editor-md-row" style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative' }}>
@@ -486,39 +533,47 @@ const BlogEditor = () => {
               ) : (
                 <MarkdownEditor content={content} onChange={setContent} />
               )}
-              
+
               {/* Word Count Stats - Floating Bottom Right */}
-              <div className="blog-editor-stats-floating" style={{ 
-                  position: 'absolute', 
-                  bottom: '10px', 
-                  right: '20px', 
-                  zIndex: 10, 
-                  background: 'rgba(255,255,255,0.9)', 
-                  padding: '6px 12px', 
-                  borderRadius: '20px', 
-                  fontSize: '12px', 
-                  color: '#64748b',
-                  boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
-                  border: '1px solid #e2e8f0',
-                  display: 'flex',
-                  gap: '12px',
-                  pointerEvents: 'none',
-                  userSelect: 'none'
+              <div className="blog-editor-stats-floating" style={{
+                position: 'absolute',
+                bottom: '10px',
+                right: '20px',
+                zIndex: 10,
+                background: 'rgba(255,255,255,0.9)',
+                padding: '6px 12px',
+                borderRadius: '20px',
+                fontSize: '12px',
+                color: '#64748b',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+                border: '1px solid #e2e8f0',
+                display: 'flex',
+                gap: '12px',
+                pointerEvents: 'none',
+                userSelect: 'none'
               }}>
                 <span className={titleLen > TITLE_MAX ? 'over-limit' : ''}>标题 {titleLen}/{TITLE_MAX}</span>
                 <span>正文 {contentLen} 字</span>
               </div>
             </div>
-            
+
             {/* 底部发布按钮 */}
             <div className="blog-editor-footer">
               <button
                 type="button"
-                className="blog-editor-action-btn blog-editor-submit-btn large"
-                onClick={handleSubmit}
+                className="blog-editor-draft-btn"
+                onClick={(e) => handleSubmit(e, 'DRAFT')}
+                disabled={submitting || !title.trim()}
+              >
+                保存草稿
+              </button>
+              <button
+                type="button"
+                className="blog-editor-submit-btn"
+                onClick={(e) => handleSubmit(e, 'PUBLISHED')}
                 disabled={submitting || !title.trim() || contentLen < CONTENT_MIN || titleLen > TITLE_MAX}
               >
-                {submitting ? '发布中…' : '发布文章'}
+                {submitting ? '发布中…' : (editId ? '更新文章' : '发布文章')}
               </button>
             </div>
           </form>
