@@ -432,7 +432,8 @@ export default function BannerNavbar({ bannerId }) {
         )}
       </div>
       <div className="nav-inner">
-        <div className="nav-brand" aria-label="站点标识">
+        {/* 1. Logo + Home Text */}
+        <div className="nav-brand" aria-label="站点标识" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           <a href="/" className="penrose-logo" aria-label="返回首页" title="返回首页">
             <div className="penrose-scale">
               <div className="penrose-shell">
@@ -460,38 +461,43 @@ export default function BannerNavbar({ bannerId }) {
               </div>
             </div>
           </a>
-        </div>
-        {/* 在 logo 右侧增加“查找好友”按钮（与私信/编辑按钮风格一致） */}
-        <div className="nav-search-cell" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-          <Link to="/users/search" className="nav-edit-blog-btn" style={{ margin: 0 }}>查找用户</Link>
+          <span style={{ fontSize: '12px', color: '#fff', marginTop: '4px', textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>首页</span>
         </div>
 
-        {/* nav-inner 右侧仅保留编辑文章按钮和头像 */}
-        {/* nav-inner 右侧第6格：私信按钮 */}
-        <div className="nav-message-cell" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-          <Link
-            to="/messages"
-            className="nav-edit-blog-btn"
-            style={{ margin: 0 }}
-          >
-            私信
-          </Link>
-          {unreadTotal > 0 && (
-            <span className="nav-badge">{unreadTotal > 99 ? '99+' : unreadTotal}</span>
-          )}
-        </div>
-        {/* nav-inner 右侧第7格：通知铃 与 编辑文章按钮并列 */}
-        <div className="nav-edit-cell">
-          <NotificationBell />
-          <Link
-            to="/blog-edit"
-            className="nav-edit-blog-btn"
-            style={{ marginLeft: 6 }}
-          >
-            发布文章
+        {/* 2. Messages */}
+        <div className="nav-item-cell" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Link to="/messages" className="nav-link-text" style={{ color: '#fff', textDecoration: 'none', fontSize: '16px', fontWeight: '500', textShadow: '0 1px 2px rgba(0,0,0,0.5)', position: 'relative' }}>
+            消息
+            {unreadTotal > 0 && <span className="nav-badge-dot" style={{ position: 'absolute', top: '-2px', right: '-8px', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#ff4d4f' }}></span>}
           </Link>
         </div>
-        {/* nav-inner 右侧第8格：头像 */}
+
+        {/* 3. Favorites */}
+        <div className="nav-item-cell" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Link to="/favorites" className="nav-link-text" style={{ color: '#fff', textDecoration: 'none', fontSize: '16px', fontWeight: '500', textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>我的收藏</Link>
+        </div>
+
+        {/* 4. Search */}
+        <div className="nav-item-cell" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Link to="/search" className="nav-link-text" style={{ color: '#fff', textDecoration: 'none', fontSize: '16px', fontWeight: '500', textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>搜索</Link>
+        </div>
+
+        {/* 5. Notifications */}
+        <div className="nav-item-cell" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Link to="/notifications" className="nav-link-text" style={{ color: '#fff', textDecoration: 'none', fontSize: '16px', fontWeight: '500', textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>系统通知</Link>
+        </div>
+
+        {/* 6. Publish */}
+        <div className="nav-item-cell" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Link to="/blog-edit" className="nav-link-text" style={{ color: '#fff', textDecoration: 'none', fontSize: '16px', fontWeight: '500', textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>发布文章</Link>
+        </div>
+
+        {/* 7. Placeholder */}
+        <div className="nav-item-cell" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span className="nav-link-text" style={{ color: '#fff', opacity: 0.6, cursor: 'default', fontSize: '16px', fontWeight: '500', textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>更多功能</span>
+        </div>
+
+        {/* 8. Avatar */}
         <div className="nav-avatar-cell">
           <NavAvatar isLoggedIn={isLoggedIn} />
         </div>

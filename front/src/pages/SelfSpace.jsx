@@ -28,7 +28,7 @@ export default function SelfSpace() {
       .then(j => {
         if (j && (j.code === 200 || j.status === 200)) setViewProfile(j.data || null);
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [effectiveUserId, isOwner]);
 
   // 文章列表相关
@@ -37,12 +37,6 @@ export default function SelfSpace() {
   const [size] = useState(4); // 每页 4 篇
   const [sortMode, setSortMode] = useState('latest'); // 'latest' | 'hot'
   const currentUserId = myId;
-
-  // 视图模式：'posts' | 'favorites'
-  const [viewMode, setViewMode] = useState('posts');
-  // 收藏分类
-  const [favoriteCategories, setFavoriteCategories] = useState([]);
-  const [selectedFavoriteCategory, setSelectedFavoriteCategory] = useState('');
 
   // 搜索和目录相关
   const [keyword, setKeyword] = useState('');
@@ -67,19 +61,6 @@ export default function SelfSpace() {
       .catch(console.error);
   }, [effectiveUserId]);
 
-  // 获取用户收藏分类
-  useEffect(() => {
-    if (!effectiveUserId || viewMode !== 'favorites') return;
-    fetch(`/api/blogpost/favorites/categories?userId=${effectiveUserId}`)
-      .then(r => r.json())
-      .then(j => {
-        if (j && (j.code === 200 || j.status === 200)) {
-          setFavoriteCategories(j.data || []);
-        }
-      })
-      .catch(console.error);
-  }, [effectiveUserId, viewMode]);
-
   useEffect(() => {
     let mounted = true;
     if (!effectiveUserId) { setPosts([]); setTotalCount(null); setLastFetchedCount(0); return; }
@@ -88,16 +69,10 @@ export default function SelfSpace() {
     const fetchSize = 10000;
     const fetchPage = 0;
 
-    let url;
-    if (viewMode === 'favorites') {
-        url = `/api/blogpost/favorites?userId=${effectiveUserId}&page=0&size=${fetchSize}`;
-        if (selectedFavoriteCategory) url += `&categoryName=${encodeURIComponent(selectedFavoriteCategory)}`;
-    } else {
-        url = `/api/blogpost?userId=${effectiveUserId}&page=${fetchPage}&size=${fetchSize}`;
-        if (currentUserId) url += `&currentUserId=${currentUserId}`;
-        if (keyword) url += `&keyword=${encodeURIComponent(keyword)}`;
-        if (selectedDirectory) url += `&directory=${encodeURIComponent(selectedDirectory)}`;
-    }
+    let url = `/api/blogpost?userId=${effectiveUserId}&page=${fetchPage}&size=${fetchSize}`;
+    if (currentUserId) url += `&currentUserId=${currentUserId}`;
+    if (keyword) url += `&keyword=${encodeURIComponent(keyword)}`;
+    if (selectedDirectory) url += `&directory=${encodeURIComponent(selectedDirectory)}`;
 
     fetch(url)
       .then(r => r.json())
@@ -106,11 +81,9 @@ export default function SelfSpace() {
         if (j && (j.code === 200 || j.status === 200)) {
           let list = j.data && j.data.list ? j.data.list : (j.data || []);
           if (!Array.isArray(list) && Array.isArray(j.data)) list = j.data;
-          
-          if (viewMode === 'posts') {
-             // 只保留当前用户的文章
-             list = list.filter(p => String(p.userId) === String(effectiveUserId));
-          }
+
+          // 只保留当前用户的文章
+          list = list.filter(p => String(p.userId) === String(effectiveUserId));
 
           if (sortMode === 'hot' && list.length) {
             try {
@@ -154,7 +127,7 @@ export default function SelfSpace() {
       });
 
     return () => { mounted = false; };
-  }, [effectiveUserId, page, size, sortMode, currentUserId, keyword, selectedDirectory, viewMode, selectedFavoriteCategory]);
+  }, [effectiveUserId, page, size, sortMode, currentUserId, keyword, selectedDirectory]);
 
   const canPrev = page > 0;
   const canNext = totalCount !== null
@@ -201,29 +174,12 @@ export default function SelfSpace() {
             <div className="selfspace-articles-top">
               <div className="selfspace-articles-header-row">
                 <div className="selfspace-articles-title">
-                  {isOwner ? (
-                    <div className="selfspace-view-toggle">
-                        <button 
-                            className={`selfspace-toggle-btn ${viewMode === 'posts' ? 'active' : ''}`}
-                            onClick={() => { setViewMode('posts'); setPage(0); }}
-                        >
-                            我的文章
-                        </button>
-                        <button 
-                            className={`selfspace-toggle-btn ${viewMode === 'favorites' ? 'active' : ''}`}
-                            onClick={() => { setViewMode('favorites'); setPage(0); }}
-                        >
-                            我的收藏
-                        </button>
-                    </div>
-                  ) : (
-                    <h2>TA 的文章</h2>
-                  )}
+                  <h2>{isOwner ? '我的文章' : 'TA 的文章'}</h2>
                 </div>
                 <form className="selfspace-search-box" onSubmit={handleSearch}>
-                  <input 
-                    type="text" 
-                    placeholder="搜索文章标题或标签..." 
+                  <input
+                    type="text"
+                    placeholder="搜索文章标题或标签..."
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
                   />
@@ -232,16 +188,16 @@ export default function SelfSpace() {
               </div>
 
               {/* 目录/文件夹列表 */}
-              {viewMode === 'posts' && directories.length > 0 && (
+              {directories.length > 0 && (
                 <div className="selfspace-directory-list">
-                  <button 
+                  <button
                     className={`selfspace-dir-btn ${!selectedDirectory ? 'active' : ''}`}
                     onClick={() => { setSelectedDirectory(''); setPage(0); }}
                   >
                     全部
                   </button>
                   {directories.map(dir => (
-                    <button 
+                    <button
                       key={dir}
                       className={`selfspace-dir-btn ${selectedDirectory === dir ? 'active' : ''}`}
                       onClick={() => { setSelectedDirectory(dir); setPage(0); }}
@@ -252,26 +208,7 @@ export default function SelfSpace() {
                 </div>
               )}
 
-              {/* 收藏分类列表 */}
-              {viewMode === 'favorites' && favoriteCategories.length > 0 && (
-                <div className="selfspace-directory-list">
-                  <button 
-                    className={`selfspace-dir-btn ${!selectedFavoriteCategory ? 'active' : ''}`}
-                    onClick={() => { setSelectedFavoriteCategory(''); setPage(0); }}
-                  >
-                    全部
-                  </button>
-                  {favoriteCategories.map(cat => (
-                    <button 
-                      key={cat}
-                      className={`selfspace-dir-btn ${selectedFavoriteCategory === cat ? 'active' : ''}`}
-                      onClick={() => { setSelectedFavoriteCategory(cat); setPage(0); }}
-                    >
-                      {cat}
-                    </button>
-                  ))}
-                </div>
-              )}
+              {/* 收藏分类列表 - 已移除，移至独立页面 */}
 
               <div className="selfspace-sort-group" role="tablist" aria-label="文章排序">
                 <button

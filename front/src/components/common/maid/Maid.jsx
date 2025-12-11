@@ -24,7 +24,7 @@ if (!Live2DModel._tickerRegistered) {
 
 // ensureCubismCoreReady 已通过 utils 引入，移除本地重复定义
 
-export default function Maid({ defaultCollapsed = true }) {
+export default function Maid({ defaultCollapsed = true, onModelLoaded }) {
   const containerRef = useRef(null);
   const appRef = useRef(null);
   const modelRef = useRef(null);
@@ -128,6 +128,12 @@ export default function Maid({ defaultCollapsed = true }) {
     // 修复：确保 app 实例及其 stage 存在
     if (!app || app.destroyed || !app.stage) return;
 
+    // Prevent reloading same model
+    if (modelUrlRef.current === cfgPath && modelRef.current) {
+      if (onModelLoaded) onModelLoaded();
+      return;
+    }
+
     try {
       await ensureCubismCoreReady();
       setStatus('加载模型资源…'); setError('');
@@ -178,6 +184,7 @@ export default function Maid({ defaultCollapsed = true }) {
       enforcerOnRef.current = false; compositeTargetRef.current = new Map();
       try { expJsonCacheRef.current = new Map(); } catch { /* ignore */ }
       await startIdle(modelRef.current);
+      if (onModelLoaded) onModelLoaded();
       setStatus(''); setError('');
       try {
         const { emotionList } = getCategorizedExpressions();
@@ -243,9 +250,12 @@ export default function Maid({ defaultCollapsed = true }) {
 
   // 监听模型配置变化，加载模型
   useEffect(() => {
-    if (appRef.current && !appRef.current.destroyed) {
-      void loadAndShowModel();
-    }
+    const timer = setTimeout(() => {
+      if (appRef.current && !appRef.current.destroyed) {
+        void loadAndShowModel();
+      }
+    }, 200);
+    return () => clearTimeout(timer);
   }, [loadAndShowModel]);
 
   // 面板尺寸、分割比例变动时，调整 renderer 并重新布局模型

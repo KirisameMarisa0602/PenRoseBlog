@@ -101,24 +101,23 @@ async function preloadForPath(fullPath) {
   } catch { /* ignore */ }
 }
 
-export default function Loading() {
+export default function Loading({ onReady }) {
   const location = useLocation();
-  const navigate = useNavigate();
 
   useEffect(() => {
-    const to = location.state?.to || '/';
+    const to = location.pathname + location.search;
     let stopped = false;
     (async () => {
       // 资源加载优先：若预加载先完成则立即进入；否则 5 秒后兜底跳转
       const preloadTask = preloadForPath(to);
       await Promise.race([preloadTask, wait(5000)]);
-      if (!stopped) navigate(to, { replace: true, state: { bypassLoading: true } });
+      if (!stopped && onReady) onReady();
     })();
     return () => { stopped = true; };
-  }, [location.state, navigate]);
+  }, [location, onReady]);
 
   return (
-    <div className="loading-overlay">
+    <div className="loading-overlay" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 9999, background: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
       <div className="loading-spinner" />
       <div className="loading-text">正在加载，请稍候…</div>
     </div>
