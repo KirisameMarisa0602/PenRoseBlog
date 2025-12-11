@@ -27,8 +27,7 @@ public interface OAuth2LoginService {
      */
     LoginResponseDTO loginWithGitHub(String code, String state);
 
-    /**
-     * Handle phone number login
+    /**     * Handle phone number login
      * @param phoneNumber phone number
      * @param verificationCode verification code
      * @return login response with token

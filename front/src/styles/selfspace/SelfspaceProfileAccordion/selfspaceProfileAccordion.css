@@ -49,15 +49,19 @@
   /* Increased opacity for better readability */
   border-radius: 12px;
   height: 100%;
+  width: 100%;
+  /* Ensure full width */
   overflow-y: auto;
 }
 
 .profilepanel-useredit-panel h4 {
-  color: #333;
+  color: #000;
+  /* Darker color */
   margin-top: 0;
   margin-bottom: 20px;
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 700;
+  /* Bolder */
 }
 
 .profilepanel-useredit-form {
@@ -74,8 +78,10 @@
 }
 
 .form-group label {
-  color: #333;
-  font-weight: 600;
+  color: #000;
+  /* Darker color */
+  font-weight: 700;
+  /* Bolder */
   font-size: 14px;
 }
 

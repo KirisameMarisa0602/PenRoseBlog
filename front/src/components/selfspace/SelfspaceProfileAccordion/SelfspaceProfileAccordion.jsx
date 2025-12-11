@@ -323,7 +323,7 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                       />
                     )
                 )}
-                <div className="profilepanel-info-overlay" style={{ position: 'relative', zIndex: 1, padding: '20px', color: '#fff', textShadow: '0 1px 3px rgba(0,0,0,0.8)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                <div className="profilepanel-info-overlay" style={{ position: 'relative', zIndex: 1, padding: '20px', color: '#fff', textShadow: '0 1px 3px rgba(0,0,0,0.8)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', width: '100%' }}>
                   <div className="profile-avatar-large" style={{ width: 80, height: 80, borderRadius: '50%', overflow: 'hidden', marginBottom: 10, border: '2px solid #fff' }}>
                     <img src={resolveUrl(profile.avatarUrl)} alt={profile.nickname} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </div>

@@ -13,6 +13,7 @@
   justify-content: center;
   align-items: center;
 }
+
 .welcome {
   background: #f6f6f6;
   width: 650px;
@@ -22,6 +23,7 @@
   display: flex;
   position: relative;
 }
+
 .pinkbox {
   position: absolute;
   top: -10%;
@@ -37,24 +39,31 @@
   z-index: 2;
   transform: translateX(0%);
 }
+
 .pinkbox.show-register {
   transform: translateX(80%);
 }
+
 .nodisplay {
   display: none;
   transition: all 0.5s ease;
 }
-.leftbox, .rightbox {
+
+.leftbox,
+.rightbox {
   position: absolute;
   width: 50%;
   transition: 1s all ease;
 }
+
 .leftbox {
   left: -2%;
 }
+
 .rightbox {
   right: -2%;
 }
+
 .welcome h1 {
   font-family: "Open Sans", sans-serif;
   text-align: center;
@@ -64,10 +73,12 @@
   font-size: 2em;
   letter-spacing: 8px;
 }
+
 .signup h1 {
   margin-top: 16px;
   font-style: italic;
 }
+
 .title {
   font-family: "Lora", serif;
   color: #8e9aaf;
@@ -78,13 +89,16 @@
   font-weight: 300;
   margin-top: 20%;
 }
+
 .desc {
   margin-top: -8px;
 }
+
 .account {
   margin-top: 45%;
   font-size: 10px;
 }
+
 p {
   font-family: "Open Sans", sans-serif;
   font-size: 0.7em;
@@ -92,9 +106,11 @@ p {
   color: #8e9aaf;
   text-align: center;
 }
+
 span {
   color: #eac7cc;
 }
+
 .flower {
   position: absolute;
   width: 130px;
@@ -103,6 +119,7 @@ span {
   left: 27%;
   opacity: 0.8;
 }
+
 .smaller {
   width: 130px;
   height: 130px;
@@ -110,6 +127,7 @@ span {
   left: 30%;
   opacity: 0.9;
 }
+
 button {
   padding: 12px;
   font-family: "Open Sans", sans-serif;
@@ -121,23 +139,27 @@ button {
   outline: none;
   display: block;
 }
+
 button:hover {
   background: #eac7cc;
   color: #f6f6f6;
   transition: background-color 1s ease-out;
 }
+
 .button {
   margin-top: 3%;
   background: #f6f6f6;
   color: #ce7d88;
   border: solid 1px #eac7cc;
 }
+
 form {
   display: flex;
   align-items: center;
   flex-direction: column;
   padding-top: 7px;
 }
+
 .signup .form-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -150,39 +172,57 @@ form {
   min-height: unset;
 }
 
-.signup .form-fields { position: relative; z-index: 1; }
-.signup .form-gender { justify-self: stretch; align-self: start; width: 100%; margin-top: 8px; display: flex; justify-content: center; }
+.signup .form-fields {
+  position: relative;
+  z-index: 1;
+}
+
+.signup .form-gender {
+  justify-self: stretch;
+  align-self: start;
+  width: 100%;
+  margin-top: 8px;
+  display: flex;
+  justify-content: center;
+}
 
 .signup .form-fields input {
   width: 100%;
   background: transparent;
 }
 
-.signup .form-fields input + input {
+.signup .form-fields input+input {
   margin-top: 10px;
 }
+
 .signup input::placeholder {
   font-style: italic;
   font-family: "Open Sans", "KaiTi", "STKaiti", "Kaiti SC", serif;
 }
+
 .more-padding {
   padding-top: 35px;
 }
+
 .more-padding input {
   padding: 12px;
 }
+
 .more-padding .sumbit {
   margin-top: 45px;
 }
+
 .sumbit {
   margin-top: 25px;
   padding: 12px;
   border-color: #ce7d88;
 }
+
 .sumbit:hover {
   background: #cbc0d3;
   border-color: #bfb1c9;
 }
+
 input {
   background: #eac7cc;
   width: 65%;
@@ -192,12 +232,14 @@ input {
   padding: 9px;
   font-weight: 100;
 }
+
 input::placeholder {
   color: #f6f6f6;
   letter-spacing: 2px;
   font-size: 1.0em;
   font-weight: 100;
 }
+
 input:focus {
   color: #ce7d88;
   outline: none;
@@ -205,15 +247,18 @@ input:focus {
   font-size: 1.0em;
   transition: 0.8s all ease;
 }
+
 input:focus::placeholder {
   opacity: 0;
 }
+
 label {
   font-family: "Open Sans", sans-serif;
   color: #ce7d88;
   font-size: 0.8em;
   letter-spacing: 1px;
 }
+
 .checkbox {
   display: inline;
   white-space: nowrap;
@@ -221,14 +266,17 @@ label {
   left: -52px;
   top: 25px;
 }
+
 input[type=checkbox] {
   width: 15px;
   background: #ce7d88;
 }
-.checkbox input[type=checkbox]:checked + label {
+
+.checkbox input[type=checkbox]:checked+label {
   color: #ce7d88;
   transition: 0.5s all ease;
 }
+
 .gender-selector {
   width: 90%;
   max-width: 360px;
@@ -258,9 +306,30 @@ input[type=checkbox] {
   padding: 0;
   list-style: none;
 }
-.gender-main li { width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
-.gender-figure { height: 60px; display: flex; align-items: center; justify-content: center; }
-.gender-figure img { max-height: 56px; width: auto; display: block; object-fit: contain; }
+
+.gender-main li {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.gender-figure {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gender-figure img {
+  max-height: 56px;
+  width: auto;
+  display: block;
+  object-fit: contain;
+}
+
 .gender-bottom {
   width: 100%;
   display: grid;
@@ -287,7 +356,12 @@ input[type=checkbox] {
 .gender-item.active {
   filter: none;
 }
-.gender-item.active .gender-btn { background: rgba(234, 199, 204, 0.5); border-radius: 16px; padding: 4px 6px; }
+
+.gender-item.active .gender-btn {
+  background: rgba(234, 199, 204, 0.5);
+  border-radius: 16px;
+  padding: 4px 6px;
+}
 
 .gender-btn {
   background: transparent;
@@ -303,26 +377,37 @@ input[type=checkbox] {
   gap: 4px;
 }
 
-.gender-bottom img { width: 22px; display: block; }
+.gender-bottom img {
+  width: 22px;
+  display: block;
+}
 
 .gender-text {
   font-size: 10px;
   color: #8e9aaf;
 }
+
 .button.submit {
   margin-top: 16px;
 }
+
 .pinkbox {
   transition: background-color 0.35s ease-in-out, transform 0.5s ease-in-out;
 }
-.pinkbox { background-image: none; }
+
+.pinkbox {
+  background-image: none;
+}
 
 @media (max-width: 420px) {
   .signup .form-grid {
     grid-template-columns: 1fr;
     row-gap: 12px;
   }
-  .gender-selector { width: 85%; }
+
+  .gender-selector {
+    width: 85%;
+  }
 }
 
 /* Third-party login styles */
@@ -356,6 +441,7 @@ input[type=checkbox] {
 
 .qq-login-btn,
 .wechat-login-btn,
+.github-login-btn,
 .phone-login-btn {
   width: 50px;
   height: 50px;
@@ -386,6 +472,15 @@ input[type=checkbox] {
 
 .wechat-login-btn:hover {
   background: linear-gradient(135deg, #07c160, #059940);
+  transform: scale(1.1);
+}
+
+.github-login-btn {
+  background: linear-gradient(135deg, #333333, #24292e);
+}
+
+.github-login-btn:hover {
+  background: linear-gradient(135deg, #24292e, #000000);
   transform: scale(1.1);
 }
 

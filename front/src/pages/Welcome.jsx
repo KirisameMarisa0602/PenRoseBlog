@@ -329,9 +329,9 @@ export default function Welcome() {
             <form autoComplete="off" onSubmit={handleRegister}>
               <div className="form-grid">
                 <div className="form-fields">
-                  <input type="text" placeholder="Username" value={registerData.username} onChange={e => setRegisterData({ ...registerData, username: e.target.value })} />
-                  <input type="password" placeholder="Password" value={registerData.password} onChange={e => setRegisterData({ ...registerData, password: e.target.value })} />
-                  <input type="password" placeholder="Confirm Password" value={registerData.confirmPassword} onChange={e => setRegisterData({ ...registerData, confirmPassword: e.target.value })} />
+                  <input type="text" placeholder="Username" value={registerData.username} onChange={e => setRegisterData({ ...registerData, username: e.target.value })} autoComplete="username" />
+                  <input type="password" placeholder="Password" value={registerData.password} onChange={e => setRegisterData({ ...registerData, password: e.target.value })} autoComplete="new-password" />
+                  <input type="password" placeholder="Confirm Password" value={registerData.confirmPassword} onChange={e => setRegisterData({ ...registerData, confirmPassword: e.target.value })} autoComplete="new-password" />
                 </div>
                 <div className="form-gender">
                   <div className="gender-selector" role="group" aria-label="Gender">
@@ -371,8 +371,8 @@ export default function Welcome() {
           <div className={`signin${showRegister ? ' nodisplay' : ''}`}>
             <h1>Sign In</h1>
             <form className="more-padding" autoComplete="off" onSubmit={handleLogin}>
-              <input type="text" placeholder="Username" value={loginData.username} onChange={e => setLoginData({ ...loginData, username: e.target.value })} />
-              <input type="password" placeholder="Password" value={loginData.password} onChange={e => setLoginData({ ...loginData, password: e.target.value })} />
+              <input type="text" placeholder="Username" value={loginData.username} onChange={e => setLoginData({ ...loginData, username: e.target.value })} autoComplete="username" />
+              <input type="password" placeholder="Password" value={loginData.password} onChange={e => setLoginData({ ...loginData, password: e.target.value })} autoComplete="current-password" />
               <div className="checkbox">
                 <input type="checkbox" id="remember" checked={rememberMe} onChange={e => setRememberMe(e.target.checked)} />
                 <label htmlFor="remember">Remember Me</label>
@@ -383,16 +383,16 @@ export default function Welcome() {
               <p className="divider"><span>或使用第三方登录</span></p>
               <div className="third-party-buttons">
                 <button type="button" className="qq-login-btn" onClick={handleQQLogin} title="QQ登录">
-                  <span className="icon">QQ</span>
+                  <img src="/site_assets/icons/sign/qq登陆.svg" alt="QQ" className="icon" />
                 </button>
                 <button type="button" className="wechat-login-btn" onClick={handleWeChatLogin} title="微信登录">
-                  <span className="icon">微信</span>
+                  <img src="/site_assets/icons/sign/微信登陆.svg" alt="WeChat" className="icon" />
                 </button>
                 <button type="button" className="github-login-btn" onClick={handleGitHubLogin} title="GitHub登录">
-                  <span className="icon">GitHub</span>
+                  <img src="/site_assets/icons/sign/github登陆.svg" alt="GitHub" className="icon" />
                 </button>
                 <button type="button" className="phone-login-btn" onClick={() => setShowPhoneLogin(!showPhoneLogin)} title="手机验证码登录">
-                  <span className="icon">📱</span>
+                  <img src="/site_assets/icons/sign/手机号登陆.svg" alt="Phone" className="icon" />
                 </button>
               </div>
             </div>

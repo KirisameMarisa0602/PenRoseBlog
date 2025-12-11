@@ -1330,7 +1330,7 @@ export default function CommunicationPage() {
                         请选择一个好友开始聊天
                     </div>
                 ) : (
-                    <>
+                    <div className="conversation-main-content">
                         <div
                             className="conversation-detail-list"
                             ref={rightScrollRef}
@@ -1605,7 +1605,7 @@ export default function CommunicationPage() {
                                 <span className="pct">{uploadProgress}%</span>
                             </div>
                         )}
-                    </>
+                    </div>
                 )}
             </div>
 

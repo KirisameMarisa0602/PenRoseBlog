@@ -8,7 +8,7 @@ import { useAuthState } from '@hooks/useAuthState';
 import { fetchFriendIds, fetchFollowingIds } from '@utils/api/friendService';
 import resolveUrl from '@utils/resolveUrl';
 
-export default function UserSearch({ embedded = false }) {
+export default function UserSearch({ embedded = false, externalKeyword = '', externalMode = 'nickname', searchTrigger = 0 }) {
   const [mode, setMode] = useState('nickname'); // 默认优先按昵称搜索
   const [keyword, setKeyword] = useState('');
   const [results, setResults] = useState([]);
@@ -19,6 +19,21 @@ export default function UserSearch({ embedded = false }) {
   const { user } = useAuthState();
   const token = typeof localStorage !== 'undefined' ? localStorage.getItem('token') : null;
   const userId = user?.id ? String(user.id) : null;
+
+  // Sync with external props if embedded
+  React.useEffect(() => {
+    if (embedded) {
+      setKeyword(externalKeyword);
+      setMode(externalMode);
+    }
+  }, [embedded, externalKeyword, externalMode]);
+
+  // Trigger search from parent
+  React.useEffect(() => {
+    if (embedded && searchTrigger > 0) {
+      doSearch();
+    }
+  }, [searchTrigger]);
 
   // 简单：每次搜索后顺便刷新一次关系集合
   const refreshRelations = async () => {
@@ -38,6 +53,7 @@ export default function UserSearch({ embedded = false }) {
   };
 
   const doSearch = async () => {
+    // Allow empty keyword check to be handled by UI or allow empty search if API supports it (usually not)
     if (!keyword.trim()) return;
     setLoading(true);
     setError(null);
@@ -63,21 +79,23 @@ export default function UserSearch({ embedded = false }) {
   return (
     <div className={embedded ? "user-search-embedded" : "user-search-page"}>
       <div className={embedded ? "user-search-container-embedded" : "user-search-container"}>
-        <div className="user-search-controls">
-          <select value={mode} onChange={e => setMode(e.target.value)} className="search-select">
-            <option value="username">按用户名</option>
-            <option value="nickname">按昵称</option>
-          </select>
-          <input
-            value={keyword}
-            onChange={e => setKeyword(e.target.value)}
-            placeholder={mode === 'username' ? '输入用户名' : '输入昵称'}
-            className="search-input"
-          />
-          <button onClick={doSearch} disabled={loading} className="search-btn">
-            {loading ? '搜索中...' : '搜索'}
-          </button>
-        </div>
+        {!embedded && (
+          <div className="user-search-controls">
+            <select value={mode} onChange={e => setMode(e.target.value)} className="search-select">
+              <option value="username">按用户名</option>
+              <option value="nickname">按昵称</option>
+            </select>
+            <input
+              value={keyword}
+              onChange={e => setKeyword(e.target.value)}
+              placeholder={mode === 'username' ? '输入用户名' : '输入昵称'}
+              className="search-input"
+            />
+            <button onClick={doSearch} disabled={loading} className="search-btn">
+              {loading ? '搜索中...' : '搜索'}
+            </button>
+          </div>
+        )}
         <ul className="user-search-results">
           {error ? (
             <li className="empty" style={{ color: 'red' }}>{error}</li>

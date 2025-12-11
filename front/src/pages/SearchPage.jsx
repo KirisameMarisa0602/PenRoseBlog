@@ -18,6 +18,11 @@ export default function SearchPage() {
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
 
+    // User search state
+    const [userKeyword, setUserKeyword] = useState('');
+    const [userMode, setUserMode] = useState('nickname');
+    const [userSearchTrigger, setUserSearchTrigger] = useState(0);
+
     // Sync URL with executed query
     useEffect(() => {
         setSearchParams({ tab: activeTab, q: executedQuery });
@@ -56,6 +61,11 @@ export default function SearchPage() {
         setExecutedQuery(keyword);
     };
 
+    const handleUserSearch = (e) => {
+        e.preventDefault();
+        setUserSearchTrigger(t => t + 1);
+    };
+
     return (
         <div className="search-page-container">
             <div className="search-header">
@@ -88,6 +98,30 @@ export default function SearchPage() {
                         </button>
                     </form>
                 )}
+
+                {activeTab === 'users' && (
+                    <form onSubmit={handleUserSearch} className="search-form">
+                        <select
+                            value={userMode}
+                            onChange={e => setUserMode(e.target.value)}
+                            className="search-select"
+                            style={{ marginRight: '10px', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                        >
+                            <option value="username">按用户名</option>
+                            <option value="nickname">按昵称</option>
+                        </select>
+                        <input
+                            type="text"
+                            value={userKeyword}
+                            onChange={(e) => setUserKeyword(e.target.value)}
+                            placeholder={userMode === 'username' ? '输入用户名' : '输入昵称'}
+                            className="search-input"
+                        />
+                        <button type="submit" className="search-btn">
+                            搜索
+                        </button>
+                    </form>
+                )}
             </div>
 
             <div className="search-content">
@@ -110,7 +144,12 @@ export default function SearchPage() {
                 )}
 
                 {activeTab === 'users' && (
-                    <UserSearch embedded={true} />
+                    <UserSearch
+                        embedded={true}
+                        externalKeyword={userKeyword}
+                        externalMode={userMode}
+                        searchTrigger={userSearchTrigger}
+                    />
                 )}
             </div>
         </div>
