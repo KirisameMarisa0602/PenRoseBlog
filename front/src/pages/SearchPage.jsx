@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import ArticleCard from '@components/common/ArticleCard';
 import UserSearch from './UserSearch'; // Reuse existing UserSearch page component
 import '@styles/home/Home.css'; // Reuse Home styles for article list
+import '@styles/pages/SearchPage.css';
 
 export default function SearchPage() {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -50,35 +51,33 @@ export default function SearchPage() {
     };
 
     return (
-        <div className="search-page-container" style={{ paddingTop: '80px', minHeight: '100vh', maxWidth: '1200px', margin: '0 auto', paddingLeft: '20px', paddingRight: '20px' }}>
-            <div className="search-header" style={{ marginBottom: '20px', textAlign: 'center' }}>
-                <div className="search-tabs" style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center', gap: '20px' }}>
+        <div className="search-page-container">
+            <div className="search-header">
+                <div className="search-tabs">
                     <button
                         className={`tab-btn ${activeTab === 'articles' ? 'active' : ''}`}
                         onClick={() => setActiveTab('articles')}
-                        style={{ padding: '10px 20px', fontSize: '16px', borderBottom: activeTab === 'articles' ? '2px solid var(--theme-color)' : 'none', fontWeight: activeTab === 'articles' ? 'bold' : 'normal' }}
                     >
                         文章
                     </button>
                     <button
                         className={`tab-btn ${activeTab === 'users' ? 'active' : ''}`}
                         onClick={() => setActiveTab('users')}
-                        style={{ padding: '10px 20px', fontSize: '16px', borderBottom: activeTab === 'users' ? '2px solid var(--theme-color)' : 'none', fontWeight: activeTab === 'users' ? 'bold' : 'normal' }}
                     >
                         用户
                     </button>
                 </div>
 
                 {activeTab === 'articles' && (
-                    <form onSubmit={handleSearch} style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '30px' }}>
+                    <form onSubmit={handleSearch} className="search-form">
                         <input
                             type="text"
                             value={keyword}
                             onChange={(e) => setKeyword(e.target.value)}
                             placeholder="搜索文章..."
-                            style={{ padding: '10px', width: '300px', borderRadius: '4px', border: '1px solid #ddd' }}
+                            className="search-input"
                         />
-                        <button type="submit" style={{ padding: '10px 20px', backgroundColor: 'var(--theme-color)', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                        <button type="submit" className="search-btn">
                             搜索
                         </button>
                     </form>
@@ -92,11 +91,11 @@ export default function SearchPage() {
                             <ArticleCard key={post.id} post={post} />
                         ))}
                         {articles.length === 0 && !loading && executedQuery && (
-                            <div style={{ textAlign: 'center', color: '#666' }}>未找到相关文章</div>
+                            <div style={{ textAlign: 'center', color: '#666', gridColumn: '1/-1' }}>未找到相关文章</div>
                         )}
                         {hasMore && articles.length > 0 && (
-                            <div style={{ textAlign: 'center', marginTop: '20px' }}>
-                                <button onClick={() => setPage(p => p + 1)} disabled={loading}>
+                            <div style={{ textAlign: 'center', marginTop: '20px', gridColumn: '1/-1' }}>
+                                <button onClick={() => setPage(p => p + 1)} disabled={loading} className="load-more-btn">
                                     {loading ? '加载中...' : '加载更多'}
                                 </button>
                             </div>
@@ -105,10 +104,7 @@ export default function SearchPage() {
                 )}
 
                 {activeTab === 'users' && (
-                    <div className="users-search-wrapper">
-                        {/* We can reuse UserSearch but we might need to adjust it to accept initial keyword or just let it be independent */}
-                        <UserSearch />
-                    </div>
+                    <UserSearch />
                 )}
             </div>
         </div>

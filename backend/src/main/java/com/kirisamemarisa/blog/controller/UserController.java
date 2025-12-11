@@ -7,6 +7,7 @@ import com.kirisamemarisa.blog.dto.ChangePasswordDTO;
 import com.kirisamemarisa.blog.dto.UserLoginDTO;
 import com.kirisamemarisa.blog.dto.UserRegisterDTO;
 import com.kirisamemarisa.blog.dto.UserProfileDTO;
+import com.kirisamemarisa.blog.dto.UserStatsDTO;
 import com.kirisamemarisa.blog.dto.LoginResponseDTO;
 import com.kirisamemarisa.blog.service.UserService;
 import jakarta.validation.Valid;
@@ -104,4 +105,9 @@ public class UserController {
                 : new ApiResponse<>(400, "密码修改失败", null);
     }
 
+    @GetMapping("/{userId}/stats")
+    public ApiResponse<UserStatsDTO> getUserStats(@PathVariable Long userId) {
+        UserStatsDTO stats = userService.getUserStats(userId);
+        return new ApiResponse<>(200, "获取成功", stats);
+    }
 }

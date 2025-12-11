@@ -5,6 +5,7 @@ import com.kirisamemarisa.blog.dto.LoginResponseDTO;
 import com.kirisamemarisa.blog.dto.UserLoginDTO;
 import com.kirisamemarisa.blog.dto.UserRegisterDTO;
 import com.kirisamemarisa.blog.dto.UserProfileDTO;
+import com.kirisamemarisa.blog.dto.UserStatsDTO;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
@@ -17,4 +18,5 @@ public interface UserService {
     String uploadBackground(Long userId, MultipartFile file);
     Long registerAndReturnId(UserRegisterDTO dto);
     boolean changePassword(Long userId, ChangePasswordDTO dto);
+    UserStatsDTO getUserStats(Long userId);
 }

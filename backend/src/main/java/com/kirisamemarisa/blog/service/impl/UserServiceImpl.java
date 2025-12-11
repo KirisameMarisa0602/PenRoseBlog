@@ -16,7 +16,10 @@ import com.kirisamemarisa.blog.model.User;
 import com.kirisamemarisa.blog.model.UserProfile;
 import com.kirisamemarisa.blog.repository.UserRepository;
 import com.kirisamemarisa.blog.repository.UserProfileRepository;
+import com.kirisamemarisa.blog.repository.FollowRepository;
+import com.kirisamemarisa.blog.repository.BlogPostRepository;
 import com.kirisamemarisa.blog.service.UserService;
+import com.kirisamemarisa.blog.dto.UserStatsDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -43,6 +46,10 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
     @Autowired
     private UserProfileMapper userProfileMapper;
+    @Autowired
+    private FollowRepository followRepository;
+    @Autowired
+    private BlogPostRepository blogPostRepository;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -296,5 +303,17 @@ public class UserServiceImpl implements UserService {
         
         logger.info("Password changed successfully for userId={}", userId);
         return true;
+    }
+
+    @Override
+    public UserStatsDTO getUserStats(Long userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return new UserStatsDTO(0, 0, 0);
+        }
+        long following = followRepository.countByFollower(user);
+        long followers = followRepository.countByFollowee(user);
+        long articles = blogPostRepository.countByUserId(userId);
+        return new UserStatsDTO(following, followers, articles);
     }
 }

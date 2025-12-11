@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import '../../styles/common/BannerNavbar.css';
 import '../../styles/common/NavAvatar.css';
+import '../../styles/common/SplitButton.css';
 import NavAvatar from './NavAvatar.jsx';
 import NotificationBell from '@components/common/NotificationBell.jsx';
 import { useAuthState } from '@hooks/useAuthState';
@@ -9,6 +10,21 @@ import ExampleSpring from './examples/ExampleSpring.jsx';
 import ExampleAutumn from './examples/ExampleAutumn.jsx';
 import ExampleWinter from './examples/ExampleWinter.jsx';
 import { Link } from 'react-router-dom';
+
+const SplitNavItem = ({ to, text, badge }) => (
+  <div className="nav-item-cell split-btn-wrapper">
+    <div className="split-btn-top">{text}</div>
+    <div className="split-btn-bottom">{text}</div>
+    {to ? (
+      <Link to={to} className="split-btn-link">
+        {text}
+        {badge > 0 && <span className="nav-badge-dot" style={{ position: 'absolute', top: '-5px', right: '-10px', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#ff4d4f' }}></span>}
+      </Link>
+    ) : (
+      <span className="split-btn-link" style={{ cursor: 'default', color: 'rgba(255,255,255,0.6)' }}>{text}</span>
+    )}
+  </div>
+);
 
 export default function BannerNavbar({ bannerId }) {
   const { isLoggedIn, user } = useAuthState();
@@ -465,37 +481,22 @@ export default function BannerNavbar({ bannerId }) {
         </div>
 
         {/* 2. Messages */}
-        <div className="nav-item-cell" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Link to="/messages" className="nav-link-text" style={{ color: '#fff', textDecoration: 'none', fontSize: '16px', fontWeight: '500', textShadow: '0 1px 2px rgba(0,0,0,0.5)', position: 'relative' }}>
-            消息
-            {unreadTotal > 0 && <span className="nav-badge-dot" style={{ position: 'absolute', top: '-2px', right: '-8px', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#ff4d4f' }}></span>}
-          </Link>
-        </div>
+        <SplitNavItem to="/messages" text="消息" badge={unreadTotal} />
 
         {/* 3. Favorites */}
-        <div className="nav-item-cell" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Link to="/favorites" className="nav-link-text" style={{ color: '#fff', textDecoration: 'none', fontSize: '16px', fontWeight: '500', textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>我的收藏</Link>
-        </div>
+        <SplitNavItem to="/favorites" text="我的收藏" />
 
         {/* 4. Search */}
-        <div className="nav-item-cell" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Link to="/search" className="nav-link-text" style={{ color: '#fff', textDecoration: 'none', fontSize: '16px', fontWeight: '500', textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>搜索</Link>
-        </div>
+        <SplitNavItem to="/search" text="搜索" />
 
         {/* 5. Notifications */}
-        <div className="nav-item-cell" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Link to="/notifications" className="nav-link-text" style={{ color: '#fff', textDecoration: 'none', fontSize: '16px', fontWeight: '500', textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>系统通知</Link>
-        </div>
+        <SplitNavItem to="/notifications" text="系统通知" />
 
         {/* 6. Publish */}
-        <div className="nav-item-cell" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Link to="/blog-edit" className="nav-link-text" style={{ color: '#fff', textDecoration: 'none', fontSize: '16px', fontWeight: '500', textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>发布文章</Link>
-        </div>
+        <SplitNavItem to="/blog-edit" text="发布文章" />
 
         {/* 7. Placeholder */}
-        <div className="nav-item-cell" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span className="nav-link-text" style={{ color: '#fff', opacity: 0.6, cursor: 'default', fontSize: '16px', fontWeight: '500', textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>更多功能</span>
-        </div>
+        <SplitNavItem text="更多功能" />
 
         {/* 8. Avatar */}
         <div className="nav-avatar-cell">

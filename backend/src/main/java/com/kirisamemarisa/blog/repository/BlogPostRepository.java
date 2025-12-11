@@ -41,4 +41,6 @@ public interface BlogPostRepository extends JpaRepository<BlogPost, Long> {
         // 获取用户收藏文章的所有分类
         @Query("SELECT DISTINCT c.name FROM BlogPostFavorite f JOIN f.blogPost p JOIN p.category c WHERE f.user.id = :userId")
         List<String> findFavoriteCategories(@Param("userId") Long userId);
+
+        long countByUserId(Long userId);
 }

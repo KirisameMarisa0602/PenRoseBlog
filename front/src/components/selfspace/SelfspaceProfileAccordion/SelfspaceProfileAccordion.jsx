@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import resolveUrl from '@utils/resolveUrl';
 import '@styles/selfspace/SelfspaceProfileAccordion/selfspaceProfileAccordion.css';
 import httpClient from '@utils/api/httpClient';
-import { changePassword } from '@utils/api/userService';
 import { useAuthState } from '@hooks/useAuthState';
 
 // 个人空间左侧手风琴面板
@@ -67,15 +66,26 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
   const [backgroundFile, setBackgroundFile] = useState(null);
   const [backgroundPreview, setBackgroundPreview] = useState('');
 
-  // 修改密码相关状态
-  const [pwdData, setPwdData] = useState({ oldPassword: '', newPassword: '', confirmPassword: '' });
-  const [pwdMsg, setPwdMsg] = useState('');
-  const [pwdLoading, setPwdLoading] = useState(false);
+  // 统计数据
+  const [stats, setStats] = useState({ followingCount: 0, followerCount: 0, articleCount: 0 });
 
   // userId & token（可由外部传入 viewUserId，用于查看别人）
   const { user, isLoggedIn } = useAuthState();
   const rawUserId = viewUserId != null ? String(viewUserId) : user?.id || '';
   const userId = rawUserId && /^\d+$/.test(rawUserId) ? Number(rawUserId) : null;
+
+  // 获取统计数据
+  useEffect(() => {
+    if (userId) {
+      httpClient.get(`/user/${userId}/stats`)
+        .then(res => {
+          if (res.data && res.data.code === 200) {
+            setStats(res.data.data || { followingCount: 0, followerCount: 0, articleCount: 0 });
+          }
+        })
+        .catch(() => { });
+    }
+  }, [userId]);
 
   // 查看别人主页：组件挂载/切换用户时直接拉取其资料用于展示（背景、头像、昵称等）
   useEffect(() => {
@@ -84,7 +94,7 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
       .then(res => {
         if (res?.data?.code === 200 && res.data.data) setProfile(res.data.data);
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [userId, hideEditPanel]);
 
   // 仅在第四个面板激活时加载用户信息
@@ -161,43 +171,6 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
     }
     setBackgroundFile(file);
     setBackgroundPreview(URL.createObjectURL(file));
-  };
-
-  const handlePwdChange = async (e) => {
-    e.preventDefault();
-    if (!pwdData.oldPassword || !pwdData.newPassword) {
-      setPwdMsg('请输入旧密码和新密码');
-      return;
-    }
-    if (pwdData.newPassword !== pwdData.confirmPassword) {
-      setPwdMsg('两次输入的新密码不一致');
-      return;
-    }
-    // 简单的正则校验，与后端保持一致
-    if (!/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,12}$/.test(pwdData.newPassword)) {
-      setPwdMsg('密码必须为8-12位，包含至少一个字母和一个数字');
-      return;
-    }
-
-    setPwdLoading(true);
-    setPwdMsg('');
-    try {
-      const res = await changePassword({
-        oldPassword: pwdData.oldPassword,
-        newPassword: pwdData.newPassword
-      });
-      if (res && res.code === 200) {
-        setPwdMsg('密码修改成功');
-        setPwdData({ oldPassword: '', newPassword: '', confirmPassword: '' });
-      } else {
-        setPwdMsg(res?.msg || res?.message || '密码修改失败');
-      }
-    } catch (err) {
-      console.error('修改密码异常:', err);
-      setPwdMsg(err?.response?.data?.msg || '修改密码异常');
-    } finally {
-      setPwdLoading(false);
-    }
   };
 
   // 保存用户信息（统一上传头像/背景并保存）
@@ -350,7 +323,26 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                       />
                     )
                 )}
-                <div className="profilepanel-empty-panel" style={{ position: 'relative', zIndex: 1 }} />
+                <div className="profilepanel-info-overlay" style={{ position: 'relative', zIndex: 1, padding: '20px', color: '#fff', textShadow: '0 1px 3px rgba(0,0,0,0.8)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                  <div className="profile-avatar-large" style={{ width: 80, height: 80, borderRadius: '50%', overflow: 'hidden', marginBottom: 10, border: '2px solid #fff' }}>
+                    <img src={resolveUrl(profile.avatarUrl)} alt={profile.nickname} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  </div>
+                  <div className="profile-name-large" style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: 15 }}>{profile.nickname}</div>
+                  <div className="profile-stats-row" style={{ display: 'flex', gap: '20px' }}>
+                    <div className="stat-item" style={{ textAlign: 'center' }}>
+                      <div className="stat-val" style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{stats.followingCount}</div>
+                      <div className="stat-label" style={{ fontSize: '0.8rem', opacity: 0.8 }}>关注</div>
+                    </div>
+                    <div className="stat-item" style={{ textAlign: 'center' }}>
+                      <div className="stat-val" style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{stats.followerCount}</div>
+                      <div className="stat-label" style={{ fontSize: '0.8rem', opacity: 0.8 }}>粉丝</div>
+                    </div>
+                    <div className="stat-item" style={{ textAlign: 'center' }}>
+                      <div className="stat-val" style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{stats.articleCount}</div>
+                      <div className="stat-label" style={{ fontSize: '0.8rem', opacity: 0.8 }}>文章</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           );
@@ -367,8 +359,7 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
             >
               <div
                 className={
-                  `profilepanel-content profilepanel-scroll-content${
-                    isActive ? ' profilepanel-scroll-active' : ' profilepanel-scroll-collapsed'
+                  `profilepanel-content profilepanel-scroll-content${isActive ? ' profilepanel-scroll-active' : ' profilepanel-scroll-collapsed'
                   } profilepanel-scroll-${direction}`
                 }
               >
@@ -425,41 +416,6 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                         {editMsg && <div className="form-msg">{editMsg}</div>}
                       </form>
                     )}
-
-                    <hr style={{ margin: '20px 0', border: '0', borderTop: '1px solid rgba(255,255,255,0.2)' }} />
-                    
-                    <h4>修改密码</h4>
-                    <form className="profilepanel-useredit-form" onSubmit={handlePwdChange}>
-                      <div className="form-group">
-                        <label>旧密码：</label>
-                        <input 
-                          type="password" 
-                          value={pwdData.oldPassword} 
-                          onChange={e => setPwdData({...pwdData, oldPassword: e.target.value})} 
-                          placeholder="请输入旧密码"
-                        />
-                      </div>
-                      <div className="form-group">
-                        <label>新密码：</label>
-                        <input 
-                          type="password" 
-                          value={pwdData.newPassword} 
-                          onChange={e => setPwdData({...pwdData, newPassword: e.target.value})} 
-                          placeholder="8-12位，含字母和数字"
-                        />
-                      </div>
-                      <div className="form-group">
-                        <label>确认新密码：</label>
-                        <input 
-                          type="password" 
-                          value={pwdData.confirmPassword} 
-                          onChange={e => setPwdData({...pwdData, confirmPassword: e.target.value})} 
-                          placeholder="再次输入新密码"
-                        />
-                      </div>
-                      <button type="submit" disabled={pwdLoading}>修改密码</button>
-                      {pwdMsg && <div className="form-msg">{pwdMsg}</div>}
-                    </form>
                   </div>
                 ) : <div className="profilepanel-empty-panel" />}
               </div>
@@ -477,8 +433,7 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
           >
             <div
               className={
-                `profilepanel-content profilepanel-scroll-content${
-                  isActive ? ' profilepanel-scroll-active' : ' profilepanel-scroll-collapsed'
+                `profilepanel-content profilepanel-scroll-content${isActive ? ' profilepanel-scroll-active' : ' profilepanel-scroll-collapsed'
                 } profilepanel-scroll-${direction}`
               }
             >

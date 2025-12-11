@@ -67,13 +67,13 @@ export default function NotificationCenter() {
     const handleNotificationClick = (note) => {
         // Navigate based on type
         if (note.type === 'POST_LIKE' || note.type === 'POST_FAVORITE' || note.type === 'POST_COMMENT') {
-            navigate(`/article/${note.referenceId}`);
+            navigate(`/post/${note.referenceId}`);
         } else if (note.type === 'COMMENT_REPLY' || note.type === 'COMMENT_LIKE' || note.type === 'REPLY_LIKE') {
-            navigate(`/article/${note.referenceId}`); // Ideally scroll to comment
+            navigate(`/post/${note.referenceId}`); // Ideally scroll to comment
         } else if (note.type === 'FRIEND_REQUEST') {
             navigate(`/friends/pending`);
         } else if (note.type === 'FOLLOW') {
-            navigate(`/space/${note.senderId}`);
+            navigate(`/selfspace?userId=${note.senderId}`);
         }
     };
 

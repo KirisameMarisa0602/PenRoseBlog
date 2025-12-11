@@ -1,0 +1,76 @@
+/* Split Button Styles */
+.split-btn-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: visible;
+}
+
+.split-btn-top,
+.split-btn-bottom {
+    font-size: 18px;
+    font-weight: 900;
+    line-height: 150px;
+    /* Adjust based on container height */
+    position: absolute;
+    color: #fff;
+    /* Or brown as in example, but white fits navbar */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: 0.4s;
+    white-space: nowrap;
+    pointer-events: none;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.split-btn-top {
+    clip-path: inset(0 0 50% 0);
+    /* Show top half */
+}
+
+.split-btn-bottom {
+    clip-path: inset(50% 0 0 0);
+    /* Show bottom half */
+}
+
+.split-btn-wrapper:hover .split-btn-top {
+    transform: translate(-50%, calc(-50% - 15px));
+    /* Move up */
+}
+
+.split-btn-wrapper:hover .split-btn-bottom {
+    transform: translate(-50%, calc(-50% + 15px));
+    /* Move down */
+}
+
+.split-btn-link {
+    text-decoration: none;
+    color: #00e5ff;
+    /* Cyan or theme color */
+    font-size: 16px;
+    font-weight: 600;
+    opacity: 0;
+    transition: 0.3s;
+    position: relative;
+    z-index: 10;
+}
+
+.split-btn-wrapper:hover .split-btn-link {
+    opacity: 1;
+}
+
+/* Adjust nav-brand layout */
+.nav-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.penrose-logo {
+    margin-bottom: 4px;
+}

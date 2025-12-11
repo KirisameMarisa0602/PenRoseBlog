@@ -17,6 +17,7 @@ const PendingFriendRequests = lazy(() => import('./pages/PendingFriendRequests')
 const FriendsList = lazy(() => import('./pages/FriendsList'));
 const FollowingList = lazy(() => import('./pages/FollowingList'));
 const NotificationCenter = lazy(() => import('./pages/NotificationCenter'));
+const SecurityCenter = lazy(() => import('./pages/SecurityCenter'));
 const Loading = lazy(() => import('./pages/Loading'));
 const OAuth2Callback = lazy(() => import('./pages/OAuth2Callback'));
 
@@ -64,6 +65,7 @@ function AppContent() {
 						<Route path="/favorites" element={<FavoritesPage />} />
 						<Route path="/search" element={<SearchPage />} />
 						<Route path="/notifications" element={<NotificationCenter />} />
+						<Route path="/security" element={<SecurityCenter />} />
 						<Route path="/users/search" element={<UserSearch />} />
 						<Route path="/auth/qq/callback" element={<OAuth2Callback />} />
 						<Route path="/auth/wechat/callback" element={<OAuth2Callback />} />

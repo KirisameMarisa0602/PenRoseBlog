@@ -1,0 +1,113 @@
+.search-page-container {
+    padding-top: calc(var(--navH) + 40px);
+    min-height: 100vh;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.search-header {
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.search-tabs {
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.tab-btn {
+    padding: 8px 24px;
+    font-size: 16px;
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: #666;
+}
+
+.tab-btn:hover {
+    background: #fff;
+    color: #333;
+}
+
+.tab-btn.active {
+    background: #555;
+    color: #fff;
+    font-weight: bold;
+}
+
+.search-form {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 30px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.search-input {
+    padding: 12px 20px;
+    width: 100%;
+    border-radius: 4px 0 0 4px;
+    border: none;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    font-size: 16px;
+    outline: none;
+    transition: background 0.3s;
+}
+
+.search-input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.search-input:focus {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.search-btn {
+    padding: 12px 30px;
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    border: none;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s;
+    white-space: nowrap;
+}
+
+.search-btn:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.articles-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.load-more-btn {
+    padding: 10px 30px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    cursor: pointer;
+    margin-top: 30px;
+    transition: all 0.3s;
+}
+
+.load-more-btn:hover {
+    background: #f0f0f0;
+}
+
+.load-more-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

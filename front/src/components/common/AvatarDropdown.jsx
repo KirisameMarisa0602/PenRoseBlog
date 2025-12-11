@@ -46,6 +46,9 @@ export default function AvatarDropdown({ user, onLogout }) {
       <button className="dropdown-btn" onClick={handleSelfSpace}>
         个人空间
       </button>
+      <button className="dropdown-btn" onClick={() => navigate('/security')}>
+        安全中心
+      </button>
       <button className="dropdown-btn logout" onClick={handleLogout}>
         退出登录
       </button>
