@@ -69,6 +69,7 @@ function AppContent() {
 						<Route path="/users/search" element={<UserSearch />} />
 						<Route path="/auth/qq/callback" element={<OAuth2Callback />} />
 						<Route path="/auth/wechat/callback" element={<OAuth2Callback />} />
+						<Route path="/auth/github/callback" element={<OAuth2Callback />} />
 					</Routes>
 				</Suspense>
 			</MainLayout>

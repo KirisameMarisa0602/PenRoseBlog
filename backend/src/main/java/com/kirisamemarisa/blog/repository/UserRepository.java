@@ -16,6 +16,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     User findByWechatUnionId(String wechatUnionId);
 
+    User findByGithubId(String githubId);
+
     @Query("SELECT u, up FROM User u LEFT JOIN UserProfile up ON u.id = up.id WHERE u.username LIKE %:username%")
     List<Object[]> searchByUsernameWithProfile(@Param("username") String username, Pageable pageable);
     @Query("SELECT u, up FROM User u LEFT JOIN UserProfile up ON u.id = up.id WHERE up.nickname LIKE %:nickname%")

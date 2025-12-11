@@ -55,6 +55,15 @@ public class OAuth2LoginServiceImpl implements OAuth2LoginService {
     @Value("${oauth2.wechat.redirect-uri:}")
     private String wechatRedirectUri;
 
+    @Value("${oauth2.github.client-id:}")
+    private String githubClientId;
+
+    @Value("${oauth2.github.client-secret:}")
+    private String githubClientSecret;
+
+    @Value("${oauth2.github.redirect-uri:}")
+    private String githubRedirectUri;
+
     private final OkHttpClient httpClient = new OkHttpClient();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -125,6 +134,39 @@ public class OAuth2LoginServiceImpl implements OAuth2LoginService {
         } catch (Exception e) {
             logger.error("WeChat login failed", e);
             throw new BusinessException("微信登录失败: " + e.getMessage());
+        }
+    }
+
+    @Override
+    @Transactional
+    public LoginResponseDTO loginWithGitHub(String code, String state) {
+        logger.info("GitHub login with code: {}, state: {}", code, state);
+
+        if (githubClientId == null || githubClientId.isEmpty() || githubClientSecret == null || githubClientSecret.isEmpty()) {
+            logger.error("GitHub OAuth2 configuration is missing");
+            throw new BusinessException("GitHub登录配置未完成");
+        }
+
+        try {
+            // Step 1: Exchange code for access token
+            String accessToken = getGitHubAccessToken(code);
+
+            // Step 2: Get user info
+            JsonNode userInfo = getGitHubUserInfo(accessToken);
+            String githubId = String.valueOf(userInfo.get("id").asLong());
+
+            // Step 3: Find or create user
+            User user = userRepository.findByGithubId(githubId);
+            if (user == null) {
+                user = createUserFromGitHub(githubId, userInfo);
+            }
+
+            // Step 4: Generate JWT token and return
+            return generateLoginResponse(user);
+
+        } catch (Exception e) {
+            logger.error("GitHub login failed", e);
+            throw new BusinessException("GitHub登录失败: " + e.getMessage());
         }
     }
 
@@ -230,6 +272,71 @@ public class OAuth2LoginServiceImpl implements OAuth2LoginService {
             }
             return objectMapper.readTree(response.body().string());
         }
+    }
+
+    private String getGitHubAccessToken(String code) throws IOException {
+        String url = String.format(
+                "https://github.com/login/oauth/access_token?client_id=%s&client_secret=%s&code=%s",
+                githubClientId, githubClientSecret, code);
+
+        Request request = new Request.Builder()
+                .url(url)
+                .header("Accept", "application/json")
+                .post(okhttp3.RequestBody.create(null, new byte[0]))
+                .build();
+        try (Response response = httpClient.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                throw new IOException("Failed to get GitHub access token: " + response);
+            }
+            JsonNode json = objectMapper.readTree(response.body().string());
+            if (json.has("access_token")) {
+                return json.get("access_token").asText();
+            }
+            throw new IOException("Access token not found in response: " + json);
+        }
+    }
+
+    private JsonNode getGitHubUserInfo(String accessToken) throws IOException {
+        String url = "https://api.github.com/user";
+
+        Request request = new Request.Builder()
+                .url(url)
+                .header("Authorization", "Bearer " + accessToken)
+                .header("Accept", "application/json")
+                .build();
+        try (Response response = httpClient.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                throw new IOException("Failed to get GitHub user info: " + response);
+            }
+            return objectMapper.readTree(response.body().string());
+        }
+    }
+
+    private User createUserFromGitHub(String githubId, JsonNode userInfo) {
+        User user = new User();
+        // Use UUID to ensure username uniqueness
+        user.setUsername("gh_" + UUID.randomUUID().toString().substring(0, 8));
+        user.setGithubId(githubId);
+        user.setLoginProvider("GITHUB");
+        // Set random password to satisfy DB constraint
+        user.setPassword(UUID.randomUUID().toString());
+
+        userRepository.save(user);
+        userRepository.flush();
+
+        // Create user profile
+        UserProfile profile = new UserProfile();
+        profile.setUser(user);
+        String nickname = userInfo.has("name") && !userInfo.get("name").isNull() ? userInfo.get("name").asText() : 
+                          (userInfo.has("login") ? userInfo.get("login").asText() : "GitHub User");
+        profile.setNickname(nickname);
+        if (userInfo.has("avatar_url") && !userInfo.get("avatar_url").isNull()) {
+            profile.setAvatarUrl(userInfo.get("avatar_url").asText());
+        }
+        userProfileRepository.save(profile);
+
+        logger.info("Created new user from GitHub: {}", user.getUsername());
+        return user;
     }
 
     private User createUserFromQQ(String openId, JsonNode userInfo) {

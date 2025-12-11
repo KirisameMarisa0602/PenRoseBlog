@@ -45,10 +45,19 @@
 /* 表单与编辑区基础样式 */
 .profilepanel-useredit-panel {
   padding: 20px;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.95);
+  /* Increased opacity for better readability */
   border-radius: 12px;
   height: 100%;
   overflow-y: auto;
+}
+
+.profilepanel-useredit-panel h4 {
+  color: #333;
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 18px;
+  font-weight: 600;
 }
 
 .profilepanel-useredit-form {

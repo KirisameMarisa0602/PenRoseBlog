@@ -5,6 +5,10 @@
   padding-top: calc(var(--navH) + 40px);
 }
 
+.user-search-embedded {
+  width: 100%;
+}
+
 .user-search-container {
   max-width: 900px;
   margin: 0 auto;
@@ -13,6 +17,11 @@
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   border: 1px solid #eee;
+}
+
+.user-search-container-embedded {
+  width: 100%;
+  /* No extra padding/bg to blend with SearchPage */
 }
 
 .user-search-container h2 {
@@ -35,6 +44,7 @@
   margin-right: auto;
 }
 
+.user-search-controls .search-select,
 .user-search-controls select {
   padding: 12px 16px;
   border-radius: 12px;
@@ -47,6 +57,7 @@
   cursor: pointer;
 }
 
+.user-search-controls .search-input,
 .user-search-controls input {
   flex: 1;
   padding: 12px 20px;
@@ -59,12 +70,15 @@
   color: #333;
 }
 
+.user-search-controls .search-input:focus,
+.user-search-controls .search-select:focus,
 .user-search-controls input:focus,
 .user-search-controls select:focus {
   border-color: #1890ff;
   box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.1);
 }
 
+.user-search-controls .search-btn,
 .user-search-controls button {
   padding: 12px 32px;
   border-radius: 12px;
@@ -79,12 +93,14 @@
   box-shadow: 0 4px 12px rgba(24, 144, 255, 0.2);
 }
 
+.user-search-controls .search-btn:hover,
 .user-search-controls button:hover {
   background: #40a9ff;
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(24, 144, 255, 0.3);
 }
 
+.user-search-controls .search-btn:disabled,
 .user-search-controls button:disabled {
   background: #ccc;
   cursor: not-allowed;

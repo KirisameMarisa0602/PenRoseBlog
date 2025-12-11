@@ -110,7 +110,7 @@ export default function SearchPage() {
                 )}
 
                 {activeTab === 'users' && (
-                    <UserSearch />
+                    <UserSearch embedded={true} />
                 )}
             </div>
         </div>

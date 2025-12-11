@@ -1283,267 +1283,269 @@ export default function ConversationDetail() {
                     ))}
                 </aside>
 
-                {/* 右侧消息区 */}
-                <div
-                    className="conversation-detail-list"
-                    ref={rightScrollRef}
-                    onScroll={handleScroll}
-                    style={{ ['--input-height']: inputHeight + 'px' }}
-                >
-                    {isLoadingHistory && (
-                        <div
-                            style={{
-                                textAlign: 'center',
-                                padding: '10px',
-                                color: '#999'
-                            }}
-                        >
-                            加载历史消息...
-                        </div>
-                    )}
+                <div className="conversation-main-content">
+                    {/* 右侧消息区 */}
+                    <div
+                        className="conversation-detail-list"
+                        ref={rightScrollRef}
+                        onScroll={handleScroll}
+                        style={{ ['--input-height']: inputHeight + 'px' }}
+                    >
+                        {isLoadingHistory && (
+                            <div
+                                style={{
+                                    textAlign: 'center',
+                                    padding: '10px',
+                                    color: '#999'
+                                }}
+                            >
+                                加载历史消息...
+                            </div>
+                        )}
 
-                    {finalMessages.map(msg => {
-                        const isSelf = msg.senderId === Number(userId);
-                        const recalled = !!msg.__recalled;
+                        {finalMessages.map(msg => {
+                            const isSelf = msg.senderId === Number(userId);
+                            const recalled = !!msg.__recalled;
 
-                        if (recalled) {
-                            return (
-                                <div className="conversation-detail-recall" key={msg.id}>
-                                    <span className="txt">
-                                        {isSelf ? '你撤回了一条消息' : '对方撤回了一条消息'}
-                                    </span>
-                                    {isSelf && msg.__originalText && (
+                            if (recalled) {
+                                return (
+                                    <div className="conversation-detail-recall" key={msg.id}>
+                                        <span className="txt">
+                                            {isSelf ? '你撤回了一条消息' : '对方撤回了一条消息'}
+                                        </span>
+                                        {isSelf && msg.__originalText && (
+                                            <button
+                                                type="button"
+                                                className="reedit"
+                                                onClick={() => reEditMessage(msg)}
+                                                title="重新编辑并发送"
+                                            >
+                                                重新编辑
+                                            </button>
+                                        )}
                                         <button
                                             type="button"
-                                            className="reedit"
-                                            onClick={() => reEditMessage(msg)}
-                                            title="重新编辑并发送"
+                                            className="recall-close"
+                                            onClick={() => deleteMessageAction(msg.id)}
+                                            title="删除这条记录"
                                         >
-                                            重新编辑
+                                            ×
                                         </button>
-                                    )}
-                                    <button
-                                        type="button"
-                                        className="recall-close"
-                                        onClick={() => deleteMessageAction(msg.id)}
-                                        title="删除这条记录"
-                                    >
-                                        ×
-                                    </button>
+                                    </div>
+                                );
+                            }
+
+                            const hasPreview = msg.blogPreview && msg.blogPreview.blogId;
+
+                            return (
+                                <div
+                                    key={msg.id}
+                                    className={`conversation-detail-msg${isSelf ? ' self' : ''}`}
+                                    onContextMenu={(e) => openContextMenu(e, msg)}
+                                    title="右键可撤回/删除"
+                                >
+                                    <div className="conversation-detail-msg-meta">
+                                        <img
+                                            src={
+                                                msg.senderAvatarUrl
+                                                    ? toAbsUrl(msg.senderAvatarUrl)
+                                                    : otherInfo.avatarUrl
+                                                        ? toAbsUrl(otherInfo.avatarUrl)
+                                                        : '/imgs/loginandwelcomepanel/1.png'
+                                            }
+                                            className={`conversation-detail-msg-avatar${!isSelf ? ' clickable' : ''}`}
+                                            title={!isSelf ? '查看主页' : undefined}
+                                            onClick={!isSelf ? () => openProfile(msg.senderId) : undefined}
+                                            onError={(ev) => {
+                                                const target = ev.target;
+                                                target.onerror = null;
+                                                target.src = '/imgs/loginandwelcomepanel/1.png';
+                                            }}
+                                        />
+                                        <span className="conversation-detail-msg-nickname">
+                                            {msg.senderNickname || (isSelf ? '你' : otherInfo.nickname)}
+                                        </span>
+                                    </div>
+
+                                    <div className="conversation-detail-msgtext">
+                                        {/* 文本 / 媒体 */}
+                                        {!hasPreview && (
+                                            msg?.type === 'IMAGE' && msg?.mediaUrl ? (
+                                                <img
+                                                    className="conversation-detail-msgmedia"
+                                                    src={toAbsUrl(msg.mediaUrl)}
+                                                    alt="image"
+                                                    onError={(ev) => {
+                                                        const target = ev.target;
+                                                        target.onerror = null;
+                                                        target.src = '';
+                                                    }}
+                                                />
+                                            ) : msg?.type === 'VIDEO' && msg?.mediaUrl ? (
+                                                <video
+                                                    className="conversation-detail-msgmedia"
+                                                    src={toAbsUrl(msg.mediaUrl)}
+                                                    controls
+                                                    preload="metadata"
+                                                    playsInline
+                                                    controlsList="nodownload"
+                                                />
+                                            ) : (
+                                                msg?.text ||
+                                                (msg?.type === 'IMAGE'
+                                                    ? '[图片]'
+                                                    : msg?.type === 'VIDEO'
+                                                        ? '[视频]'
+                                                        : '')
+                                            )
+                                        )}
+
+                                        {/* 博客预览卡片 */}
+                                        {hasPreview && (
+                                            <div className="pm-blog-preview-card clickable"
+                                                onClick={() => navigate(`/post/${msg.blogPreview.blogId}`)}>
+                                                <div className="pm-blog-preview-cover">
+                                                    {msg.blogPreview.coverImageUrl ? (
+                                                        <img
+                                                            src={toAbsUrl(msg.blogPreview.coverImageUrl)}
+                                                            alt={msg.blogPreview.title || '封面'}
+                                                            onError={e => { e.target.onerror = null; e.target.src = ''; }}
+                                                        />
+                                                    ) : (
+                                                        <div className="pm-blog-preview-cover-placeholder">
+                                                            博客
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="pm-blog-preview-body">
+                                                    <div className="pm-blog-preview-title">
+                                                        {msg.blogPreview.title || '博客'}
+                                                    </div>
+                                                    <div className="pm-blog-preview-meta">
+                                                        {msg.blogPreview.authorAvatarUrl && (
+                                                            <img
+                                                                src={toAbsUrl(msg.blogPreview.authorAvatarUrl)}
+                                                                className="pm-blog-preview-avatar"
+                                                                alt=""
+                                                                onError={e => { e.target.onerror = null; e.target.src = '/imgs/loginandwelcomepanel/1.png'; }}
+                                                            />
+                                                        )}
+                                                        <span className="pm-blog-preview-author">
+                                                            {msg.blogPreview.authorNickname || ''}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="conversation-detail-msgtime">
+                                        {msg.createdAt
+                                            ? new Date(msg.createdAt).toLocaleString()
+                                            : ''}
+                                    </div>
                                 </div>
                             );
-                        }
+                        })}
 
-                        const hasPreview = msg.blogPreview && msg.blogPreview.blogId;
-
-                        return (
-                            <div
-                                key={msg.id}
-                                className={`conversation-detail-msg${isSelf ? ' self' : ''}`}
-                                onContextMenu={(e) => openContextMenu(e, msg)}
-                                title="右键可撤回/删除"
+                        {newTip.visible && newTip.count > 0 && (
+                            <button
+                                type="button"
+                                className="conversation-detail-sendbtn"
+                                style={{
+                                    position: 'sticky',
+                                    float: 'right',
+                                    bottom: '12px',
+                                    right: '12px',
+                                    marginTop: '12px',
+                                    zIndex: 10
+                                }}
+                                onClick={jumpToLatest}
+                                title="回到底部查看最新消息"
                             >
-                                <div className="conversation-detail-msg-meta">
-                                    <img
-                                        src={
-                                            msg.senderAvatarUrl
-                                                ? toAbsUrl(msg.senderAvatarUrl)
-                                                : otherInfo.avatarUrl
-                                                    ? toAbsUrl(otherInfo.avatarUrl)
-                                                    : '/imgs/loginandwelcomepanel/1.png'
-                                        }
-                                        className={`conversation-detail-msg-avatar${!isSelf ? ' clickable' : ''}`}
-                                        title={!isSelf ? '查看主页' : undefined}
-                                        onClick={!isSelf ? () => openProfile(msg.senderId) : undefined}
-                                        onError={(ev) => {
-                                            const target = ev.target;
-                                            target.onerror = null;
-                                            target.src = '/imgs/loginandwelcomepanel/1.png';
-                                        }}
-                                    />
-                                    <span className="conversation-detail-msg-nickname">
-                                        {msg.senderNickname || (isSelf ? '你' : otherInfo.nickname)}
-                                    </span>
-                                </div>
-
-                                <div className="conversation-detail-msgtext">
-                                    {/* 文本 / 媒体 */}
-                                    {!hasPreview && (
-                                        msg?.type === 'IMAGE' && msg?.mediaUrl ? (
-                                            <img
-                                                className="conversation-detail-msgmedia"
-                                                src={toAbsUrl(msg.mediaUrl)}
-                                                alt="image"
-                                                onError={(ev) => {
-                                                    const target = ev.target;
-                                                    target.onerror = null;
-                                                    target.src = '';
-                                                }}
-                                            />
-                                        ) : msg?.type === 'VIDEO' && msg?.mediaUrl ? (
-                                            <video
-                                                className="conversation-detail-msgmedia"
-                                                src={toAbsUrl(msg.mediaUrl)}
-                                                controls
-                                                preload="metadata"
-                                                playsInline
-                                                controlsList="nodownload"
-                                            />
-                                        ) : (
-                                            msg?.text ||
-                                            (msg?.type === 'IMAGE'
-                                                ? '[图片]'
-                                                : msg?.type === 'VIDEO'
-                                                    ? '[视频]'
-                                                    : '')
-                                        )
-                                    )}
-
-                                    {/* 博客预览卡片 */}
-                                    {hasPreview && (
-                                        <div className="pm-blog-preview-card clickable"
-                                            onClick={() => navigate(`/post/${msg.blogPreview.blogId}`)}>
-                                            <div className="pm-blog-preview-cover">
-                                                {msg.blogPreview.coverImageUrl ? (
-                                                    <img
-                                                        src={toAbsUrl(msg.blogPreview.coverImageUrl)}
-                                                        alt={msg.blogPreview.title || '封面'}
-                                                        onError={e => { e.target.onerror = null; e.target.src = ''; }}
-                                                    />
-                                                ) : (
-                                                    <div className="pm-blog-preview-cover-placeholder">
-                                                        博客
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div className="pm-blog-preview-body">
-                                                <div className="pm-blog-preview-title">
-                                                    {msg.blogPreview.title || '博客'}
-                                                </div>
-                                                <div className="pm-blog-preview-meta">
-                                                    {msg.blogPreview.authorAvatarUrl && (
-                                                        <img
-                                                            src={toAbsUrl(msg.blogPreview.authorAvatarUrl)}
-                                                            className="pm-blog-preview-avatar"
-                                                            alt=""
-                                                            onError={e => { e.target.onerror = null; e.target.src = '/imgs/loginandwelcomepanel/1.png'; }}
-                                                        />
-                                                    )}
-                                                    <span className="pm-blog-preview-author">
-                                                        {msg.blogPreview.authorNickname || ''}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div className="conversation-detail-msgtime">
-                                    {msg.createdAt
-                                        ? new Date(msg.createdAt).toLocaleString()
-                                        : ''}
-                                </div>
-                            </div>
-                        );
-                    })}
-
-                    {newTip.visible && newTip.count > 0 && (
-                        <button
-                            type="button"
-                            className="conversation-detail-sendbtn"
-                            style={{
-                                position: 'sticky',
-                                float: 'right',
-                                bottom: '12px',
-                                right: '12px',
-                                marginTop: '12px',
-                                zIndex: 10
-                            }}
-                            onClick={jumpToLatest}
-                            title="回到底部查看最新消息"
-                        >
-                            {newTip.count} 条新消息
-                        </button>
-                    )}
-                </div>
-
-                {/* 右侧输入区 */}
-                <form
-                    className="conversation-detail-form"
-                    onSubmit={handleSend}
-                    style={{ ['--input-height']: inputHeight + 'px' }}
-                >
-                    <div
-                        className="conversation-inputbox-resize"
-                        title="拖动上边界可加长输入框"
-                        onMouseDown={startResize}
-                    ></div>
-
-                    <div className="conversation-toolbar">
-                        <button
-                            type="button"
-                            className="icon-btn icon-image"
-                            onClick={onPickImageClick}
-                            title="发送图片"
-                            disabled={uploading}
-                        ></button>
-                        <button
-                            type="button"
-                            className="icon-btn icon-video"
-                            onClick={onPickVideoClick}
-                            title="发送视频"
-                            disabled={uploading}
-                        ></button>
+                                {newTip.count} 条新消息
+                            </button>
+                        )}
                     </div>
 
-                    <textarea
-                        ref={inputRef}
-                        value={text}
-                        onChange={(e) => setText(e.target.value)}
-                        onKeyDown={onInputKeyDown}
-                        placeholder=""
-                        className="conversation-detail-input"
-                        disabled={uploading}
-                    />
-
-                    <div className="conversation-actions">
-                        <button
-                            type="submit"
-                            className="conversation-detail-sendbtn"
-                            disabled={uploading}
-                        >
-                            发送
-                        </button>
-                    </div>
-
-                    <input
-                        ref={imageInputRef}
-                        type="file"
-                        accept="image/*"
-                        style={{ display: 'none' }}
-                        onChange={(e) => handleFileChosen(e, 'IMAGE')}
-                    />
-                    <input
-                        ref={videoInputRef}
-                        type="file"
-                        accept="video/*"
-                        style={{ display: 'none' }}
-                        onChange={(e) => handleFileChosen(e, 'VIDEO')}
-                    />
-                </form>
-
-                {uploading && (
-                    <div
-                        className="conversation-detail-uploadprogress"
-                        aria-live="polite"
+                    {/* 右侧输入区 */}
+                    <form
+                        className="conversation-detail-form"
+                        onSubmit={handleSend}
+                        style={{ ['--input-height']: inputHeight + 'px' }}
                     >
                         <div
-                            className="bar"
-                            style={{ width: `${uploadProgress}%` }}
+                            className="conversation-inputbox-resize"
+                            title="拖动上边界可加长输入框"
+                            onMouseDown={startResize}
+                        ></div>
+
+                        <div className="conversation-toolbar">
+                            <button
+                                type="button"
+                                className="icon-btn icon-image"
+                                onClick={onPickImageClick}
+                                title="发送图片"
+                                disabled={uploading}
+                            ></button>
+                            <button
+                                type="button"
+                                className="icon-btn icon-video"
+                                onClick={onPickVideoClick}
+                                title="发送视频"
+                                disabled={uploading}
+                            ></button>
+                        </div>
+
+                        <textarea
+                            ref={inputRef}
+                            value={text}
+                            onChange={(e) => setText(e.target.value)}
+                            onKeyDown={onInputKeyDown}
+                            placeholder=""
+                            className="conversation-detail-input"
+                            disabled={uploading}
                         />
-                        <span className="pct">{uploadProgress}%</span>
-                    </div>
-                )}
+
+                        <div className="conversation-actions">
+                            <button
+                                type="submit"
+                                className="conversation-detail-sendbtn"
+                                disabled={uploading}
+                            >
+                                发送
+                            </button>
+                        </div>
+
+                        <input
+                            ref={imageInputRef}
+                            type="file"
+                            accept="image/*"
+                            style={{ display: 'none' }}
+                            onChange={(e) => handleFileChosen(e, 'IMAGE')}
+                        />
+                        <input
+                            ref={videoInputRef}
+                            type="file"
+                            accept="video/*"
+                            style={{ display: 'none' }}
+                            onChange={(e) => handleFileChosen(e, 'VIDEO')}
+                        />
+                    </form>
+
+                    {uploading && (
+                        <div
+                            className="conversation-detail-uploadprogress"
+                            aria-live="polite"
+                        >
+                            <div
+                                className="bar"
+                                style={{ width: `${uploadProgress}%` }}
+                            />
+                            <span className="pct">{uploadProgress}%</span>
+                        </div>
+                    )}
+                </div>
             </div>
 
             {menu.visible && menu.msg && (

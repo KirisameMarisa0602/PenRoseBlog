@@ -39,8 +39,12 @@ public class User {
     // 微信 UnionID，用于微信登录
     private String wechatUnionId;
 
+    @Column(length = 50, unique = true)
+    // GitHub ID，用于GitHub登录
+    private String githubId;
+
     @Column(length = 20)
-    // 第三方登录提供者类型：LOCAL, QQ, WECHAT, PHONE
+    // 第三方登录提供者类型：LOCAL, QQ, WECHAT, PHONE, GITHUB
     private String loginProvider;
 
     @Column(name = "created_at", updatable = false)
@@ -115,6 +119,14 @@ public class User {
 
     public void setWechatUnionId(String wechatUnionId) {
         this.wechatUnionId = wechatUnionId;
+    }
+
+    public String getGithubId() {
+        return githubId;
+    }
+
+    public void setGithubId(String githubId) {
+        this.githubId = githubId;
     }
 
     public String getLoginProvider() {

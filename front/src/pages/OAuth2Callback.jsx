@@ -14,7 +14,7 @@ export default function OAuth2Callback() {
       const code = searchParams.get('code');
       const state = searchParams.get('state');
       const storedState = localStorage.getItem('oauth_state');
-      
+
       // Determine provider from URL path
       const path = window.location.pathname;
       let provider = '';
@@ -22,6 +22,8 @@ export default function OAuth2Callback() {
         provider = 'QQ';
       } else if (path.includes('/wechat/')) {
         provider = 'WECHAT';
+      } else if (path.includes('/github/')) {
+        provider = 'GITHUB';
       } else {
         setMessage('未知的登录提供者');
         setTimeout(() => navigate('/'), 2000);
@@ -56,7 +58,7 @@ export default function OAuth2Callback() {
           if (typeof token === 'object' && token !== null && token.token) {
             token = token.token;
           }
-          
+
           localStorage.clear();
           localStorage.removeItem('oauth_state');
 
@@ -104,10 +106,10 @@ export default function OAuth2Callback() {
   }, [searchParams, navigate]);
 
   return (
-    <div style={{ 
-      display: 'flex', 
-      justifyContent: 'center', 
-      alignItems: 'center', 
+    <div style={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
       height: '100vh',
       fontSize: '20px',
       color: '#666'

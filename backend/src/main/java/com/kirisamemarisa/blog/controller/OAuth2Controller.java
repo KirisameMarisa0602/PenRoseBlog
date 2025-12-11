@@ -36,6 +36,8 @@ public class OAuth2Controller {
             response = oauth2LoginService.loginWithQQ(dto.getCode(), dto.getState());
         } else if ("WECHAT".equalsIgnoreCase(dto.getProvider())) {
             response = oauth2LoginService.loginWithWeChat(dto.getCode(), dto.getState());
+        } else if ("GITHUB".equalsIgnoreCase(dto.getProvider())) {
+            response = oauth2LoginService.loginWithGitHub(dto.getCode(), dto.getState());
         } else {
             return new ApiResponse<>(400, "不支持的登录提供者", null);
         }

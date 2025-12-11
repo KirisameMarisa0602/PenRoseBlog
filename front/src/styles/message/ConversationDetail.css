@@ -26,7 +26,15 @@
 .conversation-detail-container.two-columns {
   display: grid;
   grid-template-columns: 280px 1fr;
-  grid-template-rows: 1fr;
+  /* grid-template-rows: 1fr; removed to allow flex child to handle height */
+}
+
+.conversation-main-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
 }
 
 /* 左侧会话用户栏 */
@@ -107,7 +115,10 @@
   display: flex;
   flex-direction: column;
   gap: 15px;
-  height: calc(100% - var(--input-height, 60px));
+  flex: 1;
+  /* Use flex to fill remaining space */
+  height: auto;
+  /* Remove fixed height calculation */
   background-image: radial-gradient(#e0e0e0 1px, transparent 1px);
   background-size: 20px 20px;
 }
@@ -252,12 +263,13 @@
 /* Input Area */
 .conversation-detail-form {
   height: var(--input-height, 150px);
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid #ccc;
   padding: 0;
   display: flex;
   flex-direction: column;
-  background: #fff;
+  background: #f9f9f9;
   position: relative;
+  flex-shrink: 0;
 }
 
 .conversation-inputbox-resize {

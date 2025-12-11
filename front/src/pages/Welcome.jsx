@@ -124,10 +124,10 @@ export default function Welcome() {
 
   // 注册逻辑
   const avatarFiles = [
-    "三花猫.svg","傻猫.svg","博学猫.svg","布偶.svg","无毛猫.svg","暹罗猫.svg",
-    "橘猫.svg","波斯猫.svg","牛奶猫.svg","狸花猫.svg","猫.svg","田园猫.svg",
-    "白猫.svg","眯眯眼猫.svg","缅因猫.svg","美短.svg","英短猫.svg","蓝猫.svg",
-    "黄猫.svg","黑猫.svg"
+    "三花猫.svg", "傻猫.svg", "博学猫.svg", "布偶.svg", "无毛猫.svg", "暹罗猫.svg",
+    "橘猫.svg", "波斯猫.svg", "牛奶猫.svg", "狸花猫.svg", "猫.svg", "田园猫.svg",
+    "白猫.svg", "眯眯眼猫.svg", "缅因猫.svg", "美短.svg", "英短猫.svg", "蓝猫.svg",
+    "黄猫.svg", "黑猫.svg"
   ];
 
   const handleRegister = async (e) => {
@@ -193,6 +193,20 @@ export default function Welcome() {
     window.location.href = `https://graph.qq.com/oauth2.0/authorize?response_type=code&client_id=${qqAppId}&redirect_uri=${redirectUri}&state=${state}&scope=get_user_info`;
   };
 
+  // GitHub登录
+  const handleGitHubLogin = () => {
+    const githubClientId = import.meta.env.VITE_GITHUB_CLIENT_ID;
+    if (!githubClientId || githubClientId === 'YOUR_GITHUB_CLIENT_ID') {
+      setMessage('GitHub登录未配置，请联系管理员');
+      setMessageType('error');
+      return;
+    }
+    const redirectUri = encodeURIComponent(window.location.origin + '/auth/github/callback');
+    const state = Math.random().toString(36).substring(7);
+    localStorage.setItem('oauth_state', state);
+    window.location.href = `https://github.com/login/oauth/authorize?client_id=${githubClientId}&redirect_uri=${redirectUri}&state=${state}&scope=read:user`;
+  };
+
   // 微信登录
   const handleWeChatLogin = () => {
     const wechatAppId = import.meta.env.VITE_WECHAT_APP_ID;
@@ -223,7 +237,7 @@ export default function Welcome() {
         body: JSON.stringify({ phoneNumber: phoneLoginData.phoneNumber }),
       });
       const data = await response.json();
-      
+
       if (data.code === 200) {
         setMessage('验证码已发送');
         setMessageType('success');
@@ -260,10 +274,10 @@ export default function Welcome() {
         body: JSON.stringify(phoneLoginData),
       });
       const res = await response.json();
-      
+
       setMessage(res.msg);
       setMessageType(res.code === 200 ? 'success' : 'error');
-      
+
       if (res.code === 200 && res.data) {
         let token = res.data;
         if (typeof token === 'object' && token !== null && token.token) {
@@ -309,7 +323,7 @@ export default function Welcome() {
   return (
     <div className="container">
       <div className="welcome">
-        <div className={`pinkbox${showRegister ? ' show-register' : ''}`}>  
+        <div className={`pinkbox${showRegister ? ' show-register' : ''}`}>
           <div className={`signup${showRegister ? '' : ' nodisplay'}`}>
             <h1>Register</h1>
             <form autoComplete="off" onSubmit={handleRegister}>
@@ -374,6 +388,9 @@ export default function Welcome() {
                 <button type="button" className="wechat-login-btn" onClick={handleWeChatLogin} title="微信登录">
                   <span className="icon">微信</span>
                 </button>
+                <button type="button" className="github-login-btn" onClick={handleGitHubLogin} title="GitHub登录">
+                  <span className="icon">GitHub</span>
+                </button>
                 <button type="button" className="phone-login-btn" onClick={() => setShowPhoneLogin(!showPhoneLogin)} title="手机验证码登录">
                   <span className="icon">📱</span>
                 </button>
@@ -381,22 +398,22 @@ export default function Welcome() {
             </div>
             {showPhoneLogin && (
               <div className="phone-login-panel">
-                <input 
-                  type="tel" 
-                  placeholder="手机号" 
+                <input
+                  type="tel"
+                  placeholder="手机号"
                   value={phoneLoginData.phoneNumber}
                   onChange={e => setPhoneLoginData({ ...phoneLoginData, phoneNumber: e.target.value })}
                 />
                 <div className="verification-code-group">
-                  <input 
-                    type="text" 
-                    placeholder="验证码" 
+                  <input
+                    type="text"
+                    placeholder="验证码"
                     value={phoneLoginData.verificationCode}
                     onChange={e => setPhoneLoginData({ ...phoneLoginData, verificationCode: e.target.value })}
                   />
-                  <button 
-                    type="button" 
-                    className="send-code-btn" 
+                  <button
+                    type="button"
+                    className="send-code-btn"
                     onClick={handleSendVerificationCode}
                     disabled={sendingCode || countdown > 0}
                   >
