@@ -73,6 +73,9 @@ public class AiClientService {
                         });
                 lastEx = null;
                 break;
+            } catch (org.springframework.web.client.RestClientResponseException ex) {
+                throw new RuntimeException(
+                        "AI Provider Error: " + ex.getRawStatusCode() + " " + ex.getResponseBodyAsString(), ex);
             } catch (org.springframework.web.client.ResourceAccessException ex) {
                 lastEx = ex;
                 // quick backoff before a single retry
@@ -142,12 +145,18 @@ public class AiClientService {
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
 
-        ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
-                url,
-                HttpMethod.POST,
-                request,
-                new ParameterizedTypeReference<>() {
-                });
+        ResponseEntity<Map<String, Object>> response;
+        try {
+            response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    request,
+                    new ParameterizedTypeReference<>() {
+                    });
+        } catch (org.springframework.web.client.RestClientResponseException ex) {
+            throw new RuntimeException(
+                    "AI Provider Error: " + ex.getRawStatusCode() + " " + ex.getResponseBodyAsString(), ex);
+        }
 
         Map<String, Object> respBody = response != null ? response.getBody() : null;
         if (respBody == null)
@@ -209,7 +218,14 @@ public class AiClientService {
                 .retrieve()
                 // For SSE, WebClient decodes each event's data as String by default
                 .bodyToFlux(String.class)
-                .onErrorResume(e -> Flux.error(new RuntimeException("Upstream stream error: " + e.getMessage(), e)))
+                .onErrorResume(e -> {
+                    if (e instanceof org.springframework.web.reactive.function.client.WebClientResponseException wcre) {
+                        return Flux.error(new RuntimeException(
+                                "Upstream stream error: " + wcre.getStatusCode() + " " + wcre.getResponseBodyAsString(),
+                                e));
+                    }
+                    return Flux.error(new RuntimeException("Upstream stream error: " + e.getMessage(), e));
+                })
                 .takeUntil(s -> s != null && s.contains("[DONE]"))
                 .filter(s -> s != null && !s.isBlank() && !"[DONE]".equals(s.trim()))
                 .flatMap(this::extractDeltaTextSafely)
@@ -311,12 +327,18 @@ public class AiClientService {
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
 
-        ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
-                url,
-                HttpMethod.POST,
-                request,
-                new ParameterizedTypeReference<>() {
-                });
+        ResponseEntity<Map<String, Object>> response;
+        try {
+            response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    request,
+                    new ParameterizedTypeReference<>() {
+                    });
+        } catch (org.springframework.web.client.RestClientResponseException ex) {
+            throw new RuntimeException(
+                    "AI Provider Error: " + ex.getRawStatusCode() + " " + ex.getResponseBodyAsString(), ex);
+        }
 
         Map<String, Object> respBody = response != null ? response.getBody() : null;
         if (respBody == null)
@@ -392,12 +414,18 @@ public class AiClientService {
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
 
-        ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
-                url,
-                HttpMethod.POST,
-                request,
-                new ParameterizedTypeReference<>() {
-                });
+        ResponseEntity<Map<String, Object>> response;
+        try {
+            response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    request,
+                    new ParameterizedTypeReference<>() {
+                    });
+        } catch (org.springframework.web.client.RestClientResponseException ex) {
+            throw new RuntimeException(
+                    "AI Provider Error: " + ex.getRawStatusCode() + " " + ex.getResponseBodyAsString(), ex);
+        }
 
         Map<String, Object> respBody = response != null ? response.getBody() : null;
         if (respBody == null)

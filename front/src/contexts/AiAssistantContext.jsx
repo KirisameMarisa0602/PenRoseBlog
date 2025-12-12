@@ -77,14 +77,16 @@ export function AiAssistantProvider({ children }) {
       // 2) Fallback: fetch streaming (GET) to the same endpoint
       try {
         const headers = { 'Accept': 'text/event-stream, text/plain, */*' };
+        let tokenVal = null;
         try {
-          const token = typeof localStorage !== 'undefined' ? localStorage.getItem('token') : null;
+          tokenVal = typeof localStorage !== 'undefined' ? localStorage.getItem('token') : null;
           const userId = typeof localStorage !== 'undefined' ? localStorage.getItem('userId') : null;
-          if (token) headers['Authorization'] = `Bearer ${token}`;
+          if (tokenVal) headers['Authorization'] = `Bearer ${tokenVal}`;
           if (userId && !isNaN(Number(userId))) headers['X-User-Id'] = Number(userId);
         } catch { /* ignore */ }
         const encoded = encodeURIComponent(String(message ?? ''));
-        let url = `/api/ai/chat/stream?message=${encoded}${model ? `&model=${encodeURIComponent(model)}` : ''}`;
+        const tokenParam = tokenVal ? `&token=${encodeURIComponent(tokenVal)}` : '';
+        let url = `/api/ai/chat/stream?message=${encoded}${model ? `&model=${encodeURIComponent(model)}` : ''}${tokenParam}`;
         const res = await fetch(url, { method: 'GET', headers, signal });
         const ctype = String(res.headers.get('content-type') || '');
         if (!res.ok) { const txt = await res.text().catch(() => ''); throw new Error(`HTTP ${res.status}: ${txt}`); }
@@ -92,6 +94,7 @@ export function AiAssistantProvider({ children }) {
           const reader = res.body.getReader();
           const decoder = new TextDecoder('utf-8');
           let gotFirst = false;
+          let buffer = '';
           if (firstChunkTimeoutMs > 0) {
             firstTimer = setTimeout(() => { try { reader.cancel(); } catch { /* ignore */ } }, firstChunkTimeoutMs);
           }
@@ -103,19 +106,30 @@ export function AiAssistantProvider({ children }) {
           while (true) {
             const { done, value } = await reader.read();
             if (done) break;
-            const txt = decoder.decode(value, { stream: true });
+            const chunk = decoder.decode(value, { stream: true });
             if (!gotFirst) { gotFirst = true; try { clearTimeout(firstTimer); } catch { /* ignore */ } }
-            if (/^data:/m.test(txt)) {
-              const lines = txt.split(/\r?\n/);
+            
+            buffer += chunk;
+            // Split by double newline (event separator)
+            // Support \n\n or \r\n\r\n
+            const parts = buffer.split(/\n\n|\r\n\r\n/);
+            // The last part might be incomplete, keep it in buffer
+            buffer = parts.pop() || '';
+
+            for (const part of parts) {
+              const lines = part.split(/\r?\n/);
+              let msgData = null;
               for (const line of lines) {
                 if (line.startsWith('data:')) {
                   const d = line.replace(/^data:\s?/, '');
-                  if (d === '[DONE]') continue;
-                  append(d);
+                  if (d === '[DONE]') { msgData = null; break; }
+                  if (msgData === null) msgData = d;
+                  else msgData += '\n' + d;
                 }
               }
-            } else {
-              append(txt);
+              if (msgData !== null) {
+                append(msgData);
+              }
             }
           }
           try { clearTimeout(firstTimer); } catch { /* ignore */ }

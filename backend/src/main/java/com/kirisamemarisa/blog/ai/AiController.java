@@ -30,8 +30,13 @@ public class AiController {
         if (message == null || message.isBlank()) {
             return ResponseEntity.badRequest().body(Map.of("error", "message is required"));
         }
-        String reply = aiClientService.chat(message, model);
-        return ResponseEntity.ok(Map.of("reply", reply));
+        try {
+            String reply = aiClientService.chat(message, model);
+            return ResponseEntity.ok(Map.of("reply", reply));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+        }
     }
 
     /**
@@ -67,8 +72,13 @@ public class AiController {
                 }
             }
         }
-        String reply = aiClientService.chatWithAttachments(message, attachments, model);
-        return ResponseEntity.ok(Map.of("reply", reply));
+        try {
+            String reply = aiClientService.chatWithAttachments(message, attachments, model);
+            return ResponseEntity.ok(Map.of("reply", reply));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+        }
     }
 
     /**
@@ -106,8 +116,7 @@ public class AiController {
                             }
                             emitter.completeWithError(err);
                         },
-                        emitter::complete
-                );
+                        emitter::complete);
 
         emitter.onCompletion(subscription::dispose);
         emitter.onTimeout(subscription::dispose);

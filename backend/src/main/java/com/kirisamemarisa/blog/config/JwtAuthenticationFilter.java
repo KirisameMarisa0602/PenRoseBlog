@@ -18,7 +18,8 @@ import java.util.ArrayList;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
         String token = null;
         Long userId = null;
@@ -26,6 +27,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
             userId = JwtUtil.getUserIdFromToken(token);
+        } else {
+            // Fallback: check query parameter "token" (useful for SSE/EventSource)
+            String paramToken = request.getParameter("token");
+            if (paramToken != null && !paramToken.isBlank()) {
+                token = paramToken;
+                userId = JwtUtil.getUserIdFromToken(token);
+            }
         }
 
         if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {

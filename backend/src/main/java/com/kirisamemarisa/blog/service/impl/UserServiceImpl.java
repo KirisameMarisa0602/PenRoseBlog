@@ -35,10 +35,19 @@ import java.util.UUID;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.Files;
+import jakarta.annotation.PostConstruct;
+import org.springframework.context.annotation.Primary;
 
 @Service
+@Primary
 public class UserServiceImpl implements UserService {
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
+
+    @PostConstruct
+    public void init() {
+        logger.info("UserServiceImpl initialized!");
+    }
+
     @Autowired
     private UserRepository userRepository;
     @Autowired

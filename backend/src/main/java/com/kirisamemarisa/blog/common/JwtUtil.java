@@ -31,7 +31,8 @@ public class JwtUtil {
     @PostConstruct
     public void init() {
         if (jwtSecret == null || jwtSecret.length() == 0) {
-            logger.warn("[JWT] jwt.secret is empty in configuration; tokens generated in this runtime may not be compatible across restarts.");
+            logger.warn(
+                    "[JWT] jwt.secret is empty in configuration; tokens generated in this runtime may not be compatible across restarts.");
             // generate a runtime key as fallback (not recommended for production)
             key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         } else {
@@ -107,8 +108,9 @@ public class JwtUtil {
                     .parseClaimsJws(raw)// 解析、验证JWT
                     .getBody();// 获取JWT的主体部分（Claims）声明体
         } catch (Exception e) {
-            logger.error("[JWT] parseToken error for token (first 64 chars): {}", raw.length() > 64 ? raw.substring(0, 64) : raw, e);
-            throw e;
+            logger.error("[JWT] parseToken error for token (first 64 chars): {}",
+                    raw.length() > 64 ? raw.substring(0, 64) : raw, e);
+            return null;
         }
     }
 
@@ -117,7 +119,8 @@ public class JwtUtil {
         try {
             // 获取JWT声明体
             Claims claims = parseToken(token);
-            if (claims == null) return false;
+            if (claims == null)
+                return false;
             // 检查JWT是否过期
             return claims.getExpiration().after(new Date());
         } catch (Exception e) {
