@@ -112,7 +112,11 @@ public class AiClientService {
             return String.valueOf(respBody.get("message"));
         }
 
-        return respBody.toString();
+        try {
+            return objectMapper.writeValueAsString(respBody);
+        } catch (Exception e) {
+            return respBody.toString();
+        }
     }
 
     public String chat(String userMessage, String overrideModel) {
@@ -166,7 +170,11 @@ public class AiClientService {
         if (respBody.containsKey("message")) {
             return String.valueOf(respBody.get("message"));
         }
-        return respBody.toString();
+        try {
+            return objectMapper.writeValueAsString(respBody);
+        } catch (Exception e) {
+            return respBody.toString();
+        }
     }
 
     /**
@@ -187,8 +195,7 @@ public class AiClientService {
         Map<String, Object> body = Map.of(
                 "model", model,
                 "stream", true,
-                "messages", List.of(Map.of("role", "user", "content", userMessage))
-        );
+                "messages", List.of(Map.of("role", "user", "content", userMessage)));
 
         return webClient.post()
                 .uri(url)
@@ -216,7 +223,8 @@ public class AiClientService {
             if (payload.startsWith("data:")) {
                 payload = payload.substring(5).trim();
             }
-            if (payload.isEmpty()) return Flux.empty();
+            if (payload.isEmpty())
+                return Flux.empty();
             JsonNode root = objectMapper.readTree(payload);
             JsonNode choices = root.path("choices");
             if (choices.isArray()) {
@@ -412,7 +420,11 @@ public class AiClientService {
         if (respBody.containsKey("message")) {
             return String.valueOf(respBody.get("message"));
         }
-        return respBody.toString();
+        try {
+            return objectMapper.writeValueAsString(respBody);
+        } catch (Exception e) {
+            return respBody.toString();
+        }
     }
 
     private String getBaseUrlForModel(String overrideModel) {

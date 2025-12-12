@@ -1,7 +1,7 @@
 /* ConversationDetail 样式 - 美化版 */
 .conversation-detail-page {
   height: calc(100vh - var(--navH));
-  background: #f0f2f5; /* 浅灰背景，类似微信/Telegram */
+  background: transparent; /* 移除强制灰底，透出全局背景 */
   box-sizing: border-box;
   padding: 0;
   overflow: hidden;

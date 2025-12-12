@@ -217,7 +217,16 @@ export default function MaidAiChat({ visible }) {
 
   function normalizeReply(raw) {
     if (raw == null) return '';
-    if (typeof raw === 'string') return raw;
+    if (typeof raw === 'string') {
+      try {
+        const trimmed = raw.trim();
+        if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+          const parsed = JSON.parse(raw);
+          return normalizeReply(parsed);
+        }
+      } catch { /* ignore */ }
+      return raw;
+    }
     if (typeof raw === 'object') {
       try {
         const choices = raw.choices || raw.result || raw.outputs;

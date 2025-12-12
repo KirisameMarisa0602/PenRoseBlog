@@ -168,8 +168,8 @@ export default function Welcome() {
   };
 
   return (
-    <div className="container">
-      <div className="welcome">
+    <div className="welcome-container">
+      <div className="welcome-card">
         <div className={`pinkbox${showRegister ? ' show-register' : ''}`}>
           <div className={`signup${showRegister ? '' : ' nodisplay'}`}>
             <h1>Register</h1>
@@ -238,17 +238,17 @@ export default function Welcome() {
           )}
         </div>
         <div className="leftbox">
-          <h2 className="title"><span>BLOOM</span>&<br />BOUQUET</h2>
-          <p className="desc">Pick your perfect <span>bouquet</span></p>
+          <h2 className="welcome-title"><span>BLOOM</span>&<br />BOUQUET</h2>
+          <p className="welcome-desc">Pick your perfect <span>bouquet</span></p>
           <img className="flower smaller" src={resolveUrl('/imgs/loginandwelcomepanel/flower01.png')} alt="flower" />
-          <p className="account">Have an account?</p>
+          <p className="welcome-account">Have an account?</p>
           <button className="button" onClick={() => setShowRegister(false)}>Login</button>
         </div>
         <div className="rightbox">
-          <h2 className="title"><span>BLOOM</span>&<br />BOUQUET</h2>
-          <p className="desc">Pick your perfect <span>bouquet</span></p>
+          <h2 className="welcome-title"><span>BLOOM</span>&<br />BOUQUET</h2>
+          <p className="welcome-desc">Pick your perfect <span>bouquet</span></p>
           <img className="flower" src={resolveUrl('/imgs/loginandwelcomepanel/flower02.png')} alt="flower" />
-          <p className="account">Don't have an account?</p>
+          <p className="welcome-account">Don't have an account?</p>
           <button className="button" onClick={() => setShowRegister(true)}>Sign Up</button>
         </div>
       </div>

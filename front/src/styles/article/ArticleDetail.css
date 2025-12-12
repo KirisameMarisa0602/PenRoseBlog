@@ -721,3 +721,11 @@ html.banner-is-hidden .article-cover-wrapper {
     top: 0;
     transition: top 0.3s ease;
 }
+
+/* Ensure content images are responsive */
+.article-content img, .tiptap-content img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+

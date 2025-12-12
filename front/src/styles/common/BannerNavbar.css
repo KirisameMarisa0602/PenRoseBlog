@@ -148,6 +148,13 @@ html, body, #root {
   margin: 0; padding: 0; box-sizing: border-box;
   --cell: min(var(--navH), calc(100vw / 8)); /* 单元基准尺寸 */
 }
+
+/* Ensure links in navbar don't have underlines */
+.banner-navbar a {
+  text-decoration: none;
+  color: inherit;
+}
+
 .nav-brand > *{ margin: 0; padding: 0; }
 
 .banner-navbar .nav-brand .penrose-logo{

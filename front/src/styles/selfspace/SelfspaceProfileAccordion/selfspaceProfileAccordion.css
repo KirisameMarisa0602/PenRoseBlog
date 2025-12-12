@@ -929,14 +929,16 @@ input[type="file"]::file-selector-button:hover {
   font-size: 14px;
   width: 100%;
   outline: none;
+  color: #333; /* Fix invisible text */
 }
 
 .profile-add-tag-btn {
   background: none;
   border: 1px dashed #ccc;
   color: #999;
-  width: 24px;
-  height: 24px;
+  width: 32px; /* Increased size */
+  height: 32px; /* Increased size */
+  flex: 0 0 32px; /* Prevent squashing */
   border-radius: 50%;
   display: flex;
   align-items: center;

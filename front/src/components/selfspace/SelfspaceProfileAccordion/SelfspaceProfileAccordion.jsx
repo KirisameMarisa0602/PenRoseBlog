@@ -764,14 +764,8 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                               </div>
                               <div className="form-group" style={{ marginTop: '25px' }}>
                                 <label className="profile-form-label">背景图/视频</label>
-                                <div className="upload-zone">
-                                  <input type="file" accept="image/*,image/gif,video/mp4,video/webm" onChange={handleBackgroundSelect} id="bg-upload" />
-                                  <div className="upload-zone-icon">🖼️</div>
-                                  <div className="upload-zone-text">点击上传背景图片或视频</div>
-                                  <div className="upload-zone-subtext">支持图片或 MP4/WebM 视频</div>
-                                </div>
                                 {(backgroundPreview || profile.backgroundUrl) && (
-                                  <div className="profilepanel-bg-preview" style={{ marginTop: '15px', borderRadius: '12px', overflow: 'hidden', border: '1px solid #eee', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+                                  <div className="profilepanel-bg-preview" style={{ marginBottom: '15px', borderRadius: '12px', overflow: 'hidden', border: '1px solid #eee', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
                                     {(() => {
                                       const url = backgroundPreview || profile.backgroundUrl;
                                       if (/\.(mp4|webm)$/i.test(url)) {
@@ -782,6 +776,11 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                                     })()}
                                   </div>
                                 )}
+                                <div className="upload-zone" style={{ minHeight: '60px', padding: '10px', flexDirection: 'row', gap: '10px' }}>
+                                  <input type="file" accept="image/*,image/gif,video/mp4,video/webm" onChange={handleBackgroundSelect} id="bg-upload" />
+                                  <div className="upload-zone-icon" style={{ fontSize: '20px', marginBottom: 0 }}>🖼️</div>
+                                  <div className="upload-zone-text">点击更换背景</div>
+                                </div>
                               </div>
                             </>
                           )}
@@ -791,11 +790,17 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                                 <div className="form-group">
                                   <label className="profile-form-label">QQ号</label>
-                                  <input type="text" name="qq" value={profile.qq || ''} onChange={handleProfileChange} className="profile-form-input" placeholder="QQ号码" />
+                                  <div style={{ position: 'relative', width: '100%' }}>
+                                    <img src={resolveUrl('/icons/contect/qq.svg')} alt="QQ" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '20px', height: '20px', opacity: 0.6 }} />
+                                    <input type="text" name="qq" value={profile.qq || ''} onChange={handleProfileChange} className="profile-form-input" placeholder="QQ号码" style={{ paddingLeft: '38px' }} />
+                                  </div>
                                 </div>
                                 <div className="form-group">
                                   <label className="profile-form-label">微信号</label>
-                                  <input type="text" name="wechat" value={profile.wechat || ''} onChange={handleProfileChange} className="profile-form-input" placeholder="微信号码" />
+                                  <div style={{ position: 'relative', width: '100%' }}>
+                                    <img src={resolveUrl('/icons/contect/微信.svg')} alt="WeChat" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '20px', height: '20px', opacity: 0.6 }} />
+                                    <input type="text" name="wechat" value={profile.wechat || ''} onChange={handleProfileChange} className="profile-form-input" placeholder="微信号码" style={{ paddingLeft: '38px' }} />
+                                  </div>
                                 </div>
                               </div>
 
@@ -836,13 +841,19 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                                 </div>
                               </div>
 
-                              <div className="form-group">
+                              <div className="form-group" style={{ marginTop: '15px' }}>
                                 <label className="profile-form-label">GitHub主页</label>
-                                <input type="text" name="githubLink" value={profile.githubLink || ''} onChange={handleProfileChange} className="profile-form-input" placeholder="https://github.com/..." />
+                                <div style={{ position: 'relative', width: '100%' }}>
+                                  <img src={resolveUrl('/icons/contect/github.svg')} alt="GitHub" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '20px', height: '20px', opacity: 0.6 }} />
+                                  <input type="text" name="githubLink" value={profile.githubLink || ''} onChange={handleProfileChange} className="profile-form-input" placeholder="https://github.com/..." style={{ paddingLeft: '38px' }} />
+                                </div>
                               </div>
                               <div className="form-group">
                                 <label className="profile-form-label">B站主页</label>
-                                <input type="text" name="bilibiliLink" value={profile.bilibiliLink || ''} onChange={handleProfileChange} className="profile-form-input" placeholder="https://space.bilibili.com/..." />
+                                <div style={{ position: 'relative', width: '100%' }}>
+                                  <img src={resolveUrl('/icons/contect/bilibili.svg')} alt="Bilibili" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '20px', height: '20px', opacity: 0.6 }} />
+                                  <input type="text" name="bilibiliLink" value={profile.bilibiliLink || ''} onChange={handleProfileChange} className="profile-form-input" placeholder="https://space.bilibili.com/..." style={{ paddingLeft: '38px' }} />
+                                </div>
                               </div>
                             </>
                           )}
@@ -980,9 +991,10 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                     <h3 style={{ marginTop: 0, marginBottom: '25px', color: '#333', borderBottom: '2px solid #f0f0f0', paddingBottom: '15px', fontSize: '1.4rem' }}>联系方式</h3>
                     
                     <div className="profile-contact-grid" style={{ 
-                      display: 'grid', 
-                      gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', 
-                      gap: '20px',
+                      display: 'flex', 
+                      flexWrap: 'wrap',
+                      justifyContent: 'center',
+                      gap: '15px',
                       flex: 1,
                       alignContent: 'start',
                       width: '100%'
@@ -991,15 +1003,17 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                       {(profile.qq || profile.qqQrCode) && (
                         <div className="contact-card" style={{ 
                           background: '#fff', 
-                          padding: '30px', 
-                          borderRadius: '16px', 
-                          boxShadow: '0 8px 24px rgba(0,0,0,0.06)', 
+                          padding: '20px', 
+                          borderRadius: '12px', 
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.05)', 
                           border: '1px solid #f0f0f0', 
                           display: 'flex', 
                           flexDirection: 'column', 
                           alignItems: 'center',
                           transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                          height: 'fit-content'
+                          height: 'fit-content',
+                          minWidth: '160px',
+                          flex: '0 1 auto'
                         }}
                         onMouseEnter={e => {
                           e.currentTarget.style.transform = 'translateY(-5px)';

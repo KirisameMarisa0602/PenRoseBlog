@@ -1,8 +1,3 @@
-* { box-sizing: border-box; }
-body, html { margin: 0; overflow-x: hidden; min-height: 100vh; }
-a { color: inherit; text-decoration: none; }
-
-
 /* 背景统一为蓝色渐变（与私信/好友页一致） */
 .home-main-full {
   min-height: 100vh;
