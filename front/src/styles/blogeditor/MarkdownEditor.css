@@ -1,13 +1,13 @@
 .markdown-editor-container {
   display: flex;
   width: 100%;
-  height: 75vh; /* Slightly taller */
-  border: 1px solid #cbd5e1;
-  border-radius: 12px;
+  height: 100%; /* Fill parent */
+  border: none; /* Removed border to blend with container */
+  border-radius: 0;
   overflow: hidden;
   position: relative;
   background-color: #fff;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: none;
 }
 
 .markdown-pane-wrapper {
@@ -149,3 +149,48 @@
 .markdown-preview-content pre code { background-color: transparent; padding: 0; font-size: 100%; color: inherit; }
 .markdown-preview-content img { max-width: 100%; height: auto; border-radius: 4px; }
 .markdown-preview-content a { color: #3b82f6; text-decoration: underline; }
+
+/* Markdown Toolbar */
+.markdown-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  background: #fff;
+  border-bottom: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+}
+
+.markdown-toolbar button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.markdown-toolbar button:hover {
+  background: #f1f5f9;
+  color: #334155;
+  border-color: #cbd5e1;
+}
+
+.markdown-toolbar button b { font-weight: 800; }
+.markdown-toolbar button i { font-style: italic; font-family: serif; }
+.markdown-toolbar button s { text-decoration: line-through; }
+
+.md-divider {
+  width: 1px;
+  height: 16px;
+  background: #e2e8f0;
+  margin: 0 4px;
+}

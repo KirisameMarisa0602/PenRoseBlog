@@ -137,10 +137,13 @@ input[type="file"]::file-selector-button {
   font-size: 13px;
   transition: all 0.2s;
   margin-right: 10px;
+  color: #333; /* Darker text color */
+  font-weight: 600; /* Bolder text */
 }
 
 input[type="file"]::file-selector-button:hover {
   background: #e0e0e0;
+  color: #000;
 }
 
 /* Save Button */
@@ -263,9 +266,910 @@ input[type="file"]::file-selector-button:hover {
 /* 仅当滚动型面板处于激活状态时，允许纵向滚动，避免内容被裁切 */
 .profilepanel-scroll-section.profilepanel-section-active {
   overflow-y: auto;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.profilepanel-scroll-section.profilepanel-section-active::-webkit-scrollbar {
+  display: none;
 }
 
 /* 让滚动面板里的内容从顶部开始排布（覆盖基础居中样式） */
 .profilepanel-scroll-content {
   align-items: flex-start;
 }
+/* ==========================================================================
+   New UI Styles for Gender Selector & Tags (Beautification)
+   ========================================================================== */
+
+/* --- Scrollbar Hiding --- */
+.profilepanel-useredit-panel::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+.profilepanel-useredit-panel {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+  overflow-x: hidden;
+}
+
+/* Hide scrollbar for the sidebar as well if needed */
+.profilepanel-edit-sidebar::-webkit-scrollbar {
+  display: none;
+}
+.profilepanel-edit-sidebar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Ensure the content area also hides scrollbar */
+.profilepanel-edit-content::-webkit-scrollbar {
+  display: none;
+}
+.profilepanel-edit-content {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* --- Gender Selector (Visual Cards) --- */
+.profile-gender-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  width: 100%;
+  margin-top: 5px;
+}
+
+.profile-gender-card {
+  background: #fff;
+  border: 2px solid #eee;
+  border-radius: 12px;
+  padding: 15px 10px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-gender-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  border-color: #b3d8ff;
+}
+
+.profile-gender-card.active {
+  border-color: #1890ff;
+  background: #f0f9ff;
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.2);
+}
+
+.profile-gender-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+}
+
+.profile-gender-card:hover .profile-gender-icon-wrapper {
+  transform: scale(1.1);
+}
+
+.profile-gender-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.profile-gender-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #555;
+  transition: color 0.3s;
+}
+
+.profile-gender-card.active .profile-gender-label {
+  color: #1890ff;
+}
+
+/* --- Tags Input (Chips Style) --- */
+.profile-tags-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fff;
+  min-height: 48px;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.profile-tags-wrapper:focus-within {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+}
+
+.profile-tag-chip {
+  display: inline-flex;
+  align-items: center;
+  background: #e6f7ff;
+  color: #1890ff;
+  border: 1px solid #91d5ff;
+  border-radius: 16px;
+  padding: 4px 10px;
+  font-size: 13px;
+  font-weight: 500;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.profile-tag-chip button {
+  background: none;
+  border: none;
+  color: #1890ff;
+  margin-left: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.profile-tag-chip button:hover {
+  opacity: 1;
+  background: rgba(24, 144, 255, 0.1);
+  border-radius: 50%;
+}
+
+.profile-tag-input-group {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+  min-width: 120px;
+}
+
+.profile-tag-input {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  padding: 6px 0 !important;
+  font-size: 14px;
+  width: 100%;
+  outline: none;
+}
+
+.profile-add-tag-btn {
+  background: none;
+  border: 1px dashed #ccc;
+  color: #999;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-left: 5px;
+  transition: all 0.2s;
+  font-size: 18px;
+  line-height: 1;
+  padding-bottom: 2px;
+}
+
+.profile-add-tag-btn:hover:not(:disabled) {
+  border-color: #1890ff;
+  color: #1890ff;
+  background: #f0f9ff;
+}
+
+.profile-add-tag-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+/*
+  Selfspace Profile Accordion - Consolidated styles
+  - 合并基础样式并删除冗余定�?
+  - 编辑面板的差异通过 `.editing` 或特定选择器覆�?
+*/
+
+.profilepanel-container {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.profilepanel-section {
+  width: 100%;
+  min-height: 0;
+  height: 100%;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  transition: height .35s ease, min-height .35s ease;
+  will-change: height, min-height;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.16);
+}
+
+.profilepanel-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: stretch;
+}
+
+.selfspace-profilepanel-container {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* 表单与编辑区基础样式 */
+.profilepanel-useredit-panel {
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.95);
+  /* Increased opacity for better readability */
+  border-radius: 12px;
+  height: 100%;
+  width: 100%;
+  /* Ensure full width */
+  overflow-y: auto;
+}
+
+.profilepanel-useredit-panel h4 {
+  color: #000;
+  /* Darker color */
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 18px;
+  font-weight: 700;
+  /* Bolder */
+}
+
+.profilepanel-useredit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.form-group label {
+  color: #000;
+  /* Darker color */
+  font-weight: 700;
+  /* Bolder */
+  font-size: 14px;
+}
+
+.form-group input[type="text"],
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #fff;
+  font-size: 14px;
+  transition: all 0.2s;
+  outline: none;
+}
+
+.form-group input[type="text"]:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.1);
+}
+
+.profilepanel-avatar-preview {
+  margin-top: 8px;
+  display: flex;
+  justify-content: center;
+}
+
+.profilepanel-avatar-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #fff;
+  background: #fff;
+  display: block;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.profilepanel-bg-preview {
+  margin-top: 8px;
+  width: 100%;
+}
+
+/* Custom File Input Button Style */
+input[type="file"]::file-selector-button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  background: #f0f0f0;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+  margin-right: 10px;
+  color: #333; /* Darker text color */
+  font-weight: 600; /* Bolder text */
+}
+
+input[type="file"]::file-selector-button:hover {
+  background: #e0e0e0;
+  color: #000;
+}
+
+/* Save Button */
+.profilepanel-useredit-form button[type="submit"],
+.profilepanel-useredit-form .save-btn {
+  padding: 12px;
+  background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 10px;
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+}
+
+.profilepanel-useredit-form button[type="submit"]:hover,
+.profilepanel-useredit-form .save-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(24, 144, 255, 0.4);
+}
+
+.profilepanel-useredit-form button[type="submit"]:disabled,
+.profilepanel-useredit-form .save-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* 背景媒体：默认不带边框，第一模块铺满 */
+.profilepanel-bg-img,
+.profilepanel-bg-video {
+  object-fit: cover;
+  background: #fff;
+  border: none;
+  border-radius: 0;
+  display: block;
+}
+
+/* 第一模块专用：铺满整个面板（背景�?*/
+.profilepanel-section:first-child .profilepanel-bg-img,
+.profilepanel-section:first-child .profilepanel-bg-video {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+/* 其他模块的预览默认尺寸（编辑模式下可覆盖�?*/
+.profilepanel-bg-preview .profilepanel-bg-img,
+.profilepanel-bg-preview .profilepanel-bg-video {
+  width: auto;
+  max-height: 160px;
+  position: static;
+  border-radius: 0;
+}
+
+.form-msg {
+  color: #1a8917;
+  margin-top: 4px;
+  font-size: 14px;
+}
+
+/* === 编辑模式覆盖：将 preview 变为固定小图，带圆角与边�?=== */
+/* 使用方式：组件在编辑时给根节点添�?.editing 类，或直接在编辑页面额外引入此文�?*/
+.editing .profilepanel-bg-preview .profilepanel-bg-img,
+.editing .profilepanel-bg-preview .profilepanel-bg-video,
+.profilepanel-bg-preview.editing .profilepanel-bg-img,
+.profilepanel-bg-preview.editing .profilepanel-bg-video {
+  width: 220px;
+  max-height: 160px;
+  object-fit: cover;
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 8px;
+  display: block;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+
+/* -------------------------------------------------- */
+/* 编辑面板（覆�?增强规则�?                            */
+/* 放在文件末尾以覆盖上方的基础样式，便于在同一文件中管�?*/
+/* 如果需要条件生效，可在组件中向根节点添�?`.editing` �?*/
+/* -------------------------------------------------- */
+
+/* 编辑面板：预览图带边框与圆角 */
+.profilepanel-bg-preview .profilepanel-bg-img,
+.profilepanel-bg-preview .profilepanel-bg-video {
+  width: 220px;
+  max-height: 160px;
+  object-fit: cover;
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 8px;
+}
+
+/* 保持第一模块铺满的样式不变（编辑覆盖不影响首模块�?*/
+.profilepanel-section:first-child .profilepanel-bg-img,
+.profilepanel-section:first-child .profilepanel-bg-video {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 0;
+}
+
+/* 可选：当组件处于编辑模式时，使�?`.editing` 根类加强显示 */
+.editing .profilepanel-bg-preview .profilepanel-bg-img,
+.editing .profilepanel-bg-preview .profilepanel-bg-video {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+/* 仅当滚动型面板处于激活状态时，允许纵向滚动，避免内容被裁�?*/
+.profilepanel-scroll-section.profilepanel-section-active {
+  overflow-y: auto;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.profilepanel-scroll-section.profilepanel-section-active::-webkit-scrollbar {
+  display: none;
+}
+
+/* 让滚动面板里的内容从顶部开始排布（覆盖基础居中样式�?*/
+.profilepanel-scroll-content {
+  align-items: flex-start;
+}
+/* ==========================================================================
+   New UI Styles for Gender Selector & Tags (Beautification)
+   ========================================================================== */
+
+/* --- Scrollbar Hiding --- */
+.profilepanel-useredit-panel::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+.profilepanel-useredit-panel {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+  overflow-x: hidden;
+}
+
+/* Hide scrollbar for the sidebar as well if needed */
+.profilepanel-edit-sidebar::-webkit-scrollbar {
+  display: none;
+}
+.profilepanel-edit-sidebar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Ensure the content area also hides scrollbar */
+.profilepanel-edit-content::-webkit-scrollbar {
+  display: none;
+}
+.profilepanel-edit-content {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* --- Gender Selector (Visual Cards) --- */
+.profile-gender-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  width: 100%;
+  margin-top: 5px;
+}
+
+.profile-gender-card {
+  background: #fff;
+  border: 2px solid #eee;
+  border-radius: 12px;
+  padding: 15px 10px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-gender-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  border-color: #b3d8ff;
+}
+
+.profile-gender-card.active {
+  border-color: #1890ff;
+  background: #f0f9ff;
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.2);
+}
+
+.profile-gender-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+}
+
+.profile-gender-card:hover .profile-gender-icon-wrapper {
+  transform: scale(1.1);
+}
+
+.profile-gender-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.profile-gender-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #555;
+  transition: color 0.3s;
+}
+
+.profile-gender-card.active .profile-gender-label {
+  color: #1890ff;
+}
+
+/* --- Tags Input (Chips Style) --- */
+.profile-tags-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fff;
+  min-height: 48px;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.profile-tags-wrapper:focus-within {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+}
+
+.profile-tag-chip {
+  display: inline-flex;
+  align-items: center;
+  background: #e6f7ff;
+  color: #1890ff;
+  border: 1px solid #91d5ff;
+  border-radius: 16px;
+  padding: 4px 10px;
+  font-size: 13px;
+  font-weight: 500;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.profile-tag-chip button {
+  background: none;
+  border: none;
+  color: #1890ff;
+  margin-left: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.profile-tag-chip button:hover {
+  opacity: 1;
+  background: rgba(24, 144, 255, 0.1);
+  border-radius: 50%;
+}
+
+.profile-tag-input-group {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+  min-width: 120px;
+}
+
+.profile-tag-input {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  padding: 6px 0 !important;
+  font-size: 14px;
+  width: 100%;
+  outline: none;
+}
+
+.profile-add-tag-btn {
+  background: none;
+  border: 1px dashed #ccc;
+  color: #999;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-left: 5px;
+  transition: all 0.2s;
+  font-size: 18px;
+  line-height: 1;
+  padding-bottom: 2px;
+}
+
+.profile-add-tag-btn:hover:not(:disabled) {
+  border-color: #1890ff;
+  color: #1890ff;
+  background: #f0f9ff;
+}
+
+.profile-add-tag-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+
+/* ==========================================================================
+   New Form Styles (Beautification)
+   ========================================================================== */
+
+.profile-form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+.profile-form-input,
+.profile-form-textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #fff;
+  color: #333;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.profile-form-input:focus,
+.profile-form-textarea:focus {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.1);
+  background-color: #fff;
+}
+
+.profile-form-input::placeholder,
+.profile-form-textarea::placeholder {
+  color: #aaa;
+}
+
+.profile-form-textarea {
+  min-height: 100px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+/* Custom File Input Styling */
+.profile-file-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.profile-file-input {
+  display: none; /* Hide the default file input */
+}
+
+.profile-file-label {
+  display: inline-block;
+  padding: 8px 20px;
+  background-color: #f5f5f5;
+  color: #333;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.profile-file-label:hover {
+  background-color: #e6f7ff;
+  border-color: #1890ff;
+  color: #1890ff;
+}
+
+.profile-file-label:active {
+  background-color: #bae7ff;
+}
+
+.profile-file-name {
+  font-size: 13px;
+  color: #666;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* QR Code Preview Container */
+.profilepanel-qr-preview {
+  margin-top: 12px;
+  width: 120px;
+  height: 120px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profilepanel-qr-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ==========================================================================
+   Final Polish & Beautification
+   ========================================================================== */
+
+/* Hide Scrollbars Globally for Panels */
+.profilepanel-useredit-panel::-webkit-scrollbar,
+.profilepanel-info-panel::-webkit-scrollbar,
+.profilepanel-contact-panel::-webkit-scrollbar,
+.profilepanel-edit-content::-webkit-scrollbar,
+.profilepanel-edit-sidebar::-webkit-scrollbar {
+  display: none !important;
+}
+
+.profilepanel-useredit-panel,
+.profilepanel-info-panel,
+.profilepanel-contact-panel,
+.profilepanel-edit-content,
+.profilepanel-edit-sidebar {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+  overflow-x: hidden;
+}
+
+/* Upload Zone Beautification */
+.upload-zone {
+  border: 2px dashed #d9d9d9;
+  border-radius: 12px;
+  background: #fafafa;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 140px;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.upload-zone:hover {
+  border-color: #1890ff;
+  background: #f0f5ff;
+  transform: translateY(-2px);
+}
+
+.upload-zone-icon {
+  font-size: 32px;
+  color: #999;
+  margin-bottom: 12px;
+  transition: color 0.3s;
+}
+
+.upload-zone:hover .upload-zone-icon {
+  color: #1890ff;
+}
+
+.upload-zone-text {
+  color: #666;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.upload-zone-subtext {
+  color: #999;
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+.upload-zone input[type="file"] {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 10;
+}
+
+/* Contact Panel Grid Adjustment */
+.profile-contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  width: 100%;
+  align-content: start;
+}
+
+.contact-card {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+

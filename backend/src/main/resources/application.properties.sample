@@ -53,6 +53,7 @@ jwt.secret=your_very_long_random_secret_key_here_at_least_32_bytes
 resource.sources-location=file:/app/sources/
 resource.avatar-location=${resource.sources-location}avatar/
 resource.background-location=${resource.sources-location}background/
+resource.profile-location=${resource.sources-location}profile/
 resource.blogpostcover-location=${resource.sources-location}blogpostcover/
 resource.blogpostcontent-location=${resource.sources-location}blogpostcontent/
 

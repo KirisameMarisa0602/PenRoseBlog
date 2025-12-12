@@ -188,47 +188,45 @@ export default function NotificationCenter() {
             </div>
 
             <div className="notification-content-wrapper">
-                {activeTab === 'MESSAGES' ? (
-                    <MessageList />
-                ) : (
-                    <div className="notification-center-container">
-                        {activeTab === 'REQUESTS' && (
-                            <div style={{ marginBottom: '2rem' }}>
-                                <PendingFriendRequests />
+                <div className="notification-center-container">
+                    {activeTab === 'MESSAGES' ? (
+                        <MessageList isEmbedded={true} />
+                    ) : (
+                        <>
+                            {activeTab === 'REQUESTS' && <PendingFriendRequests />}
+
+                            <div className="notification-center-header">
+                                <h2>
+                                    {activeTab === 'ALL' && '全部通知'}
+                                    {activeTab === 'LIKES' && '赞与收藏'}
+                                    {activeTab === 'COMMENTS' && '评论与回复'}
+                                    {activeTab === 'FOLLOW' && '关注通知'}
+                                    {activeTab === 'REQUESTS' && '申请记录'}
+                                </h2>
+                                <button className="mark-read-btn" onClick={markAllRead}>
+                                    <img src="/site_assets/icons/message/read.svg" alt="" style={{ width: 16, height: 16 }} onError={(e) => { e.target.style.display = 'none'; }} />
+                                    全部已读
+                                </button>
                             </div>
-                        )}
 
-                        <div className="notification-center-header">
-                            <h2>
-                                {activeTab === 'ALL' && '全部通知'}
-                                {activeTab === 'LIKES' && '赞与收藏'}
-                                {activeTab === 'COMMENTS' && '评论与回复'}
-                                {activeTab === 'FOLLOW' && '关注通知'}
-                                {activeTab === 'REQUESTS' && '申请记录'}
-                            </h2>
-                            <button className="mark-read-btn" onClick={markAllRead}>
-                                <img src="/site_assets/icons/message/read.svg" alt="" style={{ width: 16, height: 16 }} onError={(e) => { e.target.style.display = 'none'; }} />
-                                全部已读
-                            </button>
-                        </div>
-
-                        <div className="notification-list">
-                            {notifications.length === 0 && !loading ? (
-                                <div className="no-notifications">
-                                    <div className="no-notifications-icon">📭</div>
-                                    <div>暂无通知</div>
-                                </div>
-                            ) : (
-                                notifications.map(renderNotificationItem)
+                            <div className="notification-list">
+                                {notifications.length === 0 && !loading ? (
+                                    <div className="no-notifications">
+                                        <div className="no-notifications-icon">📭</div>
+                                        <div>暂无通知</div>
+                                    </div>
+                                ) : (
+                                    notifications.map(renderNotificationItem)
+                                )}
+                            </div>
+                            {hasMore && notifications.length > 0 && (
+                                <button className="load-more-btn" onClick={handleLoadMore} disabled={loading}>
+                                    {loading ? '加载中...' : '加载更多'}
+                                </button>
                             )}
-                        </div>
-                        {hasMore && notifications.length > 0 && (
-                            <button className="load-more-btn" onClick={handleLoadMore} disabled={loading}>
-                                {loading ? '加载中...' : '加载更多'}
-                            </button>
-                        )}
-                    </div>
-                )}
+                        </>
+                    )}
+                </div>
             </div>
         </div>
     );

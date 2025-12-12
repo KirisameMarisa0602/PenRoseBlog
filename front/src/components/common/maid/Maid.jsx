@@ -24,7 +24,7 @@ if (!Live2DModel._tickerRegistered) {
 
 // ensureCubismCoreReady 已通过 utils 引入，移除本地重复定义
 
-export default function Maid({ defaultCollapsed = true, onModelLoaded }) {
+export default function Maid({ defaultCollapsed = true, onModelLoaded, onWidthChange }) {
   const containerRef = useRef(null);
   const appRef = useRef(null);
   const modelRef = useRef(null);
@@ -39,6 +39,14 @@ export default function Maid({ defaultCollapsed = true, onModelLoaded }) {
   const [collapsed, setCollapsed] = useState(defaultCollapsed);
   const WIDTH_KEY = WIDTH_KEY_CONST;
   const { panelWidth, setPanelWidth, onResizerPointerDown } = usePanelWidth(WIDTH_KEY);
+
+  // Notify parent about width changes
+  useEffect(() => {
+    if (onWidthChange) {
+      onWidthChange(collapsed ? 0 : panelWidth);
+    }
+  }, [panelWidth, collapsed, onWidthChange]);
+
   const [dpi, setDpi] = useState(3);
   const [userScale] = useState(1); // UI 不再暴露
   const basePosRef = useRef({ x: 0, y: 0 });

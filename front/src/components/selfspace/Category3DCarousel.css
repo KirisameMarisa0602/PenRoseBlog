@@ -1,0 +1,175 @@
+.category-3d-carousel-container {
+  width: 100%;
+  height: 320px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  perspective: 1000px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  background: transparent;
+}
+
+.carousel-stage {
+  position: relative;
+  width: 100%;
+  height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-style: preserve-3d;
+}
+
+.carousel-card {
+  position: absolute;
+  width: 160px;
+  height: 220px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  transform-origin: center center;
+  /* Ensure backface visibility if we want to see them from behind, but here we don't rotate 180 */
+}
+
+.card-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  border: 2px solid rgba(255,255,255,0.3);
+  box-sizing: border-box;
+}
+
+.card-content {
+  z-index: 2;
+  text-align: center;
+  padding: 10px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Split Text Effect Styles */
+.card-title-split {
+  position: relative;
+  height: 60px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.split-text-layer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  color: white;
+  white-space: nowrap;
+  font-size: 36px;
+  font-weight: 900;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  letter-spacing: 2px;
+}
+
+.split-text-top {
+  clip-path: inset(0 0 50% 0);
+}
+
+.split-text-bottom {
+  clip-path: inset(50% 0 0 0);
+}
+
+/* Hover effect on the card triggers the split */
+.carousel-card:hover .split-text-top {
+  transform: translate(-50%, calc(-50% - 4px));
+}
+
+.carousel-card:hover .split-text-bottom {
+  transform: translate(-50%, calc(-50% + 4px));
+}
+
+.card-desc {
+  margin-top: 5px;
+  font-size: 12px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s 0.2s;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  font-weight: 500;
+}
+
+.carousel-card.active .card-desc {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.card-shine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 60%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.carousel-card:hover {
+  filter: brightness(1.1);
+}
+
+.carousel-controls {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  z-index: 10;
+}
+
+.nav-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,0.8);
+  color: #333;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-btn:hover:not(:disabled) {
+  background: #fff;
+  transform: scale(1.1);
+}
+
+.nav-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.current-cat-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #475569;
+  min-width: 60px;
+  text-align: center;
+}

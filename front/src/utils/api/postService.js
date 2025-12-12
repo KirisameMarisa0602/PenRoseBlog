@@ -49,3 +49,10 @@ export async function sharePost(id) {
   const response = await httpClient.post(`/blogpost/${id}/share`);
   return response.data;
 }
+
+export async function deletePost(id, userId) {
+  const response = await httpClient.delete(`/blogpost/${id}`, {
+    params: { userId },
+  });
+  return response.data;
+}

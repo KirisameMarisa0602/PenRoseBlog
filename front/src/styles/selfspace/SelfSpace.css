@@ -13,7 +13,6 @@
   /* 固定在视口左侧，始终悬浮在页面左边 */
   position: fixed;
   left: 0;
-  top: var(--navH, 15vh); /* 与导航栏高度保持一致，优先使用 --navH */
   width: 25vw;
   min-width: 260px;
   max-width: 420px;
@@ -381,7 +380,7 @@
   border-color: #333;
 }
 
-/* ��ͼ�л���ť�� */
+/* ��ͼ�л���ť�� */
 .selfspace-view-toggle {
   display: flex;
   gap: 1rem;

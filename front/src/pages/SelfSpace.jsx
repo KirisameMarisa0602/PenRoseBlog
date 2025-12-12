@@ -1,16 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import '@styles/selfspace/SelfSpace.css';
 import SelfspaceProfileAccordion from '@components/selfspace/SelfspaceProfileAccordion/SelfspaceProfileAccordion.jsx';
 import ArticleCard from '@components/common/ArticleCard';
+import Category3DCarousel from '@components/selfspace/Category3DCarousel';
 import { useAuthState } from '@hooks/useAuthState';
 import resolveUrl from '@utils/resolveUrl';
+import { BLOG_CATEGORIES } from '@utils/constants';
+import { CATEGORY_CONFIG, DEFAULT_CATEGORY_CONFIG } from '@utils/categoryConfig';
 
 // SelfSpace 页面：左侧 25vw 手风琴资料面板 + 右侧内容区域
 export default function SelfSpace() {
   const location = useLocation();
+  const navigate = useNavigate();
   const params = new URLSearchParams(location.search);
   const urlUserId = params.get('userId');                 // 被查看用户ID（可能为空）
+  const urlCategory = params.get('category');             // URL中的分类参数
   const { user } = useAuthState();
   const myId = user?.id ? String(user.id) : null;
   const isOwner = !urlUserId || String(urlUserId) === String(myId);
@@ -43,6 +48,13 @@ export default function SelfSpace() {
   const [searchInput, setSearchInput] = useState('');
   const [directories, setDirectories] = useState([]);
   const [selectedDirectory, setSelectedDirectory] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState(urlCategory || ''); // 初始值优先取URL
+  const [showDrafts, setShowDrafts] = useState(false); // 新增：草稿箱模式
+
+  // 监听 URL 变化同步到 state
+  useEffect(() => {
+    setSelectedCategory(urlCategory || '');
+  }, [urlCategory]);
 
   // 可选：记录总数（热度模式下由前端计算）
   const [totalCount, setTotalCount] = useState(null);
@@ -73,6 +85,8 @@ export default function SelfSpace() {
     if (currentUserId) url += `&currentUserId=${currentUserId}`;
     if (keyword) url += `&keyword=${encodeURIComponent(keyword)}`;
     if (selectedDirectory) url += `&directory=${encodeURIComponent(selectedDirectory)}`;
+    if (selectedCategory) url += `&categoryName=${encodeURIComponent(selectedCategory)}`; // 添加分类筛选
+    if (showDrafts) url += `&status=DRAFT`; // 草稿筛选
 
     fetch(url)
       .then(r => r.json())
@@ -127,7 +141,7 @@ export default function SelfSpace() {
       });
 
     return () => { mounted = false; };
-  }, [effectiveUserId, page, size, sortMode, currentUserId, keyword, selectedDirectory]);
+  }, [effectiveUserId, page, size, sortMode, currentUserId, keyword, selectedDirectory, selectedCategory, showDrafts]);
 
   const canPrev = page > 0;
   const canNext = totalCount !== null
@@ -171,10 +185,85 @@ export default function SelfSpace() {
 
         <main className="selfspace-right-panel" aria-label="个人空间内容区">
           <div className="selfspace-articles-wrap">
+            {/* 3D Category Carousel */}
+            <Category3DCarousel 
+              categories={BLOG_CATEGORIES} 
+              selectedCategory={selectedCategory}
+              onSelect={(cat) => {
+                const newCat = (selectedCategory === cat) ? '' : cat;
+                // 更新 URL 参数
+                const newParams = new URLSearchParams(location.search);
+                if (newCat) {
+                  newParams.set('category', newCat);
+                } else {
+                  newParams.delete('category');
+                }
+                // 保持 userId 参数（如果有）
+                if (urlUserId) {
+                  newParams.set('userId', urlUserId);
+                }
+                
+                navigate(`${location.pathname}?${newParams.toString()}`);
+                
+                // State 会通过 useEffect 自动更新，这里只需重置页码和目录
+                if (newCat) {
+                  setSelectedDirectory('');
+                }
+                setPage(0);
+              }}
+            />
+
+            {/* 分类详情展示横幅 */}
+            {selectedCategory && (
+              <div className="category-header-banner" style={{
+                background: CATEGORY_CONFIG[selectedCategory]?.color ? `linear-gradient(135deg, ${CATEGORY_CONFIG[selectedCategory].color}22, ${CATEGORY_CONFIG[selectedCategory].color}44)` : '#f9f9f9',
+                borderLeft: `6px solid ${CATEGORY_CONFIG[selectedCategory]?.color || '#1890ff'}`,
+                padding: '24px 30px',
+                borderRadius: '8px',
+                marginBottom: '25px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '20px',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+                transition: 'all 0.3s ease'
+              }}>
+                <div style={{ 
+                  fontSize: '3rem', 
+                  background: '#fff', 
+                  width: '80px', 
+                  height: '80px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  borderRadius: '50%',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                }}>
+                  {CATEGORY_CONFIG[selectedCategory]?.icon || '📂'}
+                </div>
+                <div>
+                  <h2 style={{ margin: '0 0 8px 0', color: '#333', fontSize: '1.8rem' }}>{selectedCategory}</h2>
+                  <p style={{ margin: 0, color: '#666', fontSize: '1.1rem' }}>
+                    {CATEGORY_CONFIG[selectedCategory]?.description || '查看该分类下的所有文章'}
+                  </p>
+                </div>
+              </div>
+            )}
+
             <div className="selfspace-articles-top">
               <div className="selfspace-articles-header-row">
-                <div className="selfspace-articles-title">
-                  <h2>{isOwner ? '我的文章' : 'TA 的文章'}</h2>
+                <div className="selfspace-articles-title" style={{ display: 'flex', alignItems: 'center' }}>
+                  <h2>
+                    {showDrafts ? '我的草稿箱' : (selectedCategory ? '文章列表' : (isOwner ? '我的文章' : 'TA 的文章'))}
+                  </h2>
+                  {isOwner && (
+                    <button 
+                      className="draft-toggle-btn"
+                      onClick={() => { setShowDrafts(!showDrafts); setPage(0); }}
+                      style={{ marginLeft: '1rem', padding: '6px 12px', cursor: 'pointer', background: showDrafts ? '#ff7f50' : '#f0f0f0', border: 'none', borderRadius: '20px', color: showDrafts ? '#fff' : '#333', fontSize: '0.9rem', transition: 'all 0.3s' }}
+                    >
+                      {showDrafts ? '返回已发布' : '查看草稿'}
+                    </button>
+                  )}
                 </div>
                 <form className="selfspace-search-box" onSubmit={handleSearch}>
                   <input
@@ -187,8 +276,8 @@ export default function SelfSpace() {
                 </form>
               </div>
 
-              {/* 目录/文件夹列表 */}
-              {directories.length > 0 && (
+              {/* 目录/文件夹列表 - 仅在未选择分类时显示，或者作为二级筛选 */}
+              {!selectedCategory && directories.length > 0 && (
                 <div className="selfspace-directory-list">
                   <button
                     className={`selfspace-dir-btn ${!selectedDirectory ? 'active' : ''}`}
