@@ -48,6 +48,12 @@ git push -u origin local
 ## 3. 日常开发与部署流程
 
 ### 3.1 本地开发
+
+后端启动（PowerShell 中需给参数加引号）：
+```bash
+.\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=dev"
+```
+
 在本地修改代码、测试完成后：
 
 ```bash

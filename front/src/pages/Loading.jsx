@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import '@styles/loading/Loading.css';
 import { fetchPosts, fetchPostDetail } from '@utils/api/postService';
 import { fetchUserProfile } from '@utils/api/userService';

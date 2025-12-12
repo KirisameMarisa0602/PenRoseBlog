@@ -194,7 +194,7 @@ export default function Maid({ defaultCollapsed = true, onModelLoaded }) {
         setSelectedScene('');
       } catch { /* ignore */ }
     } catch (e) { console.error('[Maid] 加载模型失败:', e); setError(e?.message || '加载模型失败'); setStatus(''); }
-  }, [getCurrentConfig, fitAndPlaceMemo, getCategorizedExpressions, startIdle]);
+  }, [getCurrentConfig, fitAndPlaceMemo, getCategorizedExpressions, startIdle, onModelLoaded]);
 
   // 初始化 Pixi 应用并挂载到 CanvasArea 的 .maid-canvas-wrap
   useEffect(() => {

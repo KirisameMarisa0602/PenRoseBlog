@@ -33,6 +33,7 @@ export default function UserSearch({ embedded = false, externalKeyword = '', ext
     if (embedded && searchTrigger > 0) {
       doSearch();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTrigger]);
 
   // 简单：每次搜索后顺便刷新一次关系集合

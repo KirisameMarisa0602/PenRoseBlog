@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { changePassword } from '@utils/api/userService';
-import { useAuthState } from '@hooks/useAuthState';
 import '@styles/pages/SecurityCenter.css';
 
 export default function SecurityCenter() {
-    const { user } = useAuthState();
     const [pwdData, setPwdData] = useState({ oldPassword: '', newPassword: '', confirmPassword: '' });
     const [pwdMsg, setPwdMsg] = useState('');
     const [pwdLoading, setPwdLoading] = useState(false);

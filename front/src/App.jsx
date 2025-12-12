@@ -1,5 +1,5 @@
 import React, { Suspense, lazy, useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AiAssistantProvider } from './contexts/AiAssistantContext';
 import MainLayout from './components/layout/MainLayout';
 import '@styles/index.css';

@@ -32,6 +32,7 @@ export default function NotificationCenter() {
         setPage(0);
         setHasMore(true);
         loadNotifications(0, activeTab);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeTab]);
 
     const loadNotifications = async (pageNum, tab) => {
@@ -177,7 +178,7 @@ export default function NotificationCenter() {
     return (
         <div className="notification-layout">
             <div className="notification-sidebar">
-                <div className="sidebar-title" style={{padding: '20px 24px', fontSize: '1.2rem', fontWeight: 'bold'}}>通知中心</div>
+                <div className="sidebar-title" style={{ padding: '20px 24px', fontSize: '1.2rem', fontWeight: 'bold' }}>通知中心</div>
                 <div className={`notification-sidebar-item ${activeTab === 'ALL' ? 'active' : ''}`} onClick={() => setActiveTab('ALL')}>全部通知</div>
                 <div className={`notification-sidebar-item ${activeTab === 'LIKES' ? 'active' : ''}`} onClick={() => setActiveTab('LIKES')}>赞与收藏</div>
                 <div className={`notification-sidebar-item ${activeTab === 'COMMENTS' ? 'active' : ''}`} onClick={() => setActiveTab('COMMENTS')}>评论与回复</div>
@@ -192,7 +193,7 @@ export default function NotificationCenter() {
                 ) : (
                     <div className="notification-center-container">
                         {activeTab === 'REQUESTS' && (
-                            <div style={{marginBottom: '2rem'}}>
+                            <div style={{ marginBottom: '2rem' }}>
                                 <PendingFriendRequests />
                             </div>
                         )}
