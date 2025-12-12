@@ -7,5 +7,7 @@
 # User content (large files)
 sources/
 examplestyles/
+.env
+
 # OS generated
 Thumbs.db

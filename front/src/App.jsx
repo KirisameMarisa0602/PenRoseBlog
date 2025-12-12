@@ -1,6 +1,7 @@
 import React, { Suspense, lazy, useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AiAssistantProvider } from './contexts/AiAssistantContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import MainLayout from './components/layout/MainLayout';
 import '@styles/index.css';
 
@@ -45,31 +46,33 @@ function AppContent() {
 	}, []);
 
 	return (
-		<AiAssistantProvider>
-			{isLoading && <Loading onReady={handleContentPreloaded} />}
-			<MainLayout onMaidLoaded={handleMaidLoaded}>
-				<Suspense fallback={null}>
-					<Routes>
-						<Route path="/" element={<Home />} />
-						<Route path="/home" element={<Home />} />
-						<Route path="/welcome" element={<Welcome />} />
-						<Route path="/selfspace" element={<SelfSpace />} />
-						<Route path="/blog-edit" element={<BlogEditor />} />
-						<Route path="/post/:id" element={<ArticleDetail />} />
-						<Route path="/messages" element={<CommunicationPage />} />
-						<Route path="/conversation/:otherId" element={<CommunicationPage />} />
-						<Route path="/friends/pending" element={<PendingFriendRequests />} />
-						<Route path="/friends" element={<CommunicationPage />} />
-						<Route path="/follows" element={<FollowingList />} />
-						<Route path="/favorites" element={<FavoritesPage />} />
-						<Route path="/search" element={<SearchPage />} />
-						<Route path="/notifications" element={<NotificationCenter />} />
-						<Route path="/security" element={<SecurityCenter />} />
-						<Route path="/users/search" element={<UserSearch />} />
-					</Routes>
-				</Suspense>
-			</MainLayout>
-		</AiAssistantProvider>
+		<ThemeProvider>
+			<AiAssistantProvider>
+				{isLoading && <Loading onReady={handleContentPreloaded} />}
+				<MainLayout onMaidLoaded={handleMaidLoaded}>
+					<Suspense fallback={null}>
+						<Routes>
+							<Route path="/" element={<Home />} />
+							<Route path="/home" element={<Home />} />
+							<Route path="/welcome" element={<Welcome />} />
+							<Route path="/selfspace" element={<SelfSpace />} />
+							<Route path="/blog-edit" element={<BlogEditor />} />
+							<Route path="/post/:id" element={<ArticleDetail />} />
+							<Route path="/messages" element={<CommunicationPage />} />
+							<Route path="/conversation/:otherId" element={<CommunicationPage />} />
+							<Route path="/friends/pending" element={<PendingFriendRequests />} />
+							<Route path="/friends" element={<CommunicationPage />} />
+							<Route path="/follows" element={<FollowingList />} />
+							<Route path="/favorites" element={<FavoritesPage />} />
+							<Route path="/search" element={<SearchPage />} />
+							<Route path="/notifications" element={<NotificationCenter />} />
+							<Route path="/security" element={<SecurityCenter />} />
+							<Route path="/users/search" element={<UserSearch />} />
+						</Routes>
+					</Suspense>
+				</MainLayout>
+			</AiAssistantProvider>
+		</ThemeProvider>
 	);
 }
 
