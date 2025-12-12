@@ -52,7 +52,7 @@
 
 .security-subtitle {
     margin: 0;
-    color: #6b7280;
+    color: #4b5563;
     font-size: 14px;
 }
 
@@ -93,7 +93,7 @@
 .security-form label {
     display: block;
     margin-bottom: 8px;
-    color: #4b5563;
+    color: #1f2937;
     font-weight: 500;
     font-size: 14px;
 }
@@ -105,12 +105,17 @@
 .security-form input {
     width: 100%;
     padding: 12px 16px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid #d1d5db;
     border-radius: 8px;
     font-size: 14px;
     transition: all 0.2s;
     background: #f9fafb;
     box-sizing: border-box;
+    color: #111827;
+}
+
+.security-form input::placeholder {
+    color: #6b7280;
 }
 
 .security-form input:focus {
