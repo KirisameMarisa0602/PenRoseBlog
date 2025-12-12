@@ -1011,7 +1011,7 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                         }}
                         >
                           <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '15px', color: '#333', display: 'flex', alignItems: 'center' }}>
-                            <img src="/icons/contect/qq.svg" alt="QQ" style={{ width: '28px', height: '28px', marginRight: '10px' }} />
+                            <img src={resolveUrl('/icons/contect/qq.svg')} alt="QQ" style={{ width: '28px', height: '28px', marginRight: '10px' }} />
                             QQ
                           </div>
                           {profile.qq && <div style={{ marginBottom: '15px', color: '#555', fontSize: '1.1rem', fontFamily: 'Consolas, monospace' }}>{profile.qq}</div>}
@@ -1021,7 +1021,7 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                                 src={resolveUrl(profile.qqQrCode)} 
                                 alt="QQ QR" 
                                 style={{ width: '160px', height: '160px', objectFit: 'contain', display: 'block' }} 
-                                onError={e => { e.target.onerror = null; e.target.src = '/imgs/loginandwelcomepanel/1.png'; }}
+                                onError={e => { e.target.onerror = null; e.target.src = resolveUrl('/imgs/loginandwelcomepanel/1.png'); }}
                               />
                             </div>
                           )}
@@ -1052,7 +1052,7 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                         }}
                         >
                           <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '15px', color: '#333', display: 'flex', alignItems: 'center' }}>
-                            <img src="/icons/contect/微信.svg" alt="WeChat" style={{ width: '28px', height: '28px', marginRight: '10px' }} />
+                            <img src={resolveUrl('/icons/contect/微信.svg')} alt="WeChat" style={{ width: '28px', height: '28px', marginRight: '10px' }} />
                             微信
                           </div>
                           {profile.wechat && <div style={{ marginBottom: '15px', color: '#555', fontSize: '1.1rem', fontFamily: 'Consolas, monospace' }}>{profile.wechat}</div>}
@@ -1062,7 +1062,7 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                                 src={resolveUrl(profile.wechatQrCode)} 
                                 alt="WeChat QR" 
                                 style={{ width: '160px', height: '160px', objectFit: 'contain', display: 'block' }} 
-                                onError={e => { e.target.onerror = null; e.target.src = '/imgs/loginandwelcomepanel/1.png'; }}
+                                onError={e => { e.target.onerror = null; e.target.src = resolveUrl('/imgs/loginandwelcomepanel/1.png'); }}
                               />
                             </div>
                           )}
@@ -1095,7 +1095,7 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                         }}
                         >
                           <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '15px', color: '#333', display: 'flex', alignItems: 'center' }}>
-                            <img src="/icons/contect/github.svg" alt="GitHub" style={{ width: '28px', height: '28px', marginRight: '10px' }} />
+                            <img src={resolveUrl('/icons/contect/github.svg')} alt="GitHub" style={{ width: '28px', height: '28px', marginRight: '10px' }} />
                             GitHub
                           </div>
                           <div style={{ color: '#1890ff', wordBreak: 'break-all', textAlign: 'center', fontSize: '1rem', background: '#e6f7ff', padding: '8px 16px', borderRadius: '20px', fontWeight: '500' }}>点击访问主页</div>
@@ -1128,7 +1128,7 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                         }}
                         >
                           <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '15px', color: '#333', display: 'flex', alignItems: 'center' }}>
-                            <img src="/icons/contect/bilibili.svg" alt="Bilibili" style={{ width: '28px', height: '28px', marginRight: '10px' }} />
+                            <img src={resolveUrl('/icons/contect/bilibili.svg')} alt="Bilibili" style={{ width: '28px', height: '28px', marginRight: '10px' }} />
                             Bilibili
                           </div>
                           <div style={{ color: '#fb7299', wordBreak: 'break-all', textAlign: 'center', fontSize: '1rem', background: '#fff0f6', padding: '8px 16px', borderRadius: '20px', fontWeight: '500' }}>点击访问主页</div>

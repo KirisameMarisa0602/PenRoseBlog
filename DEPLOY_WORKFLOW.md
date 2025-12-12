@@ -118,6 +118,7 @@ git merge main          # 将最新的 main 合并进 local，保持同步
 # 启动后端
 cd backend
 .\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=dev"
+.\mvnw.cmd spring-boot:run
 
 # 启动前端（新开一个终端窗口）
 cd front

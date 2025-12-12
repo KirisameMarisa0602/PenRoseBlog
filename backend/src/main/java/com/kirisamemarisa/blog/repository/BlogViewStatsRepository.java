@@ -9,6 +9,8 @@ public interface BlogViewStatsRepository extends JpaRepository<BlogViewStats, Lo
 
     Optional<BlogViewStats> findByBlogPostId(Long blogPostId);
 
+    java.util.List<BlogViewStats> findAllByBlogPostIdIn(java.util.List<Long> blogPostIds);
+
     /**
      * 根据文章 ID 删除浏览统计记录
      */

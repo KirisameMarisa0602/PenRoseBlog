@@ -14,6 +14,7 @@ import { Live2DModel } from 'pixi-live2d-display/cubism4';
 import usePanelWidth from './hooks/usePanelWidth';
 import useLayoutSplit from './hooks/useLayoutSplit';
 import ensureCubismCoreReady from './utils/ensureCubismCoreReady';
+import resolveUrl from '@utils/resolveUrl';
 
 // 确保 Live2D 使用 Pixi 的全局 Ticker 驱动动画（需要传入 Ticker 类，而非实例）
 if (!Live2DModel._tickerRegistered) {
@@ -164,7 +165,9 @@ export default function Maid({ defaultCollapsed = true, onModelLoaded, onWidthCh
       try { app.stage.removeChildren(); } catch { /* ignore */ }
       let model = preloadedRef.current.get(cfgPath);
       if (!model) {
-        model = await Live2DModel.from(cfgPath, { autoInteract: false, autoUpdate: false });
+        // 使用 resolveUrl 处理模型路径，支持 COS
+        const resolvedPath = resolveUrl(cfgPath);
+        model = await Live2DModel.from(resolvedPath, { autoInteract: false, autoUpdate: false });
         model.interactive = true;
         if (model.anchor && typeof model.anchor.set === 'function') model.anchor.set(0.5, 0.5);
         try {

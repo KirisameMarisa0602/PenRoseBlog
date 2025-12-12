@@ -17,6 +17,7 @@
 .welcome {
   background: #f6f6f6;
   width: 650px;
+  max-width: 95vw;
   height: 415px;
   border-radius: 5px;
   box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.1);
@@ -28,7 +29,7 @@
   position: absolute;
   top: -10%;
   left: 5%;
-  background: #eac7cc;
+  background: linear-gradient(135deg, #eac7cc 0%, #d8b5ba 100%);
   width: 320px;
   height: auto;
   min-height: 560px;
@@ -208,17 +209,17 @@ form {
   padding: 12px;
 }
 
-.more-padding .sumbit {
+.more-padding .submit {
   margin-top: 45px;
 }
 
-.sumbit {
+.submit {
   margin-top: 25px;
   padding: 12px;
   border-color: #ce7d88;
 }
 
-.sumbit:hover {
+.submit:hover {
   background: #cbc0d3;
   border-color: #bfb1c9;
 }

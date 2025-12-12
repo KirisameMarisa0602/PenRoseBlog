@@ -41,23 +41,9 @@ img {
 	--border-color: #e0e0e0;
 	--card-bg: #ffffff;
 	--shadow-color: rgba(0, 0, 0, 0.1);
-}
-
-/* Dark Mode Variables */
-html.dark {
-	--bg-primary: #1a1a1a;
-	--bg-secondary: #2d2d2d;
-	--text-primary: #e0e0e0;
-	--text-secondary: #a0a0a0;
-	--border-color: #404040;
-	--card-bg: #2d2d2d;
-	--shadow-color: rgba(0, 0, 0, 0.5);
-}
-
-body {
-	background-color: var(--bg-secondary);
-	color: var(--text-primary);
-	transition: background-color 0.3s, color 0.3s;
+    --bg-glass: rgba(255, 255, 255, 0.85);
+    --bg-glass-hover: rgba(255, 255, 255, 0.95);
+    --border-glass: rgba(255, 255, 255, 0.5);
 }
 
 /* 移除 body 的全局 padding-top，避免强制所有页面下移。

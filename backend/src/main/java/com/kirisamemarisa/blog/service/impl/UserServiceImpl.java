@@ -19,6 +19,7 @@ import com.kirisamemarisa.blog.repository.UserProfileRepository;
 import com.kirisamemarisa.blog.repository.FollowRepository;
 import com.kirisamemarisa.blog.repository.BlogPostRepository;
 import com.kirisamemarisa.blog.service.UserService;
+import com.kirisamemarisa.blog.service.FileStorageService;
 import com.kirisamemarisa.blog.dto.UserStatsDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,15 +51,10 @@ public class UserServiceImpl implements UserService {
     private FollowRepository followRepository;
     @Autowired
     private BlogPostRepository blogPostRepository;
+    @Autowired
+    private FileStorageService fileStorageService;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
-    @Value("${resource.avatar-location}")
-    private String avatarLocation;
-    @Value("${resource.background-location}")
-    private String backgroundLocation;
-    @Value("${resource.profile-location}")
-    private String profileLocation;
 
     @Override
     @Transactional
@@ -179,29 +175,9 @@ public class UserServiceImpl implements UserService {
     public String uploadAvatar(Long userId, MultipartFile file) {
         if (userId == null || file == null || file.isEmpty())
             throw new BusinessException("文件为空");
-        String ext = org.springframework.util.StringUtils.getFilenameExtension(file.getOriginalFilename());
-        String filename = UUID.randomUUID() + (ext != null ? "." + ext : "");
-        Path baseDir = Paths.get(toLocalPath(avatarLocation)).toAbsolutePath().normalize();
-        Path userDir = baseDir.resolve(String.valueOf(userId)).normalize();
-        try {
-            if (!userDir.startsWith(baseDir))
-                throw new BusinessException("非法的用户目录");
-            Files.createDirectories(userDir);
-        } catch (IOException e) {
-            throw new BusinessException("头像目录创建失败");
-        }
-        // 路径安全校验，防止路径穿越
-        if (filename.contains("..") || filename.contains("/") || filename.contains("\\")) {
-            throw new BusinessException("非法文件名");
-        }
-        Path destPath = userDir.resolve(filename).normalize();
-        try {
-            File dest = destPath.toFile();
-            file.transferTo(dest);
-        } catch (IOException e) {
-            throw new BusinessException("头像上传失败");
-        }
-        String url = "/avatar/" + userId + "/" + filename;
+
+        String url = fileStorageService.storeUserMedia(file, userId, "avatar");
+
         UserProfile profile = userProfileRepository.findById(userId).orElseGet(() -> {
             UserProfile p = new UserProfile();
             p.setUser(userRepository.findById(userId).orElseThrow(() -> new BusinessException("用户不存在")));
@@ -216,29 +192,9 @@ public class UserServiceImpl implements UserService {
     public String uploadBackground(Long userId, MultipartFile file) {
         if (userId == null || file == null || file.isEmpty())
             throw new BusinessException("文件为空");
-        String ext = org.springframework.util.StringUtils.getFilenameExtension(file.getOriginalFilename());
-        String filename = UUID.randomUUID() + (ext != null ? "." + ext : "");
-        Path baseDir = Paths.get(toLocalPath(backgroundLocation)).toAbsolutePath().normalize();
-        Path userDir = baseDir.resolve(String.valueOf(userId)).normalize();
-        try {
-            if (!userDir.startsWith(baseDir))
-                throw new BusinessException("非法的用户目录");
-            Files.createDirectories(userDir);
-        } catch (IOException e) {
-            throw new BusinessException("背景目录创建失败");
-        }
-        // 路径安全校验，防止路径穿越
-        if (filename.contains("..") || filename.contains("/") || filename.contains("\\")) {
-            throw new BusinessException("非法文件名");
-        }
-        Path destPath = userDir.resolve(filename).normalize();
-        try {
-            File dest = destPath.toFile();
-            file.transferTo(dest);
-        } catch (IOException e) {
-            throw new BusinessException("背景上传失败");
-        }
-        String url = "/background/" + userId + "/" + filename;
+
+        String url = fileStorageService.storeUserMedia(file, userId, "background");
+
         UserProfile profile = userProfileRepository.findById(userId).orElseGet(() -> {
             UserProfile p = new UserProfile();
             p.setUser(userRepository.findById(userId).orElseThrow(() -> new BusinessException("用户不存在")));
@@ -262,28 +218,8 @@ public class UserServiceImpl implements UserService {
     private String uploadProfileImage(Long userId, MultipartFile file, String type) {
         if (userId == null || file == null || file.isEmpty())
             throw new BusinessException("文件为空");
-        String ext = org.springframework.util.StringUtils.getFilenameExtension(file.getOriginalFilename());
-        String filename = type + "_" + UUID.randomUUID() + (ext != null ? "." + ext : "");
-        Path baseDir = Paths.get(toLocalPath(profileLocation)).toAbsolutePath().normalize();
-        Path userDir = baseDir.resolve(String.valueOf(userId)).normalize();
-        try {
-            if (!userDir.startsWith(baseDir))
-                throw new BusinessException("非法的用户目录");
-            Files.createDirectories(userDir);
-        } catch (IOException e) {
-            throw new BusinessException("目录创建失败");
-        }
-        if (filename.contains("..") || filename.contains("/") || filename.contains("\\")) {
-            throw new BusinessException("非法文件名");
-        }
-        Path destPath = userDir.resolve(filename).normalize();
-        try {
-            File dest = destPath.toFile();
-            file.transferTo(dest);
-        } catch (IOException e) {
-            throw new BusinessException("上传失败");
-        }
-        String url = "/profile/" + userId + "/" + filename;
+
+        String url = fileStorageService.storeUserMedia(file, userId, "profile");
 
         UserProfile profile = userProfileRepository.findById(userId).orElseGet(() -> {
             UserProfile p = new UserProfile();
@@ -298,18 +234,6 @@ public class UserServiceImpl implements UserService {
         }
         userProfileRepository.save(profile);
         return url;
-    }
-
-    private String toLocalPath(String configured) {
-        if (configured == null)
-            return "";
-        String v = configured;
-        if (v.startsWith("file:"))
-            v = v.substring(5);
-        if (!v.endsWith(File.separator) && !v.endsWith("/")) {
-            v = v + File.separator;
-        }
-        return v.replace('/', File.separatorChar);
     }
 
     @Override
@@ -381,5 +305,14 @@ public class UserServiceImpl implements UserService {
         long followers = followRepository.countByFollowee(user);
         long articles = blogPostRepository.countByUserId(userId);
         return new UserStatsDTO(following, followers, articles);
+    }
+
+    @Override
+    public boolean isVip(Long userId) {
+        if (userId == null)
+            return false;
+        return userRepository.findById(userId)
+                .map(User::getIsVip)
+                .orElse(false);
     }
 }

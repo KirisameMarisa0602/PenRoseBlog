@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.kirisamemarisa.blog.service.FileStorageService;
+import com.kirisamemarisa.blog.service.UserService;
 
 @RestController
 @RequestMapping("/api/blogpost")
@@ -17,10 +18,13 @@ public class BlogPostController {
 
     private final BlogPostService blogPostService;
     private final FileStorageService fileStorageService;
+    private final UserService userService;
 
-    public BlogPostController(BlogPostService blogPostService, FileStorageService fileStorageService) {
+    public BlogPostController(BlogPostService blogPostService, FileStorageService fileStorageService,
+            UserService userService) {
         this.blogPostService = blogPostService;
         this.fileStorageService = fileStorageService;
+        this.userService = userService;
     }
 
     @PostMapping
@@ -47,7 +51,8 @@ public class BlogPostController {
             @RequestParam(required = false) String categoryName,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) Long currentUserId) {
-        PageResult<BlogPostDTO> result = blogPostService.search(keyword, userId, directory, categoryName, status, page, size,
+        PageResult<BlogPostDTO> result = blogPostService.search(keyword, userId, directory, categoryName, status, page,
+                size,
                 currentUserId);
         return new ApiResponse<>(200, "获取成功", result);
     }
@@ -144,12 +149,42 @@ public class BlogPostController {
     }
 
     /**
+     * 获取 COS 预签名上传 URL (用于前端直传大文件)
+     */
+    @GetMapping("/presigned-url")
+    public ApiResponse<java.util.Map<String, String>> getPresignedUrl(
+            @RequestParam("fileName") String fileName,
+            @RequestParam(value = "userId", required = false) Long userId) {
+        // 检查是否为视频文件
+        boolean isVideo = fileName != null && (fileName.toLowerCase().endsWith(".mp4") ||
+                fileName.toLowerCase().endsWith(".mov") ||
+                fileName.toLowerCase().endsWith(".avi") ||
+                fileName.toLowerCase().endsWith(".webm") ||
+                fileName.toLowerCase().endsWith(".mkv"));
+
+        if (isVideo) {
+            if (userId == null || !userService.isVip(userId)) {
+                return new ApiResponse<>(403, "只有VIP用户可以上传视频", null);
+            }
+        }
+        return new ApiResponse<>(200, "获取成功", fileStorageService.generatePresignedUrl(fileName, userId));
+    }
+
+    /**
      * 上传媒体文件（图片 / gif / video）供编辑器内使用，返回可访问的 URL
      * 返回格式：ApiResponse<String>，data 为 url（以 /sources/... 开头）
      */
     @PostMapping("/media")
     public ApiResponse<String> uploadMedia(@RequestParam("file") MultipartFile file,
             @RequestParam(value = "userId", required = false) Long userId) {
+        // 检查是否为视频文件
+        String contentType = file.getContentType();
+        if (contentType != null && contentType.startsWith("video/")) {
+            if (userId == null || !userService.isVip(userId)) {
+                return new ApiResponse<>(403, "只有VIP用户可以上传视频", null);
+            }
+        }
+
         try {
             String url = fileStorageService.storeBlogMedia(file, userId);
             return new ApiResponse<>(200, "上传成功", url);

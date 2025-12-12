@@ -1,82 +1,87 @@
-/* ConversationDetail 样式 */
+/* ConversationDetail 样式 - 美化版 */
 .conversation-detail-page {
   height: calc(100vh - var(--navH));
-  background: #fff;
+  background: #f0f2f5; /* 浅灰背景，类似微信/Telegram */
   box-sizing: border-box;
   padding: 0;
   overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 .conversation-detail-container {
   width: 100%;
   height: 100%;
-  background: #fff;
+  background: transparent;
   display: flex;
-  flex-direction: row; /* Force row layout */
+  flex-direction: row;
   overflow: hidden;
+  max-width: 1400px; /* 限制最大宽度，大屏更舒适 */
+  margin: 0 auto;
+  box-shadow: 0 0 20px rgba(0,0,0,0.05); /* 整体阴影 */
 }
 
 .conversation-detail-container.two-columns {
-  /* We use flexbox now, but keep this class for specificity if needed */
   display: flex;
 }
 
 /* 左侧会话用户栏 */
 .conversation-sidebar {
-  width: 280px; /* Fixed width */
+  width: 300px; /* 稍微加宽 */
   flex-shrink: 0;
-  background: #f5f5f5;
-  border-right: 1px solid #e0e0e0;
-  padding: 10px;
+  background: #ffffff; /* 纯白背景 */
+  border-right: 1px solid #e6e6e6;
+  padding: 12px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 8px;
 }
 
 .conversation-main-content {
-  flex: 1; /* Take remaining space */
+  flex: 1;
   display: flex;
   flex-direction: column;
   height: 100%;
   overflow: hidden;
   position: relative;
-  background: #fff;
+  background: #f5f5f5; /* 聊天区域背景 */
 }
 
 .conversation-sidebar-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px;
-  border-radius: 8px;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 10px; /* 更圆润 */
   background: transparent;
   border: none;
   cursor: pointer;
   text-align: left;
-  transition: background 0.2s;
+  transition: all 0.2s ease;
   width: 100%;
   position: relative;
 }
 
 .conversation-sidebar-item:hover {
-  background: #e6e6e6;
+  background: #f0f0f0;
 }
 
 .conversation-sidebar-item.active {
   background: #e6f7ff;
+  box-shadow: 0 2px 6px rgba(24, 144, 255, 0.1); /* 选中态阴影 */
 }
 
 .conversation-sidebar-avatar {
-  width: 40px;
-  height: 40px;
+  width: 44px; /* 头像稍大 */
+  height: 44px;
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
+  border: 1px solid #eee;
 }
 
 .conversation-sidebar-name {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
   color: #333;
   white-space: nowrap;
@@ -155,51 +160,61 @@
 }
 
 .conversation-detail-msgtext {
-  padding: 10px 14px;
+  padding: 12px 16px;
   border-radius: 12px;
-  background: #fff;
+  background: #ffffff;
   color: #333;
   font-size: 15px;
-  line-height: 1.5;
+  line-height: 1.6;
   word-break: break-word;
   position: relative;
-  border-top-left-radius: 2px;
+  border-top-left-radius: 2px; /* 对方消息左上角直角 */
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  max-width: 70%; /* 限制最大宽度 */
 }
 
 .conversation-detail-msg.self .conversation-detail-msgtext {
-  background: #1890ff;
-  color: #fff;
+  background: #95ec69; /* 微信绿，或者用 #1296db 蓝色 */
+  color: #000; /* 浅色背景配深色字 */
   border-radius: 12px;
-  border-top-right-radius: 2px;
+  border-top-right-radius: 2px; /* 自己消息右上角直角 */
+  border-top-left-radius: 12px;
+  background: #cce4ff; /* 柔和的蓝色 */
 }
 
 /* Media (Images/Videos) */
 .conversation-detail-msgmedia {
   max-width: 100%;
   max-height: 300px;
-  border-radius: 12px;
+  border-radius: 8px;
   display: block;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   background: #f0f0f0;
+  transition: transform 0.2s;
+}
+
+.conversation-detail-msgmedia:hover {
+  transform: scale(1.01);
 }
 
 /* Blog Preview Card */
 .pm-blog-preview-card {
   display: flex;
   flex-direction: column;
-  width: 240px;
+  width: 260px;
   border-radius: 12px;
   overflow: hidden;
   background: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid #eee;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  border: none; /* 移除边框，用阴影 */
   cursor: pointer;
-  transition: box-shadow 0.2s;
+  transition: all 0.2s;
 }
 
 .pm-blog-preview-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
 }
 
 .pm-blog-preview-cover {
@@ -260,14 +275,14 @@
 /* Input Area */
 .conversation-detail-form {
   height: var(--input-height, 150px);
-  border-top: 1px solid #e8e8e8;
+  border-top: 1px solid #e6e6e6;
   padding: 0;
   display: flex;
   flex-direction: column;
   background: #fff;
   position: relative;
   flex-shrink: 0;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.03);
   z-index: 10;
 }
 
@@ -290,10 +305,10 @@
 .conversation-toolbar {
   display: flex;
   align-items: center;
-  gap: 15px;
-  padding: 10px 20px;
-  border-bottom: 1px solid #f5f5f5;
-  background: #fafafa;
+  gap: 16px;
+  padding: 8px 20px;
+  border-bottom: none;
+  background: #fff;
 }
 
 .conversation-detail-input {
@@ -304,31 +319,31 @@
   resize: none;
   font-size: 15px;
   color: #333;
-  padding: 15px 20px;
+  padding: 12px 20px;
   width: 100%;
   box-sizing: border-box;
   line-height: 1.6;
 }
 
 .conversation-detail-sendbtn {
-  padding: 6px 20px;
-  background: linear-gradient(135deg, #1890ff 0%, #36cfc9 100%);
+  padding: 8px 24px;
+  background: #1890ff;
   color: #fff;
   border: none;
-  border-radius: 20px;
+  border-radius: 6px;
   cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s ease;
+  font-weight: 500;
+  transition: all 0.2s ease;
   white-space: nowrap;
-  font-size: 13px;
+  font-size: 14px;
   margin-left: auto; /* Push to right */
-  box-shadow: 0 2px 6px rgba(24, 144, 255, 0.3);
+  box-shadow: none;
 }
 
 .conversation-detail-sendbtn:hover {
+  background: #40a9ff;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.4);
-  filter: brightness(1.1);
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.2);
 }
 
 .conversation-detail-sendbtn:active {

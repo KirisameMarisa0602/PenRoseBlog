@@ -4,11 +4,11 @@ import '../../styles/common/ArticleCard.css';
 import resolveUrl from '@utils/resolveUrl';
 
 // Icons - use absolute paths directly since assets are served by Nginx
-const iconView = '/icons/blogpost/浏览.svg';
-const iconLike = '/icons/blogpost/点赞.svg';
-const iconComment = '/icons/blogpost/评论.svg';
-const iconFavorite = '/icons/blogpost/收藏.svg';
-const iconForward = '/icons/blogpost/转发.svg';
+const iconView = resolveUrl('/icons/blogpost/浏览.svg');
+const iconLike = resolveUrl('/icons/blogpost/点赞.svg');
+const iconComment = resolveUrl('/icons/blogpost/评论.svg');
+const iconFavorite = resolveUrl('/icons/blogpost/收藏.svg');
+const iconForward = resolveUrl('/icons/blogpost/转发.svg');
 
 function truncateByUnits(text = '', limitUnits = 48) {
     let units = 0;

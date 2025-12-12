@@ -4,6 +4,7 @@ import { jwtDecode } from 'jwt-decode';
 import '@styles/welcome/Welcome.css';
 import { login, fetchUserProfile, register } from '@utils/api/userService';
 import { setAuthState } from '@hooks/useAuthState';
+import resolveUrl from '@utils/resolveUrl';
 
 export default function Welcome() {
   const navigate = useNavigate();
@@ -41,9 +42,9 @@ export default function Welcome() {
   }, [message]);
 
   const genderItems = [
-    { key: '男', img: '/imgs/loginandwelcomepanel/1.png' },
-    { key: '女', img: '/imgs/loginandwelcomepanel/2.png' },
-    { key: '保密', img: '/imgs/loginandwelcomepanel/3.png' },
+    { key: '男', img: resolveUrl('/imgs/loginandwelcomepanel/1.png') },
+    { key: '女', img: resolveUrl('/imgs/loginandwelcomepanel/2.png') },
+    { key: '保密', img: resolveUrl('/imgs/loginandwelcomepanel/3.png') },
   ];
   const selectedGenderIndex = Math.max(0, genderItems.findIndex(g => g.key === registerData.gender));
 
@@ -223,7 +224,7 @@ export default function Welcome() {
                 <input type="checkbox" id="remember" checked={rememberMe} onChange={e => setRememberMe(e.target.checked)} />
                 <label htmlFor="remember">Remember Me</label>
               </div>
-              <button className="button sumbit" type="submit">Login</button>
+              <button className="button submit" type="submit">Login</button>
             </form>
           </div>
           {message && (
@@ -239,14 +240,14 @@ export default function Welcome() {
         <div className="leftbox">
           <h2 className="title"><span>BLOOM</span>&<br />BOUQUET</h2>
           <p className="desc">Pick your perfect <span>bouquet</span></p>
-          <img className="flower smaller" src="/imgs/loginandwelcomepanel/flower01.png" alt="flower" />
+          <img className="flower smaller" src={resolveUrl('/imgs/loginandwelcomepanel/flower01.png')} alt="flower" />
           <p className="account">Have an account?</p>
           <button className="button" onClick={() => setShowRegister(false)}>Login</button>
         </div>
         <div className="rightbox">
           <h2 className="title"><span>BLOOM</span>&<br />BOUQUET</h2>
           <p className="desc">Pick your perfect <span>bouquet</span></p>
-          <img className="flower" src="/imgs/loginandwelcomepanel/flower02.png" alt="flower" />
+          <img className="flower" src={resolveUrl('/imgs/loginandwelcomepanel/flower02.png')} alt="flower" />
           <p className="account">Don't have an account?</p>
           <button className="button" onClick={() => setShowRegister(true)}>Sign Up</button>
         </div>

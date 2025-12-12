@@ -32,4 +32,6 @@ public interface UserService {
     boolean changePassword(Long userId, ChangePasswordDTO dto);
 
     UserStatsDTO getUserStats(Long userId);
+
+    boolean isVip(Long userId);
 }

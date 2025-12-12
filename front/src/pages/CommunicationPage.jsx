@@ -13,6 +13,7 @@ import { useAuthState } from '@hooks/useAuthState';
 import { fetchConversationDetail, fetchConversations } from '@utils/api/messageService';
 import { fetchFriendsList } from '@utils/api/friendService';
 import SimpleEmojiPicker from '@components/common/SimpleEmojiPicker';
+import resolveUrl from '@utils/resolveUrl';
 
 // 本地缓存服务
 import {
@@ -630,23 +631,40 @@ export default function CommunicationPage() {
         });
     }, [viewRecords, messagesById]);
 
-    /** ---------------- 通过消息推断对方信息 ---------------- */
+    /** ---------------- 获取对方信息（优先接口获取，其次消息推断） ---------------- */
 
+    // 1. 明确调用接口获取对方信息
+    useEffect(() => {
+        if (!otherId) return;
+        api.get(`/user/profile/${otherId}`)
+            .then(res => {
+                if (res.data && res.data.code === 200) {
+                    const u = res.data.data;
+                    setOtherInfo(prev => ({
+                        nickname: u.nickname || prev.nickname,
+                        avatarUrl: u.avatarUrl || prev.avatarUrl
+                    }));
+                }
+            })
+            .catch(err => console.warn('Fetch other profile failed', err));
+    }, [otherId]);
+
+    // 2. 通过消息推断对方信息 (作为补充，但不覆盖已有信息为空的情况)
     useEffect(() => {
         if (!finalMessages || finalMessages.length === 0) return;
         for (let m of finalMessages) {
             if (m.senderId !== Number(userId)) {
-                setOtherInfo({
-                    nickname: m.senderNickname || '',
-                    avatarUrl: m.senderAvatarUrl || ''
-                });
+                setOtherInfo(prev => ({
+                    nickname: m.senderNickname || prev.nickname,
+                    avatarUrl: m.senderAvatarUrl || prev.avatarUrl
+                }));
                 return;
             }
             if (m.receiverId !== Number(userId)) {
-                setOtherInfo({
-                    nickname: m.receiverNickname || '',
-                    avatarUrl: m.receiverAvatarUrl || ''
-                });
+                setOtherInfo(prev => ({
+                    nickname: m.receiverNickname || prev.nickname,
+                    avatarUrl: m.receiverAvatarUrl || prev.avatarUrl
+                }));
                 return;
             }
         }
@@ -821,13 +839,12 @@ export default function CommunicationPage() {
             const form = new FormData();
             form.append('file', file);
             const oid = otherId ? String(otherId) : '';
-            // 避免大文件经由 Vite 代理导致连接重置：直连后端 Origin
-            const backendOrigin = (import.meta.env.VITE_BACKEND_ORIGIN)
-                || (typeof window !== 'undefined' ? window.location.origin : '');
-            console.log('[PM] uploadFile backendOrigin:', backendOrigin);
+            
+            // 使用相对路径，通过 Vite 代理转发，避免 CORS 问题
             const uploadUrl = oid
-                ? `${backendOrigin}/api/messages/upload?otherId=${encodeURIComponent(oid)}`
-                : `${backendOrigin}/api/messages/upload`;
+                ? `/api/messages/upload?otherId=${encodeURIComponent(oid)}`
+                : `/api/messages/upload`;
+                
             xhr.open('POST', uploadUrl);
             if (userId) xhr.setRequestHeader('X-User-Id', userId);
             try {
@@ -1047,7 +1064,7 @@ export default function CommunicationPage() {
 
     /** ---------------- URL 处理 ---------------- */
 
-    const toAbsUrl = (u) => {
+    const resolveMessageUrl = (u) => {
         if (!u) return '';
         if (/^https?:\/\//i.test(u)) return u;
 
@@ -1061,9 +1078,7 @@ export default function CommunicationPage() {
             path = `/files/messages${path}`;
         }
 
-        const loc = window.location;
-        const backendOrigin = import.meta.env.VITE_BACKEND_ORIGIN || loc.origin;
-        return backendOrigin + path;
+        return resolveUrl(path);
     };
 
     /** ---------------- 输入框高度拖拽 ---------------- */
@@ -1282,7 +1297,7 @@ export default function CommunicationPage() {
                             onClick={() => gotoConversation(c.otherId)}
                         >
                             <img
-                                src={c.avatarUrl ? toAbsUrl(c.avatarUrl) : '/imgs/loginandwelcomepanel/1.png'}
+                                src={c.avatarUrl ? resolveUrl(c.avatarUrl) : '/imgs/loginandwelcomepanel/1.png'}
                                 alt="avatar"
                                 className="conversation-sidebar-avatar"
                                 onError={(ev) => {
@@ -1393,9 +1408,9 @@ export default function CommunicationPage() {
                                             <img
                                                 src={
                                                     msg.senderAvatarUrl
-                                                        ? toAbsUrl(msg.senderAvatarUrl)
+                                                        ? resolveUrl(msg.senderAvatarUrl)
                                                         : otherInfo.avatarUrl
-                                                            ? toAbsUrl(otherInfo.avatarUrl)
+                                                            ? resolveUrl(otherInfo.avatarUrl)
                                                             : '/imgs/loginandwelcomepanel/1.png'
                                                 }
                                                 className={`conversation-detail-msg-avatar${!isSelf ? ' clickable' : ''}`}
@@ -1417,7 +1432,7 @@ export default function CommunicationPage() {
                                             {msg?.type === 'IMAGE' && msg?.mediaUrl ? (
                                                 <img
                                                     className="conversation-detail-msgmedia"
-                                                    src={toAbsUrl(msg.mediaUrl)}
+                                                    src={resolveMessageUrl(msg.mediaUrl)}
                                                     alt="image"
                                                     onError={(ev) => {
                                                         const target = ev.target;
@@ -1428,7 +1443,7 @@ export default function CommunicationPage() {
                                             ) : msg?.type === 'VIDEO' && msg?.mediaUrl ? (
                                                 <video
                                                     className="conversation-detail-msgmedia"
-                                                    src={toAbsUrl(msg.mediaUrl)}
+                                                    src={resolveMessageUrl(msg.mediaUrl)}
                                                     controls
                                                     preload="metadata"
                                                     playsInline
@@ -1449,7 +1464,7 @@ export default function CommunicationPage() {
                                                     <div className="pm-blog-preview-cover">
                                                         {msg.blogPreview.coverImageUrl ? (
                                                             <img
-                                                                src={toAbsUrl(msg.blogPreview.coverImageUrl)}
+                                                                src={resolveUrl(msg.blogPreview.coverImageUrl)}
                                                                 alt={msg.blogPreview.title || '封面'}
                                                                 onError={e => { e.target.onerror = null; e.target.src = ''; }}
                                                             />

@@ -27,6 +27,9 @@ public class User {
     // 性别，取值范围：男、女、保密
     private String gender;
 
+    @Column(name = "is_vip")
+    private Boolean isVip = false;
+
     @Column(name = "created_at", updatable = false)
     private java.time.LocalDateTime createdAt;
 
@@ -75,5 +78,13 @@ public class User {
 
     public void setGender(String gender) {
         this.gender = gender;
+    }
+
+    public Boolean getIsVip() {
+        return isVip;
+    }
+
+    public void setIsVip(Boolean isVip) {
+        this.isVip = isVip;
     }
 }

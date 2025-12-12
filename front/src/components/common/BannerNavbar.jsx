@@ -11,6 +11,7 @@ import ExampleSpring from './examples/ExampleSpring.jsx';
 import ExampleAutumn from './examples/ExampleAutumn.jsx';
 import ExampleWinter from './examples/ExampleWinter.jsx';
 import { Link } from 'react-router-dom';
+import resolveUrl from '@utils/resolveUrl';
 
 const SplitNavItem = ({ to, text, badge }) => (
   <div className="nav-item-cell split-btn-wrapper">
@@ -56,7 +57,7 @@ export default function BannerNavbar({ bannerId }) {
   useEffect(() => {
     let dead = false;
     setError(null);
-    fetch('/banner/manifest.json?_=' + Date.now())
+    fetch(resolveUrl('/banner/manifest.json?_=' + Date.now()))
       .then(r => (r.ok ? r.json() : []))
       .then(list => { if (!dead) setManifest(Array.isArray(list) ? list : []); })
       .catch(e => { console.error(e); if (!dead) setManifest([]); });

@@ -43,18 +43,26 @@ const Home = () => {
 
           if (fetchAllForHot && list.length) {
             try {
-              // 并行获取所有文章的浏览量并按自定义热度排序（view + like*30）
+              // 批量获取所有文章的浏览量并按自定义热度排序（view + like*30）
               const ids = list.map(p => (p.id || p.postId));
-              const promises = ids.map(id =>
-                fetch(`/api/blogview/${id}`).then(r => r.ok ? r.json() : null).catch(() => null)
-              );
-              const results = await Promise.all(promises);
+              
               const viewMap = new Map();
-              results.forEach((res, idx) => {
-                const id = ids[idx];
-                const v = (res && res.code === 200 && res.data) ? Number(res.data.viewCount || 0) : 0;
-                viewMap.set(String(id), v);
-              });
+              try {
+                  const batchRes = await fetch('/api/blogview/batch', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify(ids)
+                  }).then(r => r.ok ? r.json() : null);
+                  
+                  if (batchRes && batchRes.code === 200 && batchRes.data) {
+                      Object.entries(batchRes.data).forEach(([k, v]) => {
+                          viewMap.set(String(k), Number(v));
+                      });
+                  }
+              } catch (e) {
+                  console.error('[hot排序] 批量获取浏览量失败', e);
+              }
+
               list = list.slice().sort((a, b) => {
                 const va = (viewMap.get(String(a.id || a.postId)) || 0) + ((a.likeCount || a.likes || 0) * 30);
                 const vb = (viewMap.get(String(b.id || b.postId)) || 0) + ((b.likeCount || b.likes || 0) * 30);

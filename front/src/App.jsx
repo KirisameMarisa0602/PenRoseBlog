@@ -2,6 +2,7 @@ import React, { Suspense, lazy, useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AiAssistantProvider } from './contexts/AiAssistantContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { GlobalUploadProvider } from './contexts/GlobalUploadContext';
 import MainLayout from './components/layout/MainLayout';
 import '@styles/index.css';
 
@@ -47,6 +48,7 @@ function AppContent() {
 
 	return (
 		<ThemeProvider>
+		<GlobalUploadProvider>
 			<AiAssistantProvider>
 				{isLoading && <Loading onReady={handleContentPreloaded} />}
 				<MainLayout onMaidLoaded={handleMaidLoaded}>
@@ -72,6 +74,7 @@ function AppContent() {
 					</Suspense>
 				</MainLayout>
 			</AiAssistantProvider>
+		</GlobalUploadProvider>
 		</ThemeProvider>
 	);
 }

@@ -101,57 +101,57 @@ export default function NotificationCenter() {
     };
 
     const renderNotificationItem = (note) => {
-        let iconSrc = '/site_assets/icons/message/notification.svg';
+        let iconSrc = resolveUrl('/icons/message/notification.svg');
         let actionText = '';
 
         switch (note.type) {
             case 'POST_LIKE':
-                iconSrc = '/site_assets/icons/message/like.svg';
+                iconSrc = resolveUrl('/icons/message/like.svg');
                 actionText = '赞了你的文章';
                 break;
             case 'POST_FAVORITE':
-                iconSrc = '/site_assets/icons/message/favorite.svg';
+                iconSrc = resolveUrl('/icons/message/favorite.svg');
                 actionText = '收藏了你的文章';
                 break;
             case 'POST_COMMENT':
-                iconSrc = '/site_assets/icons/message/comment.svg';
+                iconSrc = resolveUrl('/icons/message/comment.svg');
                 actionText = '评论了你的文章';
                 break;
             case 'COMMENT_REPLY':
-                iconSrc = '/site_assets/icons/message/reply.svg';
+                iconSrc = resolveUrl('/icons/message/reply.svg');
                 actionText = '回复了你的评论';
                 break;
             case 'COMMENT_LIKE':
             case 'REPLY_LIKE':
-                iconSrc = '/site_assets/icons/message/点赞.svg';
+                iconSrc = resolveUrl('/icons/message/点赞.svg');
                 actionText = '赞了你的评论';
                 break;
             case 'FRIEND_REQUEST':
-                iconSrc = '/site_assets/icons/message/加好友.svg';
+                iconSrc = resolveUrl('/icons/message/加好友.svg');
                 actionText = '请求添加你为好友';
                 break;
             case 'FRIEND_REQUEST_ACCEPTED':
-                iconSrc = '/site_assets/icons/message/接受.svg';
+                iconSrc = resolveUrl('/icons/message/接受.svg');
                 actionText = '接受了你的好友请求';
                 break;
             case 'FRIEND_REQUEST_REJECTED':
-                iconSrc = '/site_assets/icons/message/拒绝.svg';
+                iconSrc = resolveUrl('/icons/message/拒绝.svg');
                 actionText = '拒绝了你的好友请求';
                 break;
             case 'FRIEND_DELETE':
-                iconSrc = '/site_assets/icons/message/解除好友.svg';
+                iconSrc = resolveUrl('/icons/message/解除好友.svg');
                 actionText = '解除了好友关系';
                 break;
             case 'FOLLOW':
-                iconSrc = '/site_assets/icons/message/关注.svg';
+                iconSrc = resolveUrl('/icons/message/关注.svg');
                 actionText = '关注了你';
                 break;
             case 'UNFOLLOW':
-                iconSrc = '/site_assets/icons/message/取关.svg';
+                iconSrc = resolveUrl('/icons/message/取关.svg');
                 actionText = '取消关注了你';
                 break;
             default:
-                iconSrc = '/site_assets/icons/message/通知.svg';
+                iconSrc = resolveUrl('/icons/message/通知.svg');
                 actionText = '新通知';
         }
 
@@ -204,7 +204,7 @@ export default function NotificationCenter() {
                                     {activeTab === 'REQUESTS' && '申请记录'}
                                 </h2>
                                 <button className="mark-read-btn" onClick={markAllRead}>
-                                    <img src="/site_assets/icons/message/read.svg" alt="" style={{ width: 16, height: 16 }} onError={(e) => { e.target.style.display = 'none'; }} />
+                                    {/* <img src={resolveUrl('/icons/message/read.svg')} alt="" style={{ width: 16, height: 16 }} onError={(e) => { e.target.style.display = 'none'; }} /> */}
                                     全部已读
                                 </button>
                             </div>

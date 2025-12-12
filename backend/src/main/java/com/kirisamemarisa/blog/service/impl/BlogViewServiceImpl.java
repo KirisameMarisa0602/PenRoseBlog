@@ -82,7 +82,8 @@ public class BlogViewServiceImpl implements BlogViewService {
             Long added = redisTemplate.opsForSet().add(viewedUsersKey, userId.toString());
 
             if (added != null && added > 0) {
-                // Redis says it's new (or key expired). Check DB to ensure "once per user forever".
+                // Redis says it's new (or key expired). Check DB to ensure "once per user
+                // forever".
                 boolean existsInDb = blogViewRecordRepository.existsByBlogPostIdAndUserId(dto.getBlogPostId(), userId);
                 if (existsInDb) {
                     // Already viewed in the past, not a new view.
@@ -153,6 +154,39 @@ public class BlogViewServiceImpl implements BlogViewService {
         dto.setViewCount(dbCount + delta);
 
         return new ApiResponse<>(200, "获取成功", dto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ApiResponse<java.util.Map<Long, Long>> getBatchStats(java.util.List<Long> blogPostIds) {
+        if (blogPostIds == null || blogPostIds.isEmpty()) {
+            return new ApiResponse<>(200, "获取成功", java.util.Collections.emptyMap());
+        }
+
+        // 1. Batch fetch from DB
+        java.util.List<BlogViewStats> statsList = blogViewStatsRepository.findAllByBlogPostIdIn(blogPostIds);
+        java.util.Map<Long, Long> dbCounts = statsList.stream()
+                .collect(java.util.stream.Collectors.toMap(s -> s.getBlogPost().getId(), BlogViewStats::getViewCount));
+
+        // 2. Batch fetch from Redis
+        java.util.List<String> deltaKeys = blogPostIds.stream()
+                .map(id -> KEY_VIEW_COUNT_DELTA_PREFIX + id)
+                .collect(java.util.stream.Collectors.toList());
+
+        java.util.List<String> deltaValues = redisTemplate.opsForValue().multiGet(deltaKeys);
+
+        java.util.Map<Long, Long> result = new java.util.HashMap<>();
+        for (int i = 0; i < blogPostIds.size(); i++) {
+            Long id = blogPostIds.get(i);
+            long db = dbCounts.getOrDefault(id, 0L);
+            long delta = 0L;
+            if (deltaValues != null && deltaValues.get(i) != null) {
+                delta = Long.parseLong(deltaValues.get(i));
+            }
+            result.put(id, db + delta);
+        }
+
+        return new ApiResponse<>(200, "获取成功", result);
     }
 
     @Override

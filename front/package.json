@@ -32,6 +32,7 @@
     "@tiptap/react": "^2.27.1",
     "@tiptap/starter-kit": "^2.27.1",
     "axios": "^1.13.1",
+    "cos-js-sdk-v5": "^1.10.1",
     "highlight.js": "^11.11.1",
     "jwt-decode": "^4.0.0",
     "live2d-widget": "^3.1.4",

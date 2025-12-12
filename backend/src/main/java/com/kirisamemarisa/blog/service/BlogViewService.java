@@ -17,6 +17,11 @@ public interface BlogViewService {
     ApiResponse<BlogViewStatsDTO> getStats(Long blogPostId);
 
     /**
+     * 批量获取博客浏览统计
+     */
+    ApiResponse<java.util.Map<Long, Long>> getBatchStats(java.util.List<Long> blogPostIds);
+
+    /**
      * 删除指定博客的所有浏览相关数据（明细 + 统计）
      */
     void deleteByBlogPostId(Long blogPostId);

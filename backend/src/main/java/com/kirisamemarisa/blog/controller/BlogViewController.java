@@ -31,4 +31,9 @@ public class BlogViewController {
     public ApiResponse<BlogViewStatsDTO> getStats(@PathVariable Long blogPostId) {
         return blogViewService.getStats(blogPostId);
     }
+
+    @PostMapping("/batch")
+    public ApiResponse<java.util.Map<Long, Long>> getBatchStats(@RequestBody java.util.List<Long> blogPostIds) {
+        return blogViewService.getBatchStats(blogPostIds);
+    }
 }

@@ -21,7 +21,9 @@ import { common, createLowlight } from 'lowlight';
 import 'highlight.js/styles/atom-one-dark.css';
 import '@styles/blogeditor/tiptap/TipTapEditor.css';
 import { marked } from 'marked';
+import resolveUrl from '@utils/resolveUrl';
 import httpClient from '@utils/api/httpClient';
+import axios from 'axios';
 
 // 自定义视频扩展
 const Video = Node.create({
@@ -46,7 +48,15 @@ const Video = Node.create({
   },
   
   renderHTML({ HTMLAttributes }) {
-    return ['video', mergeAttributes(HTMLAttributes, { controls: 'true', style: 'width: 100%; height: auto; max-height: 500px; border-radius: 8px;' })]
+    return ['div', { class: 'video-wrapper', style: 'display: flex; justify-content: center; margin: 1em 0;' },
+      ['video', mergeAttributes(HTMLAttributes, { 
+        controls: true, 
+        playsinline: true,
+        crossorigin: 'anonymous',
+        preload: 'metadata',
+        style: 'max-width: 100%; height: auto; max-height: 500px; border-radius: 8px;' 
+      })]
+    ]
   },
   
   addCommands() {
@@ -118,30 +128,72 @@ const MediaModal = ({ isOpen, onClose, onSubmit, title, placeholder, userId }) =
 
     setUploading(true);
     setUploadProgress(0);
-    const formData = new FormData();
-    formData.append('file', file);
-    if (userId) {
-      formData.append('userId', userId);
-    }
 
     try {
-      const res = await httpClient.post('/blogpost/media', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-        timeout: 600000, // 10分钟超时，防止大文件上传中断
-        onUploadProgress: (progressEvent) => {
-          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          setUploadProgress(percentCompleted);
+      // 判断是否为视频或大文件 (> 10MB)
+      const isVideo = file.type.startsWith('video/');
+      const isLargeFile = file.size > 10 * 1024 * 1024;
+
+      if (isVideo || isLargeFile) {
+        // --- 大文件/视频：前端直传 COS ---
+        // 1. 获取预签名 URL
+        const presignRes = await httpClient.get('/blogpost/presigned-url', {
+          params: {
+            fileName: file.name,
+            userId: userId
+          }
+        });
+        
+        if (presignRes.data.code !== 200) {
+          throw new Error(presignRes.data.message || '获取上传链接失败');
         }
-      });
-      if (res.data.code === 200) {
-        onSubmit(res.data.data);
+
+        const { uploadUrl, publicUrl } = presignRes.data.data;
+
+        // 2. 直传 COS (PUT)
+        // 使用纯 axios 避免带上 Authorization 头
+        await axios.put(uploadUrl, file, {
+          headers: {
+            'Content-Type': file.type 
+          },
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            setUploadProgress(percentCompleted);
+          }
+        });
+
+        // 3. 上传成功
+        const finalUrl = resolveUrl(publicUrl);
+        onSubmit(finalUrl);
         onClose();
+
       } else {
-        alert(res.data.message || '上传失败');
+        // --- 小文件/图片：走后端代理 ---
+        const formData = new FormData();
+        formData.append('file', file);
+        if (userId) {
+          formData.append('userId', userId);
+        }
+
+        const res = await httpClient.post('/blogpost/media', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+          timeout: 600000, // 10分钟超时
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            setUploadProgress(percentCompleted);
+          }
+        });
+        if (res.data.code === 200) {
+          const finalUrl = resolveUrl(res.data.data);
+          onSubmit(finalUrl);
+          onClose();
+        } else {
+          alert(res.data.message || '上传失败');
+        }
       }
     } catch (error) {
       console.error('Upload failed:', error);
-      alert('上传出错，请重试');
+      alert('上传出错，请重试: ' + (error.message || '未知错误'));
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -677,8 +729,8 @@ export default function TipTapEditor({ value, onChange, placeholder = '开始创
         }
         placeholder={
           modalConfig.type === 'link' ? 'https://example.com' : 
-          modalConfig.type === 'image' ? 'https://example.com/image.png' : 
-          modalConfig.type === 'video' ? 'YouTube 链接' : 
+          modalConfig.type === 'image' ? '图片url' : 
+          modalConfig.type === 'video' ? '视频url' : 
           '在此粘贴 Markdown 文本...'
         }
       />

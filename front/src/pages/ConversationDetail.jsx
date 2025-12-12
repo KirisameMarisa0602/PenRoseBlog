@@ -11,6 +11,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import '@styles/message/ConversationDetail.css';
 import { useAuthState } from '@hooks/useAuthState';
 import { fetchConversationDetail, fetchConversations } from '@utils/api/messageService';
+import resolveUrl from '@utils/resolveUrl';
 
 // 本地缓存服务
 import {
@@ -604,23 +605,40 @@ export default function ConversationDetail() {
         });
     }, [viewRecords, messagesById]);
 
-    /** ---------------- 通过消息推断对方信息 ---------------- */
+    /** ---------------- 获取对方信息（优先接口获取，其次消息推断） ---------------- */
 
+    // 1. 明确调用接口获取对方信息
+    useEffect(() => {
+        if (!otherId) return;
+        api.get(`/user/profile/${otherId}`)
+            .then(res => {
+                if (res.data && res.data.code === 200) {
+                    const u = res.data.data;
+                    setOtherInfo(prev => ({
+                        nickname: u.nickname || prev.nickname,
+                        avatarUrl: u.avatarUrl || prev.avatarUrl
+                    }));
+                }
+            })
+            .catch(err => console.warn('Fetch other profile failed', err));
+    }, [otherId]);
+
+    // 2. 通过消息推断对方信息 (作为补充，但不覆盖已有信息为空的情况)
     useEffect(() => {
         if (!finalMessages || finalMessages.length === 0) return;
         for (let m of finalMessages) {
             if (m.senderId !== Number(userId)) {
-                setOtherInfo({
-                    nickname: m.senderNickname || '',
-                    avatarUrl: m.senderAvatarUrl || ''
-                });
+                setOtherInfo(prev => ({
+                    nickname: m.senderNickname || prev.nickname,
+                    avatarUrl: m.senderAvatarUrl || prev.avatarUrl
+                }));
                 return;
             }
             if (m.receiverId !== Number(userId)) {
-                setOtherInfo({
-                    nickname: m.receiverNickname || '',
-                    avatarUrl: m.receiverAvatarUrl || ''
-                });
+                setOtherInfo(prev => ({
+                    nickname: m.receiverNickname || prev.nickname,
+                    avatarUrl: m.receiverAvatarUrl || prev.avatarUrl
+                }));
                 return;
             }
         }
@@ -1350,9 +1368,9 @@ export default function ConversationDetail() {
                                         <img
                                             src={
                                                 msg.senderAvatarUrl
-                                                    ? toAbsUrl(msg.senderAvatarUrl)
+                                                    ? resolveUrl(msg.senderAvatarUrl)
                                                     : otherInfo.avatarUrl
-                                                        ? toAbsUrl(otherInfo.avatarUrl)
+                                                        ? resolveUrl(otherInfo.avatarUrl)
                                                         : '/imgs/loginandwelcomepanel/1.png'
                                             }
                                             className={`conversation-detail-msg-avatar${!isSelf ? ' clickable' : ''}`}

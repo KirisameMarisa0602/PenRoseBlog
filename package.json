@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "cos-js-sdk-v5": "^1.10.1"
+  }
+}

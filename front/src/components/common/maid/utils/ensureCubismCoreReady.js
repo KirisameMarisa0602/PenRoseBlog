@@ -1,3 +1,5 @@
+import resolveUrl from '@utils/resolveUrl';
+
 export default async function ensureCubismCoreReady() {
   if (typeof window === 'undefined') return;
   if (window.Live2DCubismCore) return;
@@ -8,7 +10,7 @@ export default async function ensureCubismCoreReady() {
   }
   await new Promise((resolve, reject) => {
     const s = document.createElement('script');
-    s.src = '/live2dsrc/live2dcubismcore.min.js';
+    s.src = resolveUrl('/live2dsrc/live2dcubismcore.min.js');
     s.async = true;
     s.id = 'live2dcubismcore-script';
     s.onload = () => resolve();

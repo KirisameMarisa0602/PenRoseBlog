@@ -9,6 +9,7 @@ import com.kirisamemarisa.blog.model.*;
 import com.kirisamemarisa.blog.repository.*;
 import com.kirisamemarisa.blog.service.BlogPostService;
 import com.kirisamemarisa.blog.service.BlogViewService;
+import com.kirisamemarisa.blog.service.FileStorageService;
 import com.kirisamemarisa.blog.mapper.BlogPostMapper;
 import com.kirisamemarisa.blog.service.CommentService;
 import com.kirisamemarisa.blog.service.NotificationService;
@@ -49,9 +50,7 @@ public class BlogPostServiceImpl implements BlogPostService {
     private final BlogViewService blogViewService; // 新增：浏览相关服务
     private final TagRepository tagRepository;
     private final CategoryRepository categoryRepository;
-
-    @Value("${resource.blogpostcover-location}")
-    private String blogpostcoverLocation;
+    private final FileStorageService fileStorageService;
 
     public BlogPostServiceImpl(BlogPostRepository blogPostRepository,
             UserRepository userRepository,
@@ -67,7 +66,8 @@ public class BlogPostServiceImpl implements BlogPostService {
             BlogViewService blogViewService,
             TagRepository tagRepository,
             CategoryRepository categoryRepository,
-            BlogPostMapper blogpostMapper) {
+            BlogPostMapper blogpostMapper,
+            FileStorageService fileStorageService) {
         this.blogPostRepository = blogPostRepository;
         this.userRepository = userRepository;
         this.commentRepository = commentRepository;
@@ -83,6 +83,7 @@ public class BlogPostServiceImpl implements BlogPostService {
         this.tagRepository = tagRepository;
         this.categoryRepository = categoryRepository;
         this.blogpostMapper = blogpostMapper;
+        this.fileStorageService = fileStorageService;
     }
 
     @Override
@@ -320,17 +321,19 @@ public class BlogPostServiceImpl implements BlogPostService {
 
     @Override
     @Transactional(readOnly = true)
-    public PageResult<BlogPostDTO> search(String keyword, Long userId, String directory, String categoryName, String status, int page,
+    public PageResult<BlogPostDTO> search(String keyword, Long userId, String directory, String categoryName,
+            String status, int page,
             int size,
             Long currentUserId) {
-        
+
         String statusFilter = "PUBLISHED";
         if (userId != null && userId.equals(currentUserId)) {
             statusFilter = status;
         }
 
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<BlogPost> blogPage = blogPostRepository.search(keyword, userId, directory, categoryName, statusFilter, pageRequest);
+        Page<BlogPost> blogPage = blogPostRepository.search(keyword, userId, directory, categoryName, statusFilter,
+                pageRequest);
         List<BlogPost> posts = blogPage.getContent();
         // 批量获取所有 userId
         List<Long> userIds = posts.stream()
@@ -470,33 +473,11 @@ public class BlogPostServiceImpl implements BlogPostService {
         BlogPost saved = blogPostRepository.save(post);
         // 保存封面文件
         if (cover != null && !cover.isEmpty()) {
-            Path baseDir = Paths.get(toLocalPath(blogpostcoverLocation));
-            Path dirPath = baseDir.resolve(String.valueOf(userId)).resolve(String.valueOf(saved.getId()));
             try {
-                Files.createDirectories(dirPath);
-            } catch (IOException e) {
-                logger.error("无法创建目录: {}", dirPath, e);
-                return new ApiResponse<>(500, "封面上传失败（无法创建目录）", null);
-            }
-            // sanitize filename to avoid path traversal — allow only limited characters
-            String rawName = cover.getOriginalFilename();
-            String safeName = sanitizeFilename(rawName);
-            if (safeName.isEmpty())
-                safeName = String.valueOf(System.currentTimeMillis());
-            String fileName = System.currentTimeMillis() + "_" + safeName;
-            Path destPath = dirPath.resolve(fileName).normalize();
-            try {
-                Path allowed = dirPath.toAbsolutePath().normalize();
-                if (!destPath.startsWith(allowed)) {
-                    logger.warn("尝试写入不允许的位置: {} (allowed: {})", destPath, allowed);
-                    return new ApiResponse<>(400, "非法的文件路径", null);
-                }
-                File destFile = destPath.toFile();
-                cover.transferTo(destFile);
-                String url = "/sources/blogpostcover/" + userId + "/" + saved.getId() + "/" + fileName;
+                String url = fileStorageService.storeCoverImage(cover, userId, saved.getId());
                 saved.setCoverImageUrl(url);
                 blogPostRepository.save(saved);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 logger.error("封面上传异常", e);
                 return new ApiResponse<>(500, "封面上传失败", null);
             }
@@ -560,32 +541,10 @@ public class BlogPostServiceImpl implements BlogPostService {
 
         // 保存新封面文件
         if (cover != null && !cover.isEmpty()) {
-            Path baseDir = Paths.get(toLocalPath(blogpostcoverLocation));
-            Path dirPath = baseDir.resolve(String.valueOf(post.getUser().getId()))
-                    .resolve(String.valueOf(post.getId()));
             try {
-                Files.createDirectories(dirPath);
-            } catch (IOException e) {
-                logger.error("无法创建目录: {}", dirPath, e);
-                return new ApiResponse<>(500, "封面上传失败（无法创建目录）", false);
-            }
-            String rawName = cover.getOriginalFilename();
-            String safeName = sanitizeFilename(rawName);
-            if (safeName.isEmpty())
-                safeName = String.valueOf(System.currentTimeMillis());
-            String fileName = System.currentTimeMillis() + "_" + safeName;
-            Path destPath = dirPath.resolve(fileName).normalize();
-            try {
-                Path allowed = dirPath.toAbsolutePath().normalize();
-                if (!destPath.startsWith(allowed)) {
-                    logger.warn("尝试写入不允许的位置: {} (allowed: {})", destPath, allowed);
-                    return new ApiResponse<>(400, "非法的文件路径", false);
-                }
-                File destFile = destPath.toFile();
-                cover.transferTo(destFile);
-                String url = "/sources/blogpostcover/" + post.getUser().getId() + "/" + post.getId() + "/" + fileName;
+                String url = fileStorageService.storeCoverImage(cover, post.getUser().getId(), post.getId());
                 post.setCoverImageUrl(url);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 logger.error("封面上传异常", e);
                 return new ApiResponse<>(500, "封面上传失败", false);
             }
@@ -700,37 +659,6 @@ public class BlogPostServiceImpl implements BlogPostService {
     @Override
     public List<String> getFavoriteCategories(Long userId) {
         return blogPostRepository.findFavoriteCategories(userId);
-    }
-
-    private String toLocalPath(String configured) {
-        if (configured == null)
-            return "";
-        String v = configured;
-        if (v.startsWith("file:"))
-            v = v.substring(5);
-        // Normalize slashes; keep as-is for Windows, ensure trailing separator
-        if (!v.endsWith(File.separator) && !v.endsWith("/")) {
-            v = v + File.separator;
-        }
-        return v.replace('/', File.separatorChar);
-    }
-
-    private String sanitizeFilename(String raw) {
-        if (raw == null)
-            return "";
-        // Remove any path segments by taking substring after last slash/backslash
-        String name = raw;
-        int idx = Math.max(name.lastIndexOf('/'), name.lastIndexOf('\\'));
-        if (idx >= 0 && idx + 1 < name.length())
-            name = name.substring(idx + 1);
-        // Remove any parent traversal
-        name = name.replace("..", "");
-        // Replace any character not in [a-zA-Z0-9._-] with underscore
-        name = name.replaceAll("[^a-zA-Z0-9._-]", "_");
-        // limit length
-        if (name.length() > 200)
-            name = name.substring(name.length() - 200);
-        return name;
     }
 
     private long safeLong(Long v) {

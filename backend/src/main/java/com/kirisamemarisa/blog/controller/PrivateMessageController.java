@@ -325,4 +325,31 @@ public class PrivateMessageController {
             return new ApiResponse<>(e.getCode(), e.getMessage(), null);
         }
     }
+
+    /**
+     * 获取私信媒体的预签名上传 URL (加速上传)
+     */
+    @GetMapping("/presigned-url")
+    public ApiResponse<Map<String, String>> getMessagePresignedUrl(
+            @RequestParam("fileName") String fileName,
+            @RequestParam("otherId") Long otherId,
+            @RequestHeader(name = "X-User-Id", required = false) Long headerUserId,
+            @AuthenticationPrincipal UserDetails principal) {
+        User me = resolveCurrent(principal, headerUserId);
+        if (me == null)
+            return new ApiResponse<>(401, "未认证", null);
+
+        // 简单校验文件类型
+        boolean isVideo = fileName != null && (fileName.toLowerCase().endsWith(".mp4") ||
+                fileName.toLowerCase().endsWith(".mov") ||
+                fileName.toLowerCase().endsWith(".avi") ||
+                fileName.toLowerCase().endsWith(".webm") ||
+                fileName.toLowerCase().endsWith(".mkv"));
+
+        // 视频权限检查 (可选，保持与博客一致)
+        // if (isVideo && !userService.isVip(me.getId())) { ... }
+
+        return new ApiResponse<>(200, "获取成功",
+                fileStorageService.generateMessagePresignedUrl(fileName, me.getId(), otherId));
+    }
 }

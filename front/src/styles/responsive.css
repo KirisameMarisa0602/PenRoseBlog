@@ -37,13 +37,13 @@ img, svg, video, canvas {
 /* 3) Make text scale more gracefully globally
    This doesn’t override component-specific font sizes when they set explicit values.
 */
-html { font-size: 16px; }
+/* html { font-size: 16px; }
 body { font-size: var(--font-md); }
 
 h1 { font-size: var(--font-3xl); }
 h2 { font-size: var(--font-2xl); }
 h3 { font-size: var(--font-xl); }
-h4 { font-size: var(--font-lg); }
+h4 { font-size: var(--font-lg); } */
 
 /* 4) Utility classes: non-invasive helpers components can adopt optionally */
 .responsive-container { width: 100%; max-width: var(--container-regular); margin: 0 auto; }

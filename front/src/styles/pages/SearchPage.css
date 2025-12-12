@@ -14,8 +14,8 @@
     width: 100%;
     max-width: 900px;
     background: rgba(255, 255, 255, 0.6);
-    backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
     padding: 30px 40px;
     border-radius: 24px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
@@ -168,9 +168,9 @@
 }
 
 .articles-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
     width: 100%;
 }
 
@@ -194,18 +194,4 @@
 @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
-}
-    border: none;
-    border-radius: 16px;
-    cursor: pointer;
-    font-size: 18px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    white-space: nowrap;
-    box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
-}
-
-.search-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(24, 144, 255, 0.4);
 }

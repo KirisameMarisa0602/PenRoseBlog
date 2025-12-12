@@ -14,7 +14,6 @@ server.port=8080
 # --- Database ---
 # Local: jdbc:mysql://localhost:3306/blogdb...
 # Docker: jdbc:mysql://mysql:3306/blogdb...
-# 20050602
 spring.datasource.url=jdbc:mysql://localhost:3306/blogdb?useSSL=false&serverTimezone=UTC&characterEncoding=utf8&allowPublicKeyRetrieval=true
 spring.datasource.username=root
 spring.datasource.password=your_password
@@ -44,40 +43,37 @@ app.rabbitmq.exchange=blog.notifications
 
 # --- JWT Security ---
 # 请务必修改此密钥
-# VJ2fwrQ7Qq3S3UqY5yH2Z0t9Nf3KX8u6rPgC1yM4rQe9W7ZkH1vT2aR5mN8sQ0xB
 jwt.secret=your_very_long_random_secret_key_here_at_least_32_bytes
 
-# --- Static Resources (CRITICAL) ---
-# Local (Windows): file:D:/Projects/selfprojects/PenRoseBlog/sources/
-# Docker: file:/app/sources/
-resource.sources-location=file:/app/sources/
-resource.avatar-location=${resource.sources-location}avatar/
-resource.background-location=${resource.sources-location}background/
-resource.profile-location=${resource.sources-location}profile/
-resource.blogpostcover-location=${resource.sources-location}blogpostcover/
-resource.blogpostcontent-location=${resource.sources-location}blogpostcontent/
 
-# Private Messages
-resource.message-media-location=${resource.sources-location}messages/
-resource.message-media-access-prefix=/files/messages
+# --- Tencent Cloud COS (Required) ---
+# 腾讯云对象存储配置 - 必须配置
+# 获取方式：腾讯云控制台 -> 访问管理 -> API密钥管理
+cos.secretId=your_secret_id
+cos.secretKey=your_secret_key
+# 存储桶地域，如 ap-hongkong, ap-shanghai
+cos.region=ap-hongkong
+# 存储桶名称，如 penroseblogassets-13xxxxxx
+cos.bucketName=penroseblogassets-13xxxxxx
+# CDN加速域名（可选），如 https://cdn.yourdomain.com
+# 如果未配置CDN，可留空，系统将使用COS默认域名
+cos.cdnUrl=
 
 # --- File Upload Limits ---
 spring.servlet.multipart.max-file-size=648MB
 spring.servlet.multipart.max-request-size=648MB
 
 # --- AI Configuration (Spring AI) ---
-# Leave empty or use dummy key for local dev if not needed
+# DeepSeek API 配置
 spring.ai.openai.api-key=${OPENAI_API_KEY:sk-dummy-key}
-spring.ai.openai.model=gpt-3.5-turbo
-spring.ai.openai.api-base-url=https://api.openai.com
-
-# --- OAuth2 (GitHub) ---
-oauth2.github.client-id=your_github_client_id
-oauth2.github.client-secret=your_github_client_secret
-oauth2.github.redirect-uri=http://localhost:5173/auth/github/callback
+spring.ai.openai.model=deepseek-reasoner
+spring.ai.openai.api-base-url=https://api.deepseek.com
 
 # --- Flyway ---
 # Disable for local dev if using new MySQL versions or manual schema management
 spring.flyway.enabled=false
 
 logging.level.com.kirisamemarisa.blog=DEBUG
+# 如果你配置了 CDN，填 CDN 域名；如果没有，暂时留空或填 COS 的访问域名
+# 例如: https://penroseblogassets-1329628039.cos.ap-hongkong.myqcloud.com
+cos.cdnUrl=
