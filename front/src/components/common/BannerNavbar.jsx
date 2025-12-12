@@ -6,6 +6,7 @@ import NavAvatar from './NavAvatar.jsx';
 import NotificationBell from '@components/common/NotificationBell.jsx';
 import { useAuthState } from '@hooks/useAuthState';
 import { fetchUnreadTotal, markConversationRead } from '@utils/api/messageService';
+import { notificationApi } from '@utils/api/notificationApi';
 import ExampleSpring from './examples/ExampleSpring.jsx';
 import ExampleAutumn from './examples/ExampleAutumn.jsx';
 import ExampleWinter from './examples/ExampleWinter.jsx';
@@ -38,6 +39,7 @@ export default function BannerNavbar({ bannerId }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [unreadTotal, setUnreadTotal] = useState(0);
+  const [sysUnread, setSysUnread] = useState(0);
 
   const lastScrollRef = useRef(0);
   const prevHiddenRef = useRef(false);
@@ -348,20 +350,30 @@ export default function BannerNavbar({ bannerId }) {
     };
   }, [layers, isExample]);
 
-  useEffect(() => {
-    if (!userId) { setUnreadTotal(0); return; }
-    fetchUnreadTotal()
-      .then(j => { if (j && j.code === 200) setUnreadTotal(Number(j.data) || 0); })
-      .catch(() => { });
-  }, [userId]);
-
   // 新增：封装成函数，便于复用
   const refreshUnreadTotal = React.useCallback(() => {
-    if (!userId) { setUnreadTotal(0); return; }
+    if (!userId) { 
+      setUnreadTotal(0); 
+      setSysUnread(0);
+      return; 
+    }
     fetchUnreadTotal()
       .then(j => { if (j && j.code === 200) setUnreadTotal(Number(j.data) || 0); })
       .catch((err) => { void err; });
+      
+    notificationApi.getUnreadCount()
+      .then(res => {
+        if (res && res.code === 200) {
+           setSysUnread(typeof res.data === 'number' ? res.data : (res.data?.count || 0));
+        }
+      })
+      .catch(() => {});
   }, [userId]);
+
+  useEffect(() => {
+    if (!userId) { setUnreadTotal(0); setSysUnread(0); return; }
+    refreshUnreadTotal();
+  }, [userId, refreshUnreadTotal]);
 
   // 新增：订阅全局通知 SSE（后端已由 NotificationService 推送 PRIVATE_MESSAGE）
   useEffect(() => {
@@ -490,7 +502,7 @@ export default function BannerNavbar({ bannerId }) {
         <SplitNavItem to="/search" text="搜索" />
 
         {/* 5. Notifications */}
-        <SplitNavItem to="/notifications" text="系统通知" />
+        <SplitNavItem to="/notifications" text="系统通知" badge={sysUnread} />
 
         {/* 6. Publish */}
         <SplitNavItem to="/blog-edit" text="发布文章" />

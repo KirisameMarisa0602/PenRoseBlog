@@ -52,13 +52,21 @@ export default function ArticleHeader({ post, isOwner, onDelete }) {
                 </div>
                 
                 {isOwner && (
-                    <button
-                        type="button"
-                        onClick={onDelete}
-                        className="delete-post-btn"
-                    >
-                        删除博客
-                    </button>
+                    <div className="article-owner-actions">
+                        <Link
+                            to={`/blog-edit?id=${post.id || post.postId}`}
+                            className="edit-post-btn"
+                        >
+                            编辑
+                        </Link>
+                        <button
+                            type="button"
+                            onClick={onDelete}
+                            className="delete-post-btn"
+                        >
+                            删除
+                        </button>
+                    </div>
                 )}
             </div>
             

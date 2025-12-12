@@ -4,7 +4,6 @@ import '@styles/blogeditor/BlogEditor.css';
 import httpClient from '@utils/api/httpClient';
 import TipTapEditor from '@components/blogeditor/TipTapEditor';
 import MarkdownEditor from '@components/blogeditor/MarkdownEditor';
-import CategoryWheel from '@components/blogeditor/CategoryWheel'; // Import the new component
 import { marked } from 'marked';
 import TurndownService from 'turndown';
 import hljs from 'highlight.js';
@@ -87,10 +86,10 @@ const BlogEditor = () => {
     },
   };
 
-  const currentConfig = CATEGORY_CONFIG[category] || CATEGORY_CONFIG['技术'];
-  const currentThemeColor = currentConfig.color;
+  // const currentConfig = CATEGORY_CONFIG[category] || CATEGORY_CONFIG['技术'];
+  // const currentThemeColor = currentConfig.color;
   // 统一使用技术分类的布局样式（Tech Style），但保留背景色随分类变化
-  const currentLayout = 'tech';
+  // const currentLayout = 'tech';
 
   const titleLen = useMemo(() => (title || '').trim().length, [title]);
   const contentLen = useMemo(() => (content || '').trim().length, [content]);
@@ -257,13 +256,13 @@ const BlogEditor = () => {
       });
       if (res && (res.status === 200 || res.data?.code === 200)) {
         alert(status === 'PUBLISHED' ? (editId ? '更新成功！' : '发布成功！') : '草稿保存成功！');
-        try {
-          localStorage.removeItem('blog.editor.title');
-          localStorage.removeItem('blog.editor.content');
-          localStorage.removeItem('blog.editor.tags'); // Clear tags
-        } catch { /* ignore */ }
-
+        
         if (status === 'PUBLISHED') {
+          try {
+            localStorage.removeItem('blog.editor.title');
+            localStorage.removeItem('blog.editor.content');
+            localStorage.removeItem('blog.editor.tags'); // Clear tags
+          } catch { /* ignore */ }
           setTitle('');
           setContent('');
           setTags([]);
@@ -271,9 +270,14 @@ const BlogEditor = () => {
           setCoverPreview(null);
           navigate('/');
         } else {
+          // Draft saved
+          // Do NOT clear localStorage so user can continue editing without glitch
+          // If it's a new draft, navigate to the edit URL to ensure subsequent saves are updates
           if (!editId && res.data.data) {
-            navigate(`/blog-edit?id=${res.data.data}`);
+            // Use replace to avoid history stack buildup
+            navigate(`/blog-edit?id=${res.data.data}`, { replace: true });
           }
+          // If it's already an editId, stay here.
         }
       } else {
         alert('操作失败');
@@ -354,230 +358,200 @@ const BlogEditor = () => {
   }, [previewMode, previewHtml]);
 
   return (
-    <div
-      className="blog-editor-container"
-      style={{
-        background: currentConfig.bgImage || currentThemeColor
-      }}
-    >
-      <div className={`blog-editor-main layout-${currentLayout}`}>
-        {/* Category Wheel Sidebar (Integrated) */}
-        <div className="blog-category-sidebar">
-          <CategoryWheel
-            categories={PREDEFINED_CATEGORIES}
-            selected={category}
-            onChange={setCategory}
-          />
+    <div className="blog-editor-container">
+      {/* Top Header: Title & Main Actions */}
+      <div className="blog-editor-header">
+        <button className="blog-editor-back-btn" onClick={() => navigate('/')} title="返回首页">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+        
+        <input
+          type="text"
+          className="blog-editor-title-input-inline"
+          placeholder="输入文章标题..."
+          value={title}
+          onChange={e => setTitle(e.target.value)}
+        />
+
+        <div className="blog-editor-header-actions">
+           {/* Mode Switch */}
+           <button 
+             className={`blog-editor-btn secondary ${editorMode === 'markdown' ? 'active' : ''}`}
+             onClick={async () => {
+                if (editorMode === 'markdown') {
+                  try {
+                    const fixedContent = (content || '').replace(/(^|\n)(#{1,6})([^\s#])/g, '$1$2 $3');
+                    const html = await marked.parse(fixedContent);
+                    setContent(html);
+                  } catch (error) {
+                    console.error('Markdown parsing failed', error);
+                  }
+                  setEditorMode('rich');
+                } else {
+                  try {
+                    const md = turndownService.turndown(content);
+                    setContent(md);
+                  } catch (error) {
+                    console.error('Turndown failed', error);
+                  }
+                  setEditorMode('markdown');
+                }
+             }}
+             title="切换编辑模式"
+           >
+             {editorMode === 'markdown' ? '切换富文本' : '切换Markdown'}
+           </button>
+
+           {/* Preview Toggle */}
+           <button 
+             className={`blog-editor-btn secondary ${previewMode ? 'active' : ''}`}
+             onClick={() => setPreviewMode(!previewMode)}
+           >
+             {previewMode ? '编辑' : '预览'}
+           </button>
+
+           <div className="divider-vertical" style={{height: '24px', margin: '0 8px', background: '#e2e8f0', width: '1px'}}></div>
+
+           <button 
+             className="blog-editor-btn secondary"
+             onClick={(e) => handleSubmit(e, 'DRAFT')}
+             disabled={submitting || !title.trim()}
+           >
+             保存草稿
+           </button>
+           <button 
+             className="blog-editor-btn primary"
+             onClick={(e) => handleSubmit(e, 'PUBLISHED')}
+             disabled={submitting || !title.trim() || contentLen < CONTENT_MIN}
+           >
+             {submitting ? '发布中...' : (editId ? '更新' : '发布')}
+           </button>
+        </div>
+      </div>
+
+      {/* Main Layout: Editor + Sidebar */}
+      <div className="blog-editor-body">
+        {/* Main Editor Area */}
+        <div className="blog-editor-content-area">
+           {previewMode ? (
+             <div className="blog-editor-preview-wrapper">
+                <h1 className="preview-title">{title || '无标题'}</h1>
+                {coverPreview && <img src={coverPreview} alt="Cover" className="preview-cover" />}
+                <div className="tiptap-content" dangerouslySetInnerHTML={{ __html: previewHtml }} />
+             </div>
+           ) : (
+             <div className="editor-wrapper">
+                {editorMode === 'rich' ? (
+                  <TipTapEditor value={content} onChange={setContent} placeholder={'开始创作…'} userId={userId} />
+                ) : (
+                  <MarkdownEditor content={content} onChange={setContent} />
+                )}
+             </div>
+           )}
         </div>
 
-        {/* Header removed - controls moved below */}
-
-
-        {previewMode ? (
-          <div className="blog-editor-preview-container" style={{ width: '100%' }}>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
-              <button
-                type="button"
-                className="blog-editor-action-btn blog-editor-preview-btn active"
-                onClick={() => setPreviewMode(false)}
-              >
-                返回编辑
-              </button>
-            </div>
-            <h1 style={{ fontSize: '42px', fontWeight: '800', marginBottom: '30px', lineHeight: '1.2' }}>{title || '无标题'}</h1>
-            {coverPreview && (
-              <div style={{ marginBottom: '30px' }}>
-                <img src={coverPreview} alt="封面预览" className="blog-editor-cover-preview" style={{ maxWidth: '100%', borderRadius: '8px' }} />
+        {/* Right Sidebar */}
+        <div className="blog-editor-sidebar">
+           {/* Publish Settings Card */}
+           <div className="sidebar-card">
+              <h3>发布设置</h3>
+              <div className="sidebar-form-item">
+                <label>分类</label>
+                <select 
+                  className="blog-editor-select full-width"
+                  value={category} 
+                  onChange={e => setCategory(e.target.value)}
+                >
+                  <option value="" disabled>选择分类</option>
+                  {PREDEFINED_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
               </div>
-            )}
-            <div className="tiptap-content" dangerouslySetInnerHTML={{ __html: previewHtml }} />
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} encType="multipart/form-data" style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
-            <input
-              type="text"
-              placeholder="请输入标题"
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-              required
-              className="blog-editor-title-input"
-            />
 
-            {/* 封面上传区域优化 */}
-            <div className="blog-editor-cover-wrapper">
-              {!coverPreview ? (
-                <label className="blog-editor-cover-btn">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                  <span>添加封面</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleCoverChange}
-                    className="blog-editor-cover-input"
-                  />
-                </label>
-              ) : (
-                <div className="blog-editor-cover-preview-container">
-                  <img src={coverPreview} alt="封面预览" className="blog-editor-cover-preview" />
-                  <button
-                    type="button"
-                    className="blog-editor-cover-remove"
-                    onClick={() => {
-                      setCover(null);
-                      setCoverPreview(null);
-                    }}
-                    title="移除封面"
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Meta Info Inputs */}
-            <div className="blog-editor-meta-inputs" style={{ display: 'flex', gap: '16px', marginBottom: '20px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
-
-              {/* Tag Input Area */}
-              <div className="blog-editor-tags-wrapper" style={{ flex: '2 1 300px', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px', padding: '8px 12px', borderRadius: '8px', border: '1px solid #e5e7eb', minHeight: '46px', alignSelf: 'center' }}>
-                {tags.map(tag => (
-                  <span key={tag} className="blog-editor-tag-chip">
-                    {tag}
-                    <button type="button" onClick={() => handleRemoveTag(tag)}>&times;</button>
-                  </span>
-                ))}
-                {tags.length < TAG_MAX_COUNT && (
-                  <div className="blog-editor-tag-input-group">
-                    <input
+              <div className="sidebar-form-item">
+                <label>目录</label>
+                <div className="directory-input-wrapper full-width">
+                   <input
                       type="text"
-                      placeholder={tags.length === 0 ? "添加标签 (Enter添加)" : "添加标签"}
-                      value={tagInput}
-                      onChange={e => setTagInput(e.target.value)}
-                      onKeyDown={handleTagKeyDown}
-                      className="blog-editor-tag-input"
-                    />
-                    <button type="button" onClick={handleAddTag} className="blog-editor-add-tag-btn" disabled={!tagInput.trim()}>
-                      +
-                    </button>
-                  </div>
-                )}
+                      placeholder="输入或选择目录"
+                      value={directory}
+                      onChange={e => setDirectory(e.target.value)}
+                      list="directory-options"
+                      className="blog-editor-input full-width"
+                   />
+                   <datalist id="directory-options">
+                      {existingDirectories.map((dir, idx) => <option key={idx} value={dir} />)}
+                   </datalist>
+                </div>
               </div>
 
-              <div style={{ flex: '1 1 200px', position: 'relative', alignSelf: 'center' }}>
-                <input
-                  type="text"
-                  placeholder="目录/文件夹 (可选)"
-                  value={directory}
-                  onChange={e => setDirectory(e.target.value)}
-                  list="directory-options"
-                  className="blog-editor-meta-input"
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    borderRadius: '8px',
-                    border: '1px solid #e5e7eb',
-                    outline: 'none',
-                    transition: 'border-color 0.2s',
-                    color: '#1f2937', /* 显式设置深色文字 */
-                    backgroundColor: '#ffffff'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                  onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-                />
-                <datalist id="directory-options">
-                  {existingDirectories.map((dir, idx) => (
-                    <option key={idx} value={dir} />
-                  ))}
-                </datalist>
+              <div className="sidebar-form-item">
+                <label>标签</label>
+                <div className="tags-input-container full-width">
+                    <div className="tags-list">
+                      {tags.map(tag => (
+                        <span key={tag} className="tag-chip">
+                          {tag} <span onClick={() => handleRemoveTag(tag)}>&times;</span>
+                        </span>
+                      ))}
+                    </div>
+                    {tags.length < TAG_MAX_COUNT && (
+                      <input
+                        type="text"
+                        placeholder={tags.length === 0 ? "输入标签按回车" : "继续添加..."}
+                        value={tagInput}
+                        onChange={e => setTagInput(e.target.value)}
+                        onKeyDown={handleTagKeyDown}
+                        className="tag-input-field"
+                      />
+                    )}
+                </div>
               </div>
-            </div>
+           </div>
 
-            {/* Controls Area (Moved from Header) */}
-            <div className="blog-editor-controls-area" style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginBottom: '10px' }}>
-              <button
-                type="button"
-                className={`blog-editor-action-btn ${editorMode === 'markdown' ? 'active' : ''}`}
-                onClick={async () => {
-                  if (editorMode === 'markdown') {
-                    // Markdown -> Rich Text (HTML)
-                    try {
-                      // Fix headers missing space (e.g. ##Title -> ## Title)
-                      const fixedContent = (content || '').replace(/(^|\n)(#{1,6})([^\s#])/g, '$1$2 $3');
-                      const html = await marked.parse(fixedContent);
-                      setContent(html);
-                    } catch (e) { console.error(e); }
-                    setEditorMode('rich');
-                  } else {
-                    // Rich Text (HTML) -> Markdown
-                    try {
-                      const md = turndownService.turndown(content);
-                      setContent(md);
-                    } catch (e) { console.error(e); }
-                    setEditorMode('markdown');
-                  }
-                }}
-              >
-                {editorMode === 'rich' ? 'Markdown模式' : '富文本模式'}
-              </button>
-              <button
-                type="button"
-                className={`blog-editor-action-btn blog-editor-preview-btn ${previewMode ? 'active' : ''}`}
-                onClick={() => setPreviewMode(!previewMode)}
-              >
-                {previewMode ? '返回编辑' : '预览文章'}
-              </button>
-            </div>
-
-            <div className="blog-editor-md-row" style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative' }}>
-              {editorMode === 'rich' ? (
-                <TipTapEditor value={content} onChange={setContent} placeholder={'开始创作…'} userId={userId} />
-              ) : (
-                <MarkdownEditor content={content} onChange={setContent} />
-              )}
-
-              {/* Word Count Stats - Floating Bottom Right */}
-              <div className="blog-editor-stats-floating" style={{
-                position: 'absolute',
-                bottom: '10px',
-                right: '20px',
-                zIndex: 10,
-                background: 'rgba(255,255,255,0.9)',
-                padding: '6px 12px',
-                borderRadius: '20px',
-                fontSize: '12px',
-                color: '#64748b',
-                boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
-                border: '1px solid #e2e8f0',
-                display: 'flex',
-                gap: '12px',
-                pointerEvents: 'none',
-                userSelect: 'none'
-              }}>
-                <span className={titleLen > TITLE_MAX ? 'over-limit' : ''}>标题 {titleLen}/{TITLE_MAX}</span>
-                <span>正文 {contentLen} 字</span>
+           {/* Cover Card */}
+           <div className="sidebar-card">
+              <h3>文章封面</h3>
+              <div className="sidebar-cover-upload">
+                 {coverPreview ? (
+                   <div className="cover-preview-large">
+                     <img src={coverPreview} alt="Cover" />
+                     <div className="cover-actions">
+                        <label className="change-cover-btn">
+                           更换
+                           <input type="file" accept="image/*" onChange={handleCoverChange} hidden />
+                        </label>
+                        <button className="remove-cover-btn" onClick={() => {setCover(null); setCoverPreview(null);}}>移除</button>
+                     </div>
+                   </div>
+                 ) : (
+                   <label className="upload-cover-placeholder">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                      <span>点击上传封面</span>
+                      <input type="file" accept="image/*" onChange={handleCoverChange} hidden />
+                   </label>
+                 )}
               </div>
-            </div>
+           </div>
 
-            {/* 底部发布按钮 */}
-            <div className="blog-editor-footer">
-              <button
-                type="button"
-                className="blog-editor-draft-btn"
-                onClick={(e) => handleSubmit(e, 'DRAFT')}
-                disabled={submitting || !title.trim()}
-              >
-                保存草稿
-              </button>
-              <button
-                type="button"
-                className="blog-editor-submit-btn"
-                onClick={(e) => handleSubmit(e, 'PUBLISHED')}
-                disabled={submitting || !title.trim() || contentLen < CONTENT_MIN || titleLen > TITLE_MAX}
-              >
-                {submitting ? '发布中…' : (editId ? '更新文章' : '发布文章')}
-              </button>
-            </div>
-          </form>
-        )}
+           {/* Info Card */}
+           <div className="sidebar-card">
+              <h3>文章信息</h3>
+              <div className="sidebar-stats">
+                 <div className="stat-row">
+                    <span>标题字数</span>
+                    <span className={titleLen > TITLE_MAX ? 'over-limit' : ''}>{titleLen} / {TITLE_MAX}</span>
+                 </div>
+                 <div className="stat-row">
+                    <span>正文字数</span>
+                    <span>{contentLen}</span>
+                 </div>
+                 <div className="stat-row">
+                    <span>预计阅读</span>
+                    <span>{Math.ceil(contentLen / 400)} 分钟</span>
+                 </div>
+              </div>
+           </div>
+        </div>
       </div>
     </div>
   );

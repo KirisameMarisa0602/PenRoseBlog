@@ -119,6 +119,32 @@
   color: #718096;
 }
 
+.article-owner-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.edit-post-btn {
+  background-color: #fff;
+  color: #3b82f6;
+  border: 1px solid #3b82f6;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  text-decoration: none;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit-post-btn:hover {
+  background-color: #3b82f6;
+  color: #fff;
+}
+
 .delete-post-btn {
   background-color: #fff;
   color: #e53e3e;

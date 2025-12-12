@@ -8,6 +8,7 @@ import '../../styles/blogeditor/MarkdownEditor.css';
 const MarkdownEditor = ({ content, onChange }) => {
   const [leftWidth, setLeftWidth] = useState(50); // Percentage
   const containerRef = useRef(null);
+  const textareaRef = useRef(null);
   const isDragging = useRef(false);
 
   const handleMouseDown = () => {
@@ -35,6 +36,27 @@ const MarkdownEditor = ({ content, onChange }) => {
     document.body.style.userSelect = '';
   };
 
+  const insertText = (prefix, suffix = '') => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    const before = text.substring(0, start);
+    const selection = text.substring(start, end);
+    const after = text.substring(end);
+
+    const newText = before + prefix + selection + suffix + after;
+    onChange(newText);
+
+    // Restore selection/cursor
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + prefix.length, end + prefix.length);
+    }, 0);
+  };
+
   // Pre-process content to ensure headers have spaces
   const processedContent = (content || '').replace(/(^|\n)(#{1,6})([^\s#])/g, '$1$2 $3');
 
@@ -45,7 +67,27 @@ const MarkdownEditor = ({ content, onChange }) => {
           <span>Markdown 编辑</span>
         </div>
         <div className="markdown-input-pane">
+          <div className="markdown-toolbar">
+             <button onClick={() => insertText('**', '**')} title="粗体"><b>B</b></button>
+             <button onClick={() => insertText('*', '*')} title="斜体"><i>I</i></button>
+             <button onClick={() => insertText('~~', '~~')} title="删除线"><s>S</s></button>
+             <div className="md-divider"></div>
+             <button onClick={() => insertText('# ', '')} title="标题1">H1</button>
+             <button onClick={() => insertText('## ', '')} title="标题2">H2</button>
+             <button onClick={() => insertText('### ', '')} title="标题3">H3</button>
+             <div className="md-divider"></div>
+             <button onClick={() => insertText('> ', '')} title="引用">“</button>
+             <button onClick={() => insertText('`', '`')} title="代码">{'<>'}</button>
+             <button onClick={() => insertText('```\n', '\n```')} title="代码块">Code</button>
+             <div className="md-divider"></div>
+             <button onClick={() => insertText('- ', '')} title="列表">•</button>
+             <button onClick={() => insertText('1. ', '')} title="有序列表">1.</button>
+             <div className="md-divider"></div>
+             <button onClick={() => insertText('[', '](url)')} title="链接">Link</button>
+             <button onClick={() => insertText('![', '](url)')} title="图片">Img</button>
+          </div>
           <textarea
+            ref={textareaRef}
             className="markdown-textarea"
             value={content}
             onChange={(e) => onChange(e.target.value)}

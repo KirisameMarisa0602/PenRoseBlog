@@ -100,6 +100,7 @@ const MediaModal = ({ isOpen, onClose, onSubmit, title, placeholder, userId }) =
   const [url, setUrl] = useState('');
   const [activeTab, setActiveTab] = useState('link'); // 'link' | 'upload'
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef(null);
   
   useEffect(() => {
@@ -107,6 +108,7 @@ const MediaModal = ({ isOpen, onClose, onSubmit, title, placeholder, userId }) =
       setUrl('');
       setActiveTab('link');
       setUploading(false);
+      setUploadProgress(0);
     }
   }, [isOpen]);
 
@@ -115,6 +117,7 @@ const MediaModal = ({ isOpen, onClose, onSubmit, title, placeholder, userId }) =
     if (!file) return;
 
     setUploading(true);
+    setUploadProgress(0);
     const formData = new FormData();
     formData.append('file', file);
     if (userId) {
@@ -124,7 +127,11 @@ const MediaModal = ({ isOpen, onClose, onSubmit, title, placeholder, userId }) =
     try {
       const res = await httpClient.post('/blogpost/media', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
-        timeout: 600000 // 10分钟超时，防止大文件上传中断
+        timeout: 600000, // 10分钟超时，防止大文件上传中断
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          setUploadProgress(percentCompleted);
+        }
       });
       if (res.data.code === 200) {
         onSubmit(res.data.data);
@@ -235,20 +242,38 @@ const MediaModal = ({ isOpen, onClose, onSubmit, title, placeholder, userId }) =
               onChange={handleFileUpload}
               style={{ display: 'none' }}
               id="tt-file-upload"
+              disabled={uploading}
             />
             <label 
               htmlFor="tt-file-upload" 
               style={{
                 display: 'inline-block',
-                padding: '10px 20px',
+                padding: '20px',
                 backgroundColor: '#f3f4f6',
                 border: '1px dashed #ccc',
                 borderRadius: '8px',
-                cursor: 'pointer',
-                width: '100%'
+                cursor: uploading ? 'not-allowed' : 'pointer',
+                width: '100%',
+                position: 'relative',
+                overflow: 'hidden'
               }}
             >
-              {uploading ? '上传中...' : '点击选择文件上传'}
+              <div style={{ position: 'relative', zIndex: 1 }}>
+                {uploading ? `正在上传... ${uploadProgress}%` : '点击选择文件上传'}
+              </div>
+              {uploading && (
+                <div 
+                  style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    left: 0,
+                    height: '4px',
+                    backgroundColor: '#3b82f6',
+                    width: `${uploadProgress}%`,
+                    transition: 'width 0.2s ease'
+                  }}
+                />
+              )}
             </label>
             <div style={{ marginTop: '10px', fontSize: '12px', color: '#888' }}>
               支持 {title === '插入图片' ? 'JPG, PNG, GIF' : 'MP4, WebM'} 格式

@@ -15,7 +15,7 @@ export default ({ mode }) => {
 
   // 注意：本地开发（Windows）如果 8080 被占用，通常改为 8081。
   // 请确保这里与 backend/src/main/resources/application-dev.properties 中的 server.port 一致。
-  const backendTarget = env.VITE_BACKEND_ORIGIN || 'http://localhost:8080';
+  const backendTarget = env.VITE_BACKEND_ORIGIN || 'http://localhost:8081';
 
   return defineConfig({
     plugins: [react()],
@@ -50,6 +50,11 @@ export default ({ mode }) => {
           changeOrigin: true,
           rewrite: path => path
         },
+        '/profile': {
+          target: backendTarget,
+          changeOrigin: true,
+          rewrite: path => path
+        },
         // 博客文章封面等静态资源后端路径
         '/sources': {
           target: backendTarget,
@@ -58,6 +63,11 @@ export default ({ mode }) => {
         },
         // 常见的上传/静态目录（如果后端使用其它前缀，可在此添加）
         '/uploads': {
+          target: backendTarget,
+          changeOrigin: true,
+          rewrite: path => path
+        },
+        '/files': {
           target: backendTarget,
           changeOrigin: true,
           rewrite: path => path

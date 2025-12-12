@@ -16,13 +16,15 @@ public class WebConfig implements WebMvcConfigurer {
         @Override
         public void addResourceHandlers(ResourceHandlerRegistry registry) {
                 // 静态资源已由 Nginx 直接代理，后端不再负责映射
-                /*
                 // 头像、背景
                 registry.addResourceHandler("/avatar/**")
                                 .addResourceLocations(resourceProperties.getAvatarLocation())
                                 .setCachePeriod(2592000);
                 registry.addResourceHandler("/background/**")
                                 .addResourceLocations(resourceProperties.getBackgroundLocation())
+                                .setCachePeriod(2592000);
+                registry.addResourceHandler("/profile/**")
+                                .addResourceLocations(resourceProperties.getProfileLocation())
                                 .setCachePeriod(2592000);
 
                 // 博客文章封面/正文
@@ -51,6 +53,5 @@ public class WebConfig implements WebMvcConfigurer {
                 registry.addResourceHandler(handlerPattern)
                                 .addResourceLocations(locationPath)
                                 .setCachePeriod(3600);
-                */
         }
 }

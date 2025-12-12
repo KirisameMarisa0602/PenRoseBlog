@@ -57,6 +57,8 @@ public class UserServiceImpl implements UserService {
     private String avatarLocation;
     @Value("${resource.background-location}")
     private String backgroundLocation;
+    @Value("${resource.profile-location}")
+    private String profileLocation;
 
     @Override
     @Transactional
@@ -146,6 +148,15 @@ public class UserServiceImpl implements UserService {
         profile.setNickname(dto.getNickname());
         profile.setAvatarUrl(dto.getAvatarUrl());
         profile.setBackgroundUrl(dto.getBackgroundUrl());
+        profile.setSignature(dto.getSignature());
+        profile.setBio(dto.getBio());
+        profile.setTags(dto.getTags());
+        profile.setQq(dto.getQq());
+        profile.setWechat(dto.getWechat());
+        profile.setQqQrCode(dto.getQqQrCode());
+        profile.setWechatQrCode(dto.getWechatQrCode());
+        profile.setGithubLink(dto.getGithubLink());
+        profile.setBilibiliLink(dto.getBilibiliLink());
 
         // 修复：同步性别字段到 User 表
         if (dto.getGender() != null) {
@@ -173,7 +184,8 @@ public class UserServiceImpl implements UserService {
         Path baseDir = Paths.get(toLocalPath(avatarLocation)).toAbsolutePath().normalize();
         Path userDir = baseDir.resolve(String.valueOf(userId)).normalize();
         try {
-            if (!userDir.startsWith(baseDir)) throw new BusinessException("非法的用户目录");
+            if (!userDir.startsWith(baseDir))
+                throw new BusinessException("非法的用户目录");
             Files.createDirectories(userDir);
         } catch (IOException e) {
             throw new BusinessException("头像目录创建失败");
@@ -209,7 +221,8 @@ public class UserServiceImpl implements UserService {
         Path baseDir = Paths.get(toLocalPath(backgroundLocation)).toAbsolutePath().normalize();
         Path userDir = baseDir.resolve(String.valueOf(userId)).normalize();
         try {
-            if (!userDir.startsWith(baseDir)) throw new BusinessException("非法的用户目录");
+            if (!userDir.startsWith(baseDir))
+                throw new BusinessException("非法的用户目录");
             Files.createDirectories(userDir);
         } catch (IOException e) {
             throw new BusinessException("背景目录创建失败");
@@ -236,10 +249,63 @@ public class UserServiceImpl implements UserService {
         return url;
     }
 
+    @Override
+    public String uploadQqQrCode(Long userId, MultipartFile file) {
+        return uploadProfileImage(userId, file, "qq_qrcode");
+    }
+
+    @Override
+    public String uploadWechatQrCode(Long userId, MultipartFile file) {
+        return uploadProfileImage(userId, file, "wechat_qrcode");
+    }
+
+    private String uploadProfileImage(Long userId, MultipartFile file, String type) {
+        if (userId == null || file == null || file.isEmpty())
+            throw new BusinessException("文件为空");
+        String ext = org.springframework.util.StringUtils.getFilenameExtension(file.getOriginalFilename());
+        String filename = type + "_" + UUID.randomUUID() + (ext != null ? "." + ext : "");
+        Path baseDir = Paths.get(toLocalPath(profileLocation)).toAbsolutePath().normalize();
+        Path userDir = baseDir.resolve(String.valueOf(userId)).normalize();
+        try {
+            if (!userDir.startsWith(baseDir))
+                throw new BusinessException("非法的用户目录");
+            Files.createDirectories(userDir);
+        } catch (IOException e) {
+            throw new BusinessException("目录创建失败");
+        }
+        if (filename.contains("..") || filename.contains("/") || filename.contains("\\")) {
+            throw new BusinessException("非法文件名");
+        }
+        Path destPath = userDir.resolve(filename).normalize();
+        try {
+            File dest = destPath.toFile();
+            file.transferTo(dest);
+        } catch (IOException e) {
+            throw new BusinessException("上传失败");
+        }
+        String url = "/profile/" + userId + "/" + filename;
+
+        UserProfile profile = userProfileRepository.findById(userId).orElseGet(() -> {
+            UserProfile p = new UserProfile();
+            p.setUser(userRepository.findById(userId).orElseThrow(() -> new BusinessException("用户不存在")));
+            return p;
+        });
+
+        if ("qq_qrcode".equals(type)) {
+            profile.setQqQrCode(url);
+        } else if ("wechat_qrcode".equals(type)) {
+            profile.setWechatQrCode(url);
+        }
+        userProfileRepository.save(profile);
+        return url;
+    }
+
     private String toLocalPath(String configured) {
-        if (configured == null) return "";
+        if (configured == null)
+            return "";
         String v = configured;
-        if (v.startsWith("file:")) v = v.substring(5);
+        if (v.startsWith("file:"))
+            v = v.substring(5);
         if (!v.endsWith(File.separator) && !v.endsWith("/")) {
             v = v + File.separator;
         }
@@ -279,28 +345,28 @@ public class UserServiceImpl implements UserService {
         if (userId == null || dto == null) {
             throw new BusinessException("请求参数为空");
         }
-        
+
         Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) {
             throw new BusinessException("用户不存在");
         }
-        
+
         User user = userOpt.get();
-        
+
         // 如果是第三方登录用户（没有密码），不允许修改密码
         if (user.getPassword() == null || user.getPassword().isEmpty()) {
             throw new BusinessException("第三方登录用户无法修改密码");
         }
-        
+
         // 验证旧密码
         if (!passwordEncoder.matches(dto.getOldPassword(), user.getPassword())) {
             throw new BusinessException("旧密码错误");
         }
-        
+
         // 设置新密码
         user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
         userRepository.save(user);
-        
+
         logger.info("Password changed successfully for userId={}", userId);
         return true;
     }

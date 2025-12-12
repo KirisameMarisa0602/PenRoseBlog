@@ -11,6 +11,7 @@ public class ResourceProperties {
     // 头像、背景与博客资源（application.properties 中已配置为 file: 前缀）
     private String avatarLocation;
     private String backgroundLocation;
+    private String profileLocation;
     private String blogpostcoverLocation;
     private String blogpostcontentLocation;
 
@@ -40,6 +41,14 @@ public class ResourceProperties {
 
     public void setBackgroundLocation(String backgroundLocation) {
         this.backgroundLocation = backgroundLocation;
+    }
+
+    public String getProfileLocation() {
+        return profileLocation;
+    }
+
+    public void setProfileLocation(String profileLocation) {
+        this.profileLocation = profileLocation;
     }
 
     public String getBlogpostcoverLocation() {

@@ -1050,26 +1050,20 @@ export default function CommunicationPage() {
     const toAbsUrl = (u) => {
         if (!u) return '';
         if (/^https?:\/\//i.test(u)) return u;
-        const isFiles = u.startsWith('/files/');
-        if (isFiles) {
-            const loc = window.location;
-            const backendOrigin = import.meta.env.VITE_BACKEND_ORIGIN || loc.origin;
-            return backendOrigin + u;
-        }
+
+        let path = u;
         // 兼容后端返回相对文件名或路径（如 "abc.jpg"、"3/abc.jpg"），补齐前缀
-        if (!u.startsWith('/')) {
-            u = `/files/messages/${u}`;
+        if (!path.startsWith('/')) {
+            path = `/files/messages/${path}`;
         }
         // 形如 "/3/abc.jpg" 也补前缀
-        if (/^\/[0-9]+\//.test(u)) {
-            u = `/files/messages${u}`;
+        else if (/^\/[0-9]+\//.test(path)) {
+            path = `/files/messages${path}`;
         }
-        try {
-            return new URL(u, window.location.origin).toString();
-        } catch (err) {
-            console.warn('toAbsUrl failed', err);
-            return u;
-        }
+
+        const loc = window.location;
+        const backendOrigin = import.meta.env.VITE_BACKEND_ORIGIN || loc.origin;
+        return backendOrigin + path;
     };
 
     /** ---------------- 输入框高度拖拽 ---------------- */
@@ -1139,14 +1133,16 @@ export default function CommunicationPage() {
                     }
                     es = null;
                 }
-                pollTimer = setInterval(() => {
-                    refreshView();
-                }, 3000);
+                if (!pollTimer) {
+                    pollTimer = setInterval(() => {
+                        refreshView();
+                    }, 5000);
+                }
             };
         } else {
             pollTimer = setInterval(() => {
                 refreshView();
-            }, 3000);
+            }, 5000);
         }
 
         refreshView();
@@ -1570,6 +1566,13 @@ export default function CommunicationPage() {
                                         disabled={uploading}
                                         style={{ fontSize: '1.2rem', lineHeight: 1, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                                     >😊</button>
+                                    <button
+                                        type="submit"
+                                        className="conversation-detail-sendbtn"
+                                        disabled={uploading}
+                                    >
+                                        发送
+                                    </button>
                                 </div>
 
                                 {showEmoji && (
@@ -1589,13 +1592,6 @@ export default function CommunicationPage() {
                                     className="conversation-detail-input"
                                     disabled={uploading}
                                 />
-                                <button
-                                    type="submit"
-                                    className="conversation-detail-sendbtn"
-                                    disabled={uploading}
-                                >
-                                    发送
-                                </button>
                             </div>
 
                             <input
