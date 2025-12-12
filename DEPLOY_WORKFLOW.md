@@ -99,3 +99,48 @@ git checkout local  # 切回 local 继续开发
 1.  **拉取代码**：`git fetch` 和 `git pull` 同步远程最新代码。
 2.  **停止服务**：`docker-compose down` 停止当前运行的容器。
 3.  **重建部署**：`docker-compose up -d --build` 重新构建镜像并启动容器。
+
+## 5. 完整开发迭代流程 (Cheatsheet)
+
+如果您已经初始化过项目，后续的日常开发请遵循以下步骤：
+
+**Step 1. 开始新工作前（同步最新代码）**
+```bash
+# 在本地终端
+git checkout main
+git pull origin main
+git checkout local      # 切换回开发分支
+git merge main          # 将最新的 main 合并进 local，保持同步
+```
+
+**Step 2. 本地开发与测试**
+```bash
+# 启动后端
+cd backend
+.\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=dev"
+
+# 启动前端（新开一个终端窗口）
+cd front
+npm run dev
+```
+
+**Step 3. 提交更改**
+```bash
+git add .
+git commit -m "描述您的修改内容"
+git push origin local
+```
+
+**Step 4. 合并到主分支（准备发布）**
+```bash
+git checkout main
+git merge local
+git push origin main
+git checkout local      # 切回 local 准备下一次开发
+```
+
+**Step 5. 服务器部署**
+```bash
+# 在服务器终端（VS Code）
+./redeploy.sh
+```

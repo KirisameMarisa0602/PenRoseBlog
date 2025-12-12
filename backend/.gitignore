@@ -4,6 +4,24 @@ target/
 
 # 敏感配置文件 (保留 sample 文件，忽略真实配置)
 src/main/resources/application.properties
+src/main/resources/application-dev.properties
+src/main/resources/application-prod.properties
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+*.classpath
+*.project
+*.settings/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
 
 # STS / Eclipse
 .apt_generated
