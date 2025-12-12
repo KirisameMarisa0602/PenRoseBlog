@@ -99,7 +99,10 @@ export default function ArticleDetail() {
                     // Apply syntax highlighting
                     setTimeout(() => {
                         document.querySelectorAll('.article-content pre code').forEach((block) => {
-                            hljs.highlightElement(block);
+                            if (!block.dataset.highlighted) {
+                                hljs.highlightElement(block);
+                                block.dataset.highlighted = 'yes';
+                            }
                         });
                     }, 100);
                 } else if (j && j.code === 404) {

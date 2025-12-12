@@ -227,7 +227,6 @@ public class AiClientService {
                     return Flux.error(new RuntimeException("Upstream stream error: " + e.getMessage(), e));
                 })
                 .takeUntil(s -> s != null && s.contains("[DONE]"))
-                .filter(s -> s != null && !s.isBlank() && !"[DONE]".equals(s.trim()))
                 .flatMap(this::extractDeltaTextSafely)
                 .filter(s -> s != null && !s.isEmpty());
     }

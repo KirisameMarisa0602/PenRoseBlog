@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
+import { common } from 'lowlight';
 import 'highlight.js/styles/atom-one-dark.css';
 import '../../styles/blogeditor/MarkdownEditor.css';
 
@@ -108,7 +109,7 @@ const MarkdownEditor = ({ content, onChange }) => {
           <div className="markdown-preview-content">
             <ReactMarkdown 
               remarkPlugins={[remarkGfm]} 
-              rehypePlugins={[rehypeHighlight]}
+              rehypePlugins={[[rehypeHighlight, { languages: common }]]}
             >
               {processedContent}
             </ReactMarkdown>

@@ -346,7 +346,7 @@ const BlogEditor = () => {
     if (previewMode && previewHtml) {
       // Use requestAnimationFrame to ensure DOM is updated
       requestAnimationFrame(() => {
-        document.querySelectorAll('.blog-editor-preview-container pre code').forEach((block) => {
+        document.querySelectorAll('.tiptap-content pre code').forEach((block) => {
           // Check if already highlighted to avoid double highlighting issues if any
           if (!block.dataset.highlighted) {
             hljs.highlightElement(block);
