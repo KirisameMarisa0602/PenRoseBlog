@@ -35,6 +35,8 @@ export default function ArticleCard({ post, className }) {
     const shareCount = post.shareCount || post.repostCount || 0;
     const viewCount = post.viewCount || 0;
     const id = post.id || post.postId;
+    const isDraft = post.status === 'DRAFT';
+    const linkTarget = isDraft ? `/blog-edit?id=${id}` : `/post/${id}`;
 
     // Format date
     const formatDate = (dateStr) => {
@@ -45,14 +47,14 @@ export default function ArticleCard({ post, className }) {
 
     return (
         <div className={`article-card-new ${className || ''}`}>
-            <Link to={`/post/${id}`} className="article-card-link">
+            <Link to={linkTarget} className="article-card-link">
                 <div className="article-card-cover-wrapper">
                     {coverSrc ? (
                         <img src={coverSrc} alt={post.title} className="article-card-cover" />
                     ) : (
                         <div className="article-card-cover-placeholder" />
                     )}
-                    {post.status === 'DRAFT' && (
+                    {isDraft && (
                         <div style={{
                             position: 'absolute',
                             top: '10px',

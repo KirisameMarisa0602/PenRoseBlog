@@ -8,7 +8,7 @@ import ArticleHeader from '@components/article/ArticleHeader';
 import ArticleActions from '@components/article/ArticleActions';
 import CommentsSection from '@components/article/CommentsSection';
 import ForwardFriendsModal from '@components/article/ForwardFriendsModal';
-import { fetchPostDetail, recordPostView, toggleFavorite, sharePost } from '@utils/api/postService';
+import { fetchPostDetail, recordPostView, toggleFavorite, sharePost, deletePost } from '@utils/api/postService';
 // 评论操作改为使用 useArticleComments 提供的方法
 import useArticleComments from '@hooks/useArticleComments';
 import { fetchFriendsList } from '@utils/api/friendService';
@@ -463,9 +463,15 @@ export default function ArticleDetail() {
             return;
         }
         try {
+            const token = localStorage.getItem('token');
             const res = await fetch(
                 `/api/comment/${commentId}/like?userId=${userId}`,
-                { method: 'POST' }
+                { 
+                    method: 'POST',
+                    headers: {
+                        'Authorization': token ? `Bearer ${token}` : ''
+                    }
+                }
             );
             const j = await res.json().catch(() => null);
             if (j && j.code === 200) {
@@ -482,9 +488,15 @@ export default function ArticleDetail() {
             return;
         }
         try {
+            const token = localStorage.getItem('token');
             const res = await fetch(
                 `/api/comment-reply/${replyId}/like?userId=${userId}`,
-                { method: 'POST' }
+                { 
+                    method: 'POST',
+                    headers: {
+                        'Authorization': token ? `Bearer ${token}` : ''
+                    }
+                }
             );
             const j = await res.json().catch(() => null);
             if (j && j.code === 200) {
@@ -553,17 +565,20 @@ export default function ArticleDetail() {
             return;
         }
         try {
+            const token = localStorage.getItem('token');
             const res = await fetch(
                 `/api/blogpost/${id}/like?userId=${userId}`,
-                { method: 'POST' }
+                { 
+                    method: 'POST',
+                    headers: {
+                        'Authorization': token ? `Bearer ${token}` : ''
+                    }
+                }
             );
             const j = await res.json();
             if (j && j.code === 200) {
-                const r2 = await fetch(
-                    `/api/blogpost/${id}?currentUserId=${userId}`
-                );
-                const j2 = await r2.json();
-                if (j2 && j2.code === 200) setPost(j2.data);
+                const data = await fetchPostDetail(id, { currentUserId: userId });
+                if (data && data.code === 200) setPost(data.data);
             }
         } catch (e) {
             console.error(e);
@@ -578,11 +593,8 @@ export default function ArticleDetail() {
         try {
             const res = await toggleFavorite(id, userId);
             if (res && res.code === 200) {
-                const r2 = await fetch(
-                    `/api/blogpost/${id}?currentUserId=${userId}`
-                );
-                const j2 = await r2.json();
-                if (j2 && j2.code === 200) setPost(j2.data);
+                const data = await fetchPostDetail(id, { currentUserId: userId });
+                if (data && data.code === 200) setPost(data.data);
             }
         } catch (e) {
             console.error(e);
@@ -604,8 +616,7 @@ export default function ArticleDetail() {
         const ok = window.confirm('确定要删除这篇博客吗？此操作不可恢复');
         if (!ok) return;
         try {
-            const res = await fetch(`/api/blogpost/${id}?userId=${userId}`, { method: 'DELETE' });
-            const j = await res.json().catch(() => null);
+            const j = await deletePost(id, userId);
             if (j && j.code === 200 && j.data) {
                 alert('删除成功');
                 navigate('/');

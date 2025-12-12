@@ -1,53 +1,47 @@
 /* ConversationDetail 样式 */
 .conversation-detail-page {
-  min-height: 100vh;
-  background: #e0e2e5;
-  /* Darker background */
+  height: calc(100vh - var(--navH));
+  background: #fff;
   box-sizing: border-box;
-  padding: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  padding: 0;
+  overflow: hidden;
 }
 
 .conversation-detail-container {
   width: 100%;
-  max-width: 1200px;
+  height: 100%;
   background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   display: flex;
-  flex-direction: column;
-  height: 85vh;
+  flex-direction: row; /* Force row layout */
   overflow: hidden;
-  border: 1px solid #e0e0e0;
 }
 
 .conversation-detail-container.two-columns {
-  display: grid;
-  grid-template-columns: 280px 1fr;
-  /* grid-template-rows: 1fr; removed to allow flex child to handle height */
-}
-
-.conversation-main-content {
+  /* We use flexbox now, but keep this class for specificity if needed */
   display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: hidden;
-  position: relative;
-  grid-column: 2;
 }
 
 /* 左侧会话用户栏 */
 .conversation-sidebar {
-  background: #e8e8e8;
-  /* Slightly darker sidebar */
-  border-right: 1px solid #d0d0d0;
+  width: 280px; /* Fixed width */
+  flex-shrink: 0;
+  background: #f5f5f5;
+  border-right: 1px solid #e0e0e0;
   padding: 10px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 5px;
+}
+
+.conversation-main-content {
+  flex: 1; /* Take remaining space */
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  background: #fff;
 }
 
 .conversation-sidebar-item {
@@ -266,13 +260,21 @@
 /* Input Area */
 .conversation-detail-form {
   height: var(--input-height, 150px);
-  border-top: 1px solid #ccc;
+  border-top: 1px solid #e8e8e8;
   padding: 0;
   display: flex;
   flex-direction: column;
-  background: #f9f9f9;
+  background: #fff;
   position: relative;
   flex-shrink: 0;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  z-index: 10;
+}
+
+.conversation-inputbox {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .conversation-inputbox-resize {
@@ -289,7 +291,9 @@
   display: flex;
   align-items: center;
   gap: 15px;
-  padding: 10px 20px 5px;
+  padding: 10px 20px;
+  border-bottom: 1px solid #f5f5f5;
+  background: #fafafa;
 }
 
 .conversation-detail-input {
@@ -298,11 +302,46 @@
   background: transparent;
   outline: none;
   resize: none;
-  font-size: 14px;
+  font-size: 15px;
   color: #333;
-  padding: 5px 20px;
+  padding: 15px 20px;
   width: 100%;
   box-sizing: border-box;
+  line-height: 1.6;
+}
+
+.conversation-detail-sendbtn {
+  padding: 6px 20px;
+  background: linear-gradient(135deg, #1890ff 0%, #36cfc9 100%);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  font-size: 13px;
+  margin-left: auto; /* Push to right */
+  box-shadow: 0 2px 6px rgba(24, 144, 255, 0.3);
+}
+
+.conversation-detail-sendbtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.4);
+  filter: brightness(1.1);
+}
+
+.conversation-detail-sendbtn:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 3px rgba(24, 144, 255, 0.3);
+}
+
+.conversation-detail-sendbtn:disabled {
+  background: #e0e0e0;
+  color: #999;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }
 
 .conversation-actions {
@@ -337,35 +376,7 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolygon points='23 7 16 12 23 17 23 7'/%3E%3Crect x='1' y='5' width='15' height='14' rx='2' ry='2'/%3E%3C/svg%3E");
 }
 
-.conversation-detail-sendbtn {
-  padding: 6px 16px;
-  /* Smaller padding */
-  background: #1890ff;
-  color: #fff;
-  border: none;
-  border-radius: 16px;
-  /* Smaller radius */
-  cursor: pointer;
-  font-weight: 500;
-  transition: background 0.2s;
-  white-space: nowrap;
-  font-size: 13px;
-  /* Smaller font */
-  align-self: flex-end;
-  /* Align to bottom right if in flex container */
-  margin-right: 10px;
-  /* Add some margin */
-  margin-bottom: 5px;
-}
-
-.conversation-detail-sendbtn:hover {
-  background: #40a9ff;
-}
-
-.conversation-detail-sendbtn:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-}
+/* Old sendbtn style removed */
 
 .conversation-detail-uploadprogress {
   position: absolute;

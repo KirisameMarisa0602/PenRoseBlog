@@ -124,33 +124,35 @@ export default function SearchPage() {
                 )}
             </div>
 
-            <div className="search-content">
-                {activeTab === 'articles' && (
-                    <div className="articles-list">
-                        {articles.map(post => (
-                            <ArticleCard key={post.id} post={post} />
-                        ))}
-                        {articles.length === 0 && !loading && executedQuery && (
-                            <div style={{ textAlign: 'center', color: '#666', gridColumn: '1/-1' }}>未找到相关文章</div>
-                        )}
-                        {hasMore && articles.length > 0 && (
-                            <div style={{ textAlign: 'center', marginTop: '20px', gridColumn: '1/-1' }}>
-                                <button onClick={() => setPage(p => p + 1)} disabled={loading} className="load-more-btn">
-                                    {loading ? '加载中...' : '加载更多'}
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                )}
+            <div className="search-results-scroll-area">
+                <div className="search-results-content">
+                    {activeTab === 'articles' && (
+                        <div className="articles-list">
+                            {articles.map(post => (
+                                <ArticleCard key={post.id} post={post} />
+                            ))}
+                            {articles.length === 0 && !loading && executedQuery && (
+                                <div style={{ textAlign: 'center', color: '#666', gridColumn: '1/-1', padding: '20px' }}>未找到相关文章</div>
+                            )}
+                            {hasMore && articles.length > 0 && (
+                                <div style={{ textAlign: 'center', marginTop: '20px', gridColumn: '1/-1', paddingBottom: '40px' }}>
+                                    <button onClick={() => setPage(p => p + 1)} disabled={loading} className="load-more-btn">
+                                        {loading ? '加载中...' : '加载更多'}
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    )}
 
-                {activeTab === 'users' && (
-                    <UserSearch
-                        embedded={true}
-                        externalKeyword={userKeyword}
-                        externalMode={userMode}
-                        searchTrigger={userSearchTrigger}
-                    />
-                )}
+                    {activeTab === 'users' && (
+                        <UserSearch
+                            embedded={true}
+                            externalKeyword={userKeyword}
+                            externalMode={userMode}
+                            searchTrigger={userSearchTrigger}
+                        />
+                    )}
+                </div>
             </div>
         </div>
     );

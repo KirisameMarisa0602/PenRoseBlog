@@ -58,21 +58,20 @@ export default function PendingFriendRequests() {
 
     if (loading) return <div className="pf-loading">加载中...</div>;
 
+    if (!error && requests.length === 0) {
+        return null;
+    }
+
     return (
-        <div className="message-list-page pf-page">
-            <div className="message-list-container pf-container">
-                <h2 className="message-list-title pf-title">好友申请</h2>
+        <div className="pf-embedded-list" style={{ marginBottom: '2rem' }}>
+            <h3 style={{ margin: '0 0 1rem 0', fontSize: '1.2rem', color: '#333' }}>待处理请求</h3>
 
-                {error && <div className="message-list-empty pf-error">{error}</div>}
+            {error && <div className="message-list-empty pf-error">{error}</div>}
 
-                {!error && requests.length === 0 && (
-                    <div className="message-list-empty pf-empty">暂无待处理的好友申请</div>
-                )}
-
-                {!error && requests.length > 0 && (
-                    <div className="pf-main">
-                        <section className="pf-center" style={{ width: '100%' }}>
-                            <ul className="message-list-ul pf-list">
+            {!error && requests.length > 0 && (
+                <div className="pf-main">
+                    <section className="pf-center" style={{ width: '100%', minHeight: 'auto' }}>
+                        <ul className="message-list-ul pf-list">
                                 {requests.map((req) => {
                                     const id = req.id || req.requestId;
                                     const sender = req.sender || {};
@@ -118,7 +117,6 @@ export default function PendingFriendRequests() {
                         </section>
                     </div>
                 )}
-            </div>
         </div>
     );
 }

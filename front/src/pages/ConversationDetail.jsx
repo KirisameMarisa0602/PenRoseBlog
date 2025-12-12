@@ -1113,14 +1113,16 @@ export default function ConversationDetail() {
                     }
                     es = null;
                 }
-                pollTimer = setInterval(() => {
-                    refreshView();
-                }, 3000);
+                if (!pollTimer) {
+                    pollTimer = setInterval(() => {
+                        refreshView();
+                    }, 5000);
+                }
             };
         } else {
             pollTimer = setInterval(() => {
                 refreshView();
-            }, 3000);
+            }, 5000);
         }
 
         refreshView();
