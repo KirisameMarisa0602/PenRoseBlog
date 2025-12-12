@@ -228,6 +228,8 @@ public class BlogViewServiceImpl implements BlogViewService {
         }
 
         for (String postIdStr : pendingPosts) {
+            // 先移除，防止处理期间又有新浏览导致丢失同步信号
+            redisTemplate.opsForSet().remove(KEY_PENDING_SYNC_POSTS, postIdStr);
             try {
                 Long postId = Long.parseLong(postIdStr);
                 String deltaKey = KEY_VIEW_COUNT_DELTA_PREFIX + postId;
@@ -259,10 +261,10 @@ public class BlogViewServiceImpl implements BlogViewService {
                         });
                     }
                 }
-                // 处理完移除
-                redisTemplate.opsForSet().remove(KEY_PENDING_SYNC_POSTS, postIdStr);
             } catch (Exception e) {
                 logger.error("Error syncing view stats for post " + postIdStr, e);
+                // 如果失败，尝试加回集合以便下次重试（可选）
+                redisTemplate.opsForSet().add(KEY_PENDING_SYNC_POSTS, postIdStr);
             }
         }
     }
