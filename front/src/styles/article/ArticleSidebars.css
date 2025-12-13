@@ -128,6 +128,7 @@
     background: rgba(255, 255, 255, 0.6); /* Increased transparency */
     z-index: 1;
     transition: background 0.3s ease;
+    -webkit-backdrop-filter: blur(3px); /* Safari support */
     backdrop-filter: blur(3px); /* Added blur for better text readability */
 }
 
@@ -179,6 +180,7 @@
     text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2; /* Standard property */
     -webkit-box-orient: vertical;
 }
 
