@@ -331,15 +331,14 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
   };
 
   // 保存用户信息（统一上传头像/背景并保存）
-  const handleProfileSave = async () => {
-    console.log('[ProfileAccordion] 保存资料 userId:', userId, 'profile:', profile);
+  const handleProfileSave = async (section = null) => {
+    console.log('[ProfileAccordion] 保存资料 userId:', userId, 'profile:', profile, 'section:', section);
     if (!userId) {
       setEditMsg('用户ID无效，请重新登录');
       return;
     }
     setEditLoading(true);
     setEditMsg('');
-    console.log('[ProfileAccordion] 保存资料');
 
     // 初始使用当前 profile 中可能已有的 url
     let avatarUrl = profile.avatarUrl || '';
@@ -348,8 +347,8 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
     let wechatQrCode = profile.wechatQrCode || '';
 
     try {
-      // 1) 上传头像（如有）
-      if (avatarFile) {
+      // 1) 上传头像（如有） - 仅当 section 为 media 或 null 时
+      if ((!section || section === 'media') && avatarFile) {
         setEditMsg('正在上传头像...');
         const formData = new FormData();
         formData.append('file', avatarFile);
@@ -375,8 +374,8 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
         }
       }
 
-      // 2) 上传背景（如有）
-      if (backgroundFile) {
+      // 2) 上传背景（如有） - 仅当 section 为 media 或 null 时
+      if ((!section || section === 'media') && backgroundFile) {
         setEditMsg('正在上传背景...');
         const formData = new FormData();
         formData.append('file', backgroundFile);
@@ -400,8 +399,8 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
         }
       }
 
-      // 3) 上传QQ二维码（如有）
-      if (qqQrFile) {
+      // 3) 上传QQ二维码（如有） - 仅当 section 为 contact 或 null 时
+      if ((!section || section === 'contact') && qqQrFile) {
         setEditMsg('正在上传QQ二维码...');
         const formData = new FormData();
         formData.append('file', qqQrFile);
@@ -417,8 +416,8 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
         }
       }
 
-      // 4) 上传微信二维码（如有）
-      if (wechatQrFile) {
+      // 4) 上传微信二维码（如有） - 仅当 section 为 contact 或 null 时
+      if ((!section || section === 'contact') && wechatQrFile) {
         setEditMsg('正在上传微信二维码...');
         const formData = new FormData();
         formData.append('file', wechatQrFile);
@@ -446,15 +445,19 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
         localStorage.setItem('gender', newProfile.gender || '');
         window.dispatchEvent(new Event('auth-changed'));
 
-        // 清空本地文件和预览
-        setAvatarFile(null);
-        setAvatarPreview('');
-        setBackgroundFile(null);
-        setBackgroundPreview('');
-        setQqQrFile(null);
-        setQqQrPreview('');
-        setWechatQrFile(null);
-        setWechatQrPreview('');
+        // 清空本地文件和预览 (仅清空已处理的 section)
+        if (!section || section === 'media') {
+          setAvatarFile(null);
+          setAvatarPreview('');
+          setBackgroundFile(null);
+          setBackgroundPreview('');
+        }
+        if (!section || section === 'contact') {
+          setQqQrFile(null);
+          setQqQrPreview('');
+          setWechatQrFile(null);
+          setWechatQrPreview('');
+        }
 
         // 更新组件 state（显示最新）
         setProfile(newProfile);
@@ -683,7 +686,7 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                       ) : (
                         <form
                           className="profilepanel-useredit-form"
-                          onSubmit={e => { e.preventDefault(); handleProfileSave(); }}
+                          onSubmit={e => { e.preventDefault(); handleProfileSave(activeTab); }}
                           style={{ maxWidth: '100%', width: '100%', display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}
                         >
                           {activeTab === 'profile' && (
@@ -1279,7 +1282,7 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                 }
               >
                 {isActive ? (
-                  <div className="profilepanel-info-panel" style={{ padding: '30px', height: '100%', overflowY: 'auto', boxSizing: 'border-box' }}>
+                  <div className="profilepanel-info-panel" style={{ padding: '30px', width: '100%', boxSizing: 'border-box' }}>
                     <h3 style={{ marginTop: 0, marginBottom: '25px', color: '#333', borderBottom: '2px solid #f0f0f0', paddingBottom: '15px', fontSize: '1.4rem' }}>关于我</h3>
                     
                     <div className="profile-tags-section" style={{ marginBottom: '35px' }}>
@@ -1364,53 +1367,44 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                   <div className="profilepanel-contact-panel" style={{ padding: '30px', height: '100%', overflowY: 'auto', boxSizing: 'border-box', display: 'flex', flexDirection: 'column' }}>
                     <h3 style={{ marginTop: 0, marginBottom: '25px', color: '#333', borderBottom: '2px solid #f0f0f0', paddingBottom: '15px', fontSize: '1.4rem' }}>联系方式</h3>
                     
-                    <div className="profile-contact-grid" style={{ 
-                      display: 'flex', 
-                      flexWrap: 'wrap',
-                      justifyContent: 'center',
-                      gap: '15px',
-                      flex: 1,
-                      alignContent: 'start',
-                      width: '100%'
-                    }}>
+                    <div className="profile-contact-list" style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                       {/* QQ */}
                       {(profile.qq || profile.qqQrCode) && (
-                        <div className="contact-card" style={{ 
-                          background: '#fff', 
-                          padding: '20px', 
-                          borderRadius: '12px', 
-                          boxShadow: '0 4px 12px rgba(0,0,0,0.05)', 
-                          border: '1px solid #f0f0f0', 
+                        <div className="contact-item" style={{ 
                           display: 'flex', 
-                          flexDirection: 'column', 
-                          alignItems: 'center',
-                          transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                          height: 'fit-content',
-                          minWidth: '160px',
-                          flex: '0 1 auto'
-                        }}
-                        onMouseEnter={e => {
-                          e.currentTarget.style.transform = 'translateY(-5px)';
-                          e.currentTarget.style.boxShadow = '0 12px 32px rgba(0,0,0,0.1)';
-                        }}
-                        onMouseLeave={e => {
-                          e.currentTarget.style.transform = 'translateY(0)';
-                          e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.06)';
-                        }}
-                        >
-                          <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '15px', color: '#333', display: 'flex', alignItems: 'center' }}>
-                            <img src={resolveUrl('/icons/contect/qq.svg')} alt="QQ" style={{ width: '28px', height: '28px', marginRight: '10px' }} />
-                            QQ
+                          alignItems: 'center', 
+                          background: '#fff', 
+                          padding: '15px 20px', 
+                          borderRadius: '12px', 
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                          border: '1px solid #f0f0f0'
+                        }}>
+                          <img src={resolveUrl('/icons/contect/qq.svg')} alt="QQ" style={{ width: '32px', height: '32px', marginRight: '15px' }} />
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: '1rem', fontWeight: 'bold', color: '#333' }}>QQ</div>
+                            {profile.qq && <div style={{ fontSize: '0.9rem', color: '#666', marginTop: '2px' }}>{profile.qq}</div>}
                           </div>
-                          {profile.qq && <div style={{ marginBottom: '15px', color: '#555', fontSize: '1.1rem', fontFamily: 'Consolas, monospace' }}>{profile.qq}</div>}
                           {profile.qqQrCode && (
-                            <div style={{ padding: '10px', background: '#f9f9f9', borderRadius: '8px', border: '1px solid #eee' }}>
-                              <img 
-                                src={resolveUrl(profile.qqQrCode)} 
-                                alt="QQ QR" 
-                                style={{ width: '160px', height: '160px', objectFit: 'contain', display: 'block' }} 
-                                onError={e => { e.target.onerror = null; e.target.src = resolveUrl('/imgs/loginandwelcomepanel/1.png'); }}
-                              />
+                            <div className="qr-preview-hover" style={{ position: 'relative', cursor: 'pointer' }}>
+                               <img src={resolveUrl('/icons/profile/qrcode_icon.svg')} alt="QR" style={{ width: '24px', height: '24px', opacity: 0.6 }} onError={(e) => { e.target.onerror = null; e.target.src = resolveUrl('/imgs/loginandwelcomepanel/1.png'); }} />
+                               <div className="qr-popup" style={{ 
+                                 position: 'absolute', 
+                                 right: '0', 
+                                 top: '100%', 
+                                 marginTop: '10px', 
+                                 background: '#fff', 
+                                 padding: '10px', 
+                                 borderRadius: '8px', 
+                                 boxShadow: '0 4px 12px rgba(0,0,0,0.15)', 
+                                 zIndex: 10,
+                                 display: 'none',
+                                 border: '1px solid #eee'
+                               }}>
+                                 <img src={resolveUrl(profile.qqQrCode)} alt="QQ QR" style={{ width: '150px', height: '150px', objectFit: 'contain', display: 'block' }} />
+                               </div>
+                               <style>{`
+                                 .qr-preview-hover:hover .qr-popup { display: block !important; }
+                               `}</style>
                             </div>
                           )}
                         </div>
@@ -1418,40 +1412,38 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
 
                       {/* WeChat */}
                       {(profile.wechat || profile.wechatQrCode) && (
-                        <div className="contact-card" style={{ 
-                          background: '#fff', 
-                          padding: '30px', 
-                          borderRadius: '16px', 
-                          boxShadow: '0 8px 24px rgba(0,0,0,0.06)', 
-                          border: '1px solid #f0f0f0', 
+                        <div className="contact-item" style={{ 
                           display: 'flex', 
-                          flexDirection: 'column', 
-                          alignItems: 'center',
-                          transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                          height: 'fit-content'
-                        }}
-                        onMouseEnter={e => {
-                          e.currentTarget.style.transform = 'translateY(-5px)';
-                          e.currentTarget.style.boxShadow = '0 12px 32px rgba(0,0,0,0.1)';
-                        }}
-                        onMouseLeave={e => {
-                          e.currentTarget.style.transform = 'translateY(0)';
-                          e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.06)';
-                        }}
-                        >
-                          <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '15px', color: '#333', display: 'flex', alignItems: 'center' }}>
-                            <img src={resolveUrl('/icons/contect/微信.svg')} alt="WeChat" style={{ width: '28px', height: '28px', marginRight: '10px' }} />
-                            微信
+                          alignItems: 'center', 
+                          background: '#fff', 
+                          padding: '15px 20px', 
+                          borderRadius: '12px', 
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                          border: '1px solid #f0f0f0'
+                        }}>
+                          <img src={resolveUrl('/icons/contect/微信.svg')} alt="WeChat" style={{ width: '32px', height: '32px', marginRight: '15px' }} />
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: '1rem', fontWeight: 'bold', color: '#333' }}>微信</div>
+                            {profile.wechat && <div style={{ fontSize: '0.9rem', color: '#666', marginTop: '2px' }}>{profile.wechat}</div>}
                           </div>
-                          {profile.wechat && <div style={{ marginBottom: '15px', color: '#555', fontSize: '1.1rem', fontFamily: 'Consolas, monospace' }}>{profile.wechat}</div>}
                           {profile.wechatQrCode && (
-                            <div style={{ padding: '10px', background: '#f9f9f9', borderRadius: '8px', border: '1px solid #eee' }}>
-                              <img 
-                                src={resolveUrl(profile.wechatQrCode)} 
-                                alt="WeChat QR" 
-                                style={{ width: '160px', height: '160px', objectFit: 'contain', display: 'block' }} 
-                                onError={e => { e.target.onerror = null; e.target.src = resolveUrl('/imgs/loginandwelcomepanel/1.png'); }}
-                              />
+                            <div className="qr-preview-hover" style={{ position: 'relative', cursor: 'pointer' }}>
+                               <img src={resolveUrl('/icons/profile/qrcode_icon.svg')} alt="QR" style={{ width: '24px', height: '24px', opacity: 0.6 }} onError={(e) => { e.target.onerror = null; e.target.src = resolveUrl('/imgs/loginandwelcomepanel/1.png'); }} />
+                               <div className="qr-popup" style={{ 
+                                 position: 'absolute', 
+                                 right: '0', 
+                                 top: '100%', 
+                                 marginTop: '10px', 
+                                 background: '#fff', 
+                                 padding: '10px', 
+                                 borderRadius: '8px', 
+                                 boxShadow: '0 4px 12px rgba(0,0,0,0.15)', 
+                                 zIndex: 10,
+                                 display: 'none',
+                                 border: '1px solid #eee'
+                               }}>
+                                 <img src={resolveUrl(profile.wechatQrCode)} alt="WeChat QR" style={{ width: '150px', height: '150px', objectFit: 'contain', display: 'block' }} />
+                               </div>
                             </div>
                           )}
                         </div>
@@ -1459,28 +1451,19 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
 
                       {/* GitHub */}
                       {profile.githubLink && (
-                        <a href={profile.githubLink} target="_blank" rel="noopener noreferrer" className="contact-card" style={{ 
-                          textDecoration: 'none', 
-                          background: '#fff', 
-                          padding: '30px', 
-                          borderRadius: '16px', 
-                          boxShadow: '0 8px 24px rgba(0,0,0,0.06)', 
-                          border: '1px solid #f0f0f0', 
+                        <a href={profile.githubLink} target="_blank" rel="noopener noreferrer" className="contact-item" style={{ 
                           display: 'flex', 
-                          flexDirection: 'column', 
                           alignItems: 'center', 
-                          cursor: 'pointer', 
-                          transition: 'all 0.3s ease',
-                          height: 'fit-content'
+                          background: '#fff', 
+                          padding: '15px 20px', 
+                          borderRadius: '12px', 
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                          border: '1px solid #f0f0f0',
+                          textDecoration: 'none',
+                          transition: 'transform 0.2s'
                         }}
-                        onMouseEnter={e => {
-                          e.currentTarget.style.transform = 'translateY(-5px)';
-                          e.currentTarget.style.boxShadow = '0 12px 32px rgba(0,0,0,0.1)';
-                        }}
-                        onMouseLeave={e => {
-                          e.currentTarget.style.transform = 'translateY(0)';
-                          e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.06)';
-                        }}
+                        onMouseEnter={e => e.currentTarget.style.transform = 'translateX(5px)'}
+                        onMouseLeave={e => e.currentTarget.style.transform = 'translateX(0)'}
                         >
                           <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '15px', color: '#333', display: 'flex', alignItems: 'center' }}>
                             <img src={resolveUrl('/icons/contect/github.svg')} alt="GitHub" style={{ width: '28px', height: '28px', marginRight: '10px' }} />
@@ -1492,34 +1475,28 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
 
                       {/* Bilibili */}
                       {profile.bilibiliLink && (
-                        <a href={profile.bilibiliLink} target="_blank" rel="noopener noreferrer" className="contact-card" style={{ 
-                          textDecoration: 'none', 
-                          background: '#fff', 
-                          padding: '30px', 
-                          borderRadius: '16px', 
-                          boxShadow: '0 8px 24px rgba(0,0,0,0.06)', 
-                          border: '1px solid #f0f0f0', 
+                        <a href={profile.bilibiliLink} target="_blank" rel="noopener noreferrer" className="contact-item" style={{ 
                           display: 'flex', 
-                          flexDirection: 'column', 
                           alignItems: 'center', 
-                          cursor: 'pointer', 
-                          transition: 'all 0.3s ease',
-                          height: 'fit-content'
+                          background: '#fff', 
+                          padding: '15px 20px', 
+                          borderRadius: '12px', 
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                          border: '1px solid #f0f0f0',
+                          textDecoration: 'none',
+                          transition: 'transform 0.2s'
                         }}
-                        onMouseEnter={e => {
-                          e.currentTarget.style.transform = 'translateY(-5px)';
-                          e.currentTarget.style.boxShadow = '0 12px 32px rgba(0,0,0,0.1)';
-                        }}
-                        onMouseLeave={e => {
-                          e.currentTarget.style.transform = 'translateY(0)';
-                          e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.06)';
-                        }}
+                        onMouseEnter={e => e.currentTarget.style.transform = 'translateX(5px)'}
+                        onMouseLeave={e => e.currentTarget.style.transform = 'translateX(0)'}
                         >
-                          <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '15px', color: '#333', display: 'flex', alignItems: 'center' }}>
-                            <img src={resolveUrl('/icons/contect/bilibili.svg')} alt="Bilibili" style={{ width: '28px', height: '28px', marginRight: '10px' }} />
-                            Bilibili
+                          <img src={resolveUrl('/icons/contect/bilibili.svg')} alt="Bilibili" style={{ width: '32px', height: '32px', marginRight: '15px' }} />
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: '1rem', fontWeight: 'bold', color: '#333' }}>Bilibili</div>
+                            <div style={{ fontSize: '0.9rem', color: '#fb7299', marginTop: '2px' }}>点击访问主页</div>
                           </div>
-                          <div style={{ color: '#fb7299', wordBreak: 'break-all', textAlign: 'center', fontSize: '1rem', background: '#fff0f6', padding: '8px 16px', borderRadius: '20px', fontWeight: '500' }}>点击访问主页</div>
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ccc" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                          </svg>
                         </a>
                       )}
                     </div>
