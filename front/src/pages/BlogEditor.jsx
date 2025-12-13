@@ -509,6 +509,19 @@ const BlogEditor = () => {
     setContent(newContent);
   };
 
+  const handleResourceRemove = (resource) => {
+    if (!window.confirm('确定要移除这个资源吗？')) return;
+    
+    const targetStr = content.substring(resource.index, resource.index + resource.fullTag.length);
+    if (targetStr === resource.fullTag) {
+       const newContent = content.substring(0, resource.index) + content.substring(resource.index + resource.fullTag.length);
+       setContent(newContent);
+    } else {
+       // Fallback if index mismatch
+       setContent(content.replace(resource.fullTag, ''));
+    }
+  };
+
   const handleDelete = async () => {
     if (!editId) return;
     if (!window.confirm('确定要删除这篇草稿吗？删除后无法恢复，且关联的图片资源也会被清理。')) {
@@ -641,12 +654,13 @@ const BlogEditor = () => {
               </div>
            </SidebarAccordion>
 
-           <SidebarAccordion title="资源管理" defaultOpen={true}>
+           <SidebarAccordion title={<span>资源管理 <small style={{fontSize: '11px', color: '#94a3b8', fontWeight: 'normal', marginLeft: '4px'}}>拖动可调整位置</small></span>} defaultOpen={true}>
               <ResourceManager 
                 content={content} 
                 editorMode={editorMode} 
                 onReorder={handleResourceReorder}
                 onItemClick={scrollToResource}
+                onRemove={handleResourceRemove}
               />
            </SidebarAccordion>
         </div>
@@ -721,7 +735,7 @@ const BlogEditor = () => {
                         value={tagInput}
                         onChange={e => setTagInput(e.target.value)}
                         onKeyDown={handleTagKeyDown}
-                        className="blog-editor-input"
+                        className="tag-input-field"
                       />
                     )}
                 </div>

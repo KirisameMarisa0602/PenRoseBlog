@@ -477,19 +477,24 @@
   width: 100%;
   box-sizing: border-box;
   min-height: 42px;
-  padding: 6px;
+  padding: 4px 8px;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
-  background: #f8fafc;
+  background: #fff;
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.tags-input-container.full-width:hover {
+  border-color: #94a3b8;
 }
 
 .tags-input-container.full-width:focus-within {
   border-color: #3b82f6;
-  background: #fff;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
 .tags-list {
@@ -497,25 +502,59 @@
 }
 
 .tag-chip {
-  background: #e0f2fe;
-  color: #0369a1;
+  background: #eff6ff;
+  color: #2563eb;
   font-size: 12px;
-  padding: 4px 8px;
-  border-radius: 6px;
+  padding: 2px 8px 2px 10px;
+  border-radius: 16px;
   display: inline-flex;
   align-items: center;
   font-weight: 500;
+  border: 1px solid #bfdbfe;
+  -webkit-user-select: none;
+  user-select: none;
+  transition: all 0.2s;
+}
+
+.tag-chip:hover {
+  background: #dbeafe;
+  border-color: #93c5fd;
+}
+
+.tag-chip span {
+  margin-left: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  font-size: 14px;
+  line-height: 1;
+  color: #60a5fa;
+  transition: all 0.2s;
+}
+
+.tag-chip span:hover {
+  background: #bfdbfe;
+  color: #1d4ed8;
 }
 
 .tag-input-field {
   flex: 1;
-  min-width: 80px;
+  min-width: 60px;
   border: none;
   background: transparent;
   outline: none;
   font-size: 13px;
-  padding: 4px;
+  padding: 6px 0;
   color: #334155;
+  height: 24px;
+}
+
+.tag-input-field::placeholder {
+  color: #94a3b8;
 }
 
 /* --- Sidebar Cover Upload --- */

@@ -27,7 +27,7 @@ export const SidebarAccordion = ({ title, children, defaultOpen = true, classNam
   );
 };
 
-export const ResourceManager = ({ content, editorMode, onReorder, onItemClick }) => {
+export const ResourceManager = ({ content, editorMode, onReorder, onItemClick, onRemove }) => {
   const [resources, setResources] = useState([]);
   const [draggedItem, setDraggedItem] = useState(null);
 
@@ -136,6 +136,16 @@ export const ResourceManager = ({ content, editorMode, onReorder, onItemClick })
             <span className="resource-type">{res.type === 'image' ? '图片' : '视频'}</span>
             <span className="resource-index">#{idx + 1}</span>
           </div>
+          <button 
+            className="resource-remove-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove && onRemove(res);
+            }}
+            title="移除资源"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
         </div>
       ))}
     </div>

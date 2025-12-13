@@ -327,7 +327,7 @@ public class BlogPostServiceImpl implements BlogPostService {
             Long currentUserId) {
 
         String statusFilter = "PUBLISHED";
-        if (userId != null && userId.equals(currentUserId)) {
+        if (userId != null && currentUserId != null && userId.longValue() == currentUserId.longValue()) {
             // 只有当明确指定了状态时才使用指定状态，否则默认只查已发布
             if (status != null && !status.isEmpty()) {
                 statusFilter = status;

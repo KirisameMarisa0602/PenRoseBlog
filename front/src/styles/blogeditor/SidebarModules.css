@@ -28,6 +28,15 @@
   font-weight: 600;
   color: #1e293b;
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sidebar-module-header h3 small {
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 400;
 }
 
 .toggle-icon {
@@ -37,36 +46,35 @@
 }
 
 .sidebar-module-content {
-  padding: 0 16px 16px 16px;
   border-top: 1px solid #f1f5f9;
+  background: #fff;
 }
 
-/* Resource Manager Styles */
+/* --- Resource Manager --- */
 .resource-list {
+  padding: 8px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-height: 300px;
+  max-height: 400px;
   overflow-y: auto;
-  padding-top: 10px;
 }
 
 .resource-item {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 6px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  padding: 8px;
   border-radius: 8px;
+  border: 1px solid #f1f5f9;
+  background: #fff;
   cursor: grab;
   transition: all 0.2s;
 }
 
 .resource-item:hover {
-  border-color: #cbd5e1;
-  background: #fff;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  border-color: #e2e8f0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
 
 .resource-item:active {
@@ -116,6 +124,30 @@
 .resource-index {
   font-size: 10px;
   color: #94a3b8;
+}
+
+.resource-remove-btn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: #cbd5e1;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  opacity: 0;
+}
+
+.resource-item:hover .resource-remove-btn {
+  opacity: 1;
+}
+
+.resource-remove-btn:hover {
+  background: #fee2e2;
+  color: #ef4444;
 }
 
 .empty-resource-tip {
