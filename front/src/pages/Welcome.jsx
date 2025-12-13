@@ -31,6 +31,15 @@ export default function Welcome() {
   });
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   useEffect(() => {
     if (!message) return;
@@ -169,8 +178,35 @@ export default function Welcome() {
 
   return (
     <div className="welcome-container">
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        style={{
+          position: 'absolute',
+          top: `-${(mousePos.y / window.innerHeight) * 5}vh`,
+          left: `-${(mousePos.x / window.innerWidth) * 5}vw`,
+          width: '105vw',
+          height: '105vh',
+          objectFit: 'cover',
+          zIndex: -1,
+          transition: 'top 0.1s ease-out, left 0.1s ease-out', // Smooth movement
+        }}
+      >
+        <source src={resolveUrl('/background/34.mp4')} type="video/mp4" />
+      </video>
       <div className="welcome-card">
-        <div className={`pinkbox${showRegister ? ' show-register' : ''}`}>
+        <div
+          className={`pinkbox${showRegister ? ' show-register' : ''}`}
+          onMouseMove={(e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            e.currentTarget.style.setProperty('--x', `${x}px`);
+            e.currentTarget.style.setProperty('--y', `${y}px`);
+          }}
+        >
           <div className={`signup${showRegister ? '' : ' nodisplay'}`}>
             <h1>Register</h1>
             <form autoComplete="off" onSubmit={handleRegister}>
