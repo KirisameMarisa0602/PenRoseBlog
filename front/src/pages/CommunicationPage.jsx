@@ -1345,6 +1345,19 @@ export default function CommunicationPage() {
                     </div>
                 ) : (
                     <div className="conversation-main-content">
+                        {/* 顶部好友信息栏 */}
+                        <div className="conversation-chat-header">
+                            <div className="conversation-chat-header-info">
+                                <img 
+                                    src={otherInfo.avatarUrl ? resolveUrl(otherInfo.avatarUrl) : '/imgs/loginandwelcomepanel/1.png'} 
+                                    className="conversation-chat-header-avatar"
+                                    onError={(e) => {e.target.onerror=null; e.target.src='/imgs/loginandwelcomepanel/1.png'}}
+                                    alt="avatar"
+                                />
+                                <span className="conversation-chat-header-name">{otherInfo.nickname || '用户'}</span>
+                            </div>
+                        </div>
+
                         <div
                             className="conversation-detail-list"
                             ref={rightScrollRef}
@@ -1617,15 +1630,16 @@ export default function CommunicationPage() {
                         </form>
 
                         {uploading && (
-                            <div
-                                className="conversation-detail-uploadprogress"
-                                aria-live="polite"
-                            >
-                                <div
-                                    className="bar"
-                                    style={{ width: `${uploadProgress}%` }}
-                                />
-                                <span className="pct">{uploadProgress}%</span>
+                            <div className="conversation-upload-overlay">
+                                <div className="conversation-upload-box">
+                                    <div className="conversation-upload-text">正在发送... {uploadProgress}%</div>
+                                    <div className="conversation-upload-track">
+                                        <div
+                                            className="conversation-upload-bar"
+                                            style={{ width: `${uploadProgress}%` }}
+                                        />
+                                    </div>
+                                </div>
                             </div>
                         )}
                     </div>
