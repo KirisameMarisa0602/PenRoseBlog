@@ -1,17 +1,43 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import ThemeContext from './themeContextCore';
 
 export function ThemeProvider({ children }) {
-    // 强制使用 'light' 主题，移除切换功能
-    const theme = 'light';
-    const setTheme = () => {}; // 空函数，防止报错
+    // 'light' | 'dark' | 'system'
+    const [theme, setTheme] = useState(() => {
+        if (typeof localStorage !== 'undefined') {
+            return localStorage.getItem('theme') || 'system';
+        }
+        return 'system';
+    });
 
     useEffect(() => {
         const root = window.document.documentElement;
-        root.classList.remove('dark');
-        root.classList.add('light');
-        localStorage.removeItem('theme');
-    }, []);
+
+        const removeOldTheme = () => {
+            root.classList.remove('light', 'dark');
+        };
+
+        const applyTheme = (t) => {
+            removeOldTheme();
+            if (t === 'system') {
+                const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                root.classList.add(systemTheme);
+            } else {
+                root.classList.add(t);
+            }
+        };
+
+        applyTheme(theme);
+        localStorage.setItem('theme', theme);
+
+        // Listen for system changes if theme is 'system'
+        if (theme === 'system') {
+            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            const handleChange = () => applyTheme('system');
+            mediaQuery.addEventListener('change', handleChange);
+            return () => mediaQuery.removeEventListener('change', handleChange);
+        }
+    }, [theme]);
 
     return (
         <ThemeContext.Provider value={{ theme, setTheme }}>
