@@ -386,7 +386,9 @@ export default function BannerNavbar({ bannerId }) {
     const onMsg = (e) => {
       try {
         const data = JSON.parse(e.data);
-        if (data && data.type === 'PRIVATE_MESSAGE') {
+        if (!data) return;
+
+        if (data.type === 'PRIVATE_MESSAGE') {
           // 若正处于该会话页面
           const m = (window.location.pathname || '').match(/\/conversation\/(\d+)/);
           const currentOtherId = m ? m[1] : null;
@@ -404,6 +406,9 @@ export default function BannerNavbar({ bannerId }) {
           try {
             window.dispatchEvent(new CustomEvent('pm-event', { detail: data }));
           } catch (err) { void err; }
+        } else {
+          // 其他类型通知（系统通知、点赞、评论等）：刷新未读数
+          refreshUnreadTotal();
         }
       } catch (err) {
         console.error('[BannerNavbar SSE message error]', err);

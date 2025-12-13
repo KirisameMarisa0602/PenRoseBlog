@@ -76,6 +76,20 @@ public class NotificationController {
         return new ApiResponse<>(200, "Success", count);
     }
 
+    @GetMapping("/unread-stats")
+    public ApiResponse<java.util.Map<String, Long>> getUnreadStats(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestHeader(value = "X-User-Id", required = false) Long headerUserId) {
+
+        User currentUser = currentUserResolver.resolve(userDetails, headerUserId);
+        if (currentUser == null) {
+            return new ApiResponse<>(401, "Unauthorized", null);
+        }
+
+        java.util.Map<String, Long> stats = notificationService.getUnreadStats(currentUser.getId());
+        return new ApiResponse<>(200, "Success", stats);
+    }
+
     @PutMapping("/{id}/read")
     public ApiResponse<Void> markAsRead(@PathVariable Long id) {
         notificationService.markAsRead(id);

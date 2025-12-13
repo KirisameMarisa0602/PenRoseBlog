@@ -1463,7 +1463,10 @@ export default function CommunicationPage() {
 
                                             {/* 博客预览卡片 */}
                                             {hasPreview && (
-                                                <div className="pm-blog-preview-card">
+                                                <div className="pm-blog-preview-card" onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    navigate(`/post/${msg.blogPreview.blogId}`);
+                                                }}>
                                                     <div className="pm-blog-preview-cover">
                                                         {msg.blogPreview.coverImageUrl ? (
                                                             <img
@@ -1478,40 +1481,25 @@ export default function CommunicationPage() {
                                                         )}
                                                     </div>
                                                     <div className="pm-blog-preview-body">
-                                                        <div className="pm-blog-preview-title">
+                                                        <h3 className="pm-blog-preview-title" title={msg.blogPreview.title}>
                                                             {msg.blogPreview.title || '博客'}
-                                                        </div>
+                                                        </h3>
                                                         <div className="pm-blog-preview-meta">
-                                                            <span className="pm-blog-preview-author">
-                                                                {msg.blogPreview.authorNickname || ''}
-                                                            </span>
+                                                            <div className="pm-blog-preview-author-info">
+                                                                <img 
+                                                                    src={resolveUrl(msg.blogPreview.authorAvatarUrl) || '/imgs/loginandwelcomepanel/1.png'} 
+                                                                    alt="" 
+                                                                    className="pm-blog-preview-avatar-small"
+                                                                    onError={(e) => { e.target.onerror = null; e.target.src = '/imgs/loginandwelcomepanel/1.png'; }}
+                                                                />
+                                                                <span className="pm-blog-preview-author">
+                                                                    {msg.blogPreview.authorNickname || '匿名'}
+                                                                </span>
+                                                            </div>
                                                             {msg.blogPreview.createdAt && (
                                                                 <span className="pm-blog-preview-time">
-                                                                    {new Date(msg.blogPreview.createdAt).toLocaleString()}
+                                                                    {new Date(msg.blogPreview.createdAt).toLocaleDateString()}
                                                                 </span>
-                                                            )}
-                                                        </div>
-                                                        <div className="pm-blog-preview-actions">
-                                                            {msg.blogPreview && msg.blogPreview.blogId ? (
-                                                                <button
-                                                                    type="button"
-                                                                    className="pm-blog-preview-open"
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        navigate(`/post/${msg.blogPreview.blogId}`);
-                                                                    }}
-                                                                >
-                                                                    查看原文
-                                                                </button>
-                                                            ) : (
-                                                                <a
-                                                                    href={msg.blogPreview?.url || '#'}
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
-                                                                    onClick={(e) => e.stopPropagation()}
-                                                                >
-                                                                    查看原文
-                                                                </a>
                                                             )}
                                                         </div>
                                                     </div>

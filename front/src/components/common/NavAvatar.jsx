@@ -3,12 +3,13 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import AvatarDropdown from './AvatarDropdown';
 import { useAuthState } from '@hooks/useAuthState';
 import resolveUrl from '@utils/resolveUrl';
+import { getDefaultAvatar } from '@utils/avatarUtils';
 
 /**
  * 导航栏右上角头像/入口组件 NavAvatar
  * 功能：
  *  - 未登录：显示“去登录 / 注册”点击跳转 /welcome
- *  - 已登录无头像：随机选择占位图片（public/icons/avatar_no_sign_in）
+ *  - 已登录无头像：根据ID确定占位图片（public/icons/avatar_no_sign_in）
  *  - 已登录有头像：显示该头像
  * 样式：src/styles/common/NavAvatar.css 仅通过类名切换，不在此写内联样式
  */
@@ -25,20 +26,11 @@ export default function NavAvatar({
   // 可选尺寸变量
   const style = size ? { ['--size']: typeof size === 'number' ? `${size}px` : size } : undefined;
 
-  // 预置的本地占位资源（构建时静态存在）
-  const fallbackList = useMemo(
-    () => [
-      '三花猫.svg','傻猫.svg','博学猫.svg','布偶.svg','无毛猫.svg','暹罗猫.svg','橘猫.svg','波斯猫.svg','牛奶猫.svg','狸花猫.svg','猫.svg','田园猫.svg','白猫.svg','眯眯眼猫.svg','缅因猫.svg','美短.svg','英短猫.svg','蓝猫.svg','黄猫.svg','黑猫.svg'
-    ],
-    []
-  );
-
-  // 已登录但没有头像时随机挑选（首次渲染稳定）
+  // 已登录但没有头像时根据ID确定（首次渲染稳定）
   const randomFallback = useMemo(() => {
     if (!isLoggedIn || (user && user.avatar)) return '';
-    const idx = Math.floor(Math.random() * fallbackList.length);
-    return `/icons/avatar_no_sign_in/${fallbackList[idx]}`;
-  }, [isLoggedIn, user, fallbackList]);
+    return getDefaultAvatar(user.id);
+  }, [isLoggedIn, user]);
 
   // ===== 用户资料（昵称 / 用户ID / 性别）读取 =====
   // 下拉面板已移除，这些资料在头像处暂未展示，预留以后扩展时再启用

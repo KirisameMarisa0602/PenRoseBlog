@@ -331,14 +331,15 @@ html, body, #root {
 
 .nav-badge-dot {
     position: absolute;
-    top: -6px;
-    right: -12px;
-    width: 10px;
-    height: 10px;
+    top: 10px;
+    right: 10px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     background-color: #ff4d4f;
     box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8);
     animation: badgePulse 2s infinite;
+    z-index: 10;
 }
 
 @keyframes badgePulse {

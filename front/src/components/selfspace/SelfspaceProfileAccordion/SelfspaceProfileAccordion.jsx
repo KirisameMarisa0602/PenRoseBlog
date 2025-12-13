@@ -3,6 +3,7 @@ import resolveUrl from '@utils/resolveUrl';
 import '@styles/selfspace/SelfspaceProfileAccordion/selfspaceProfileAccordion.css';
 import httpClient from '@utils/api/httpClient';
 import { useAuthState } from '@hooks/useAuthState';
+import { getDefaultAvatar } from '@utils/avatarUtils';
 
 // 个人空间左侧手风琴面板
 export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHeight = '100%', viewUserId = null, hideEditPanel = false }) {
@@ -484,7 +485,7 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
               onMouseMove={handleMouseMove}
             >
               <div className={`profilepanel-content${isActive ? ' profilepanel-content-active' : ' profilepanel-content-collapsed'}`}>
-                {profile.backgroundUrl && (
+                {profile.backgroundUrl ? (
                   /\.(mp4|webm)$/i.test(profile.backgroundUrl)
                     ? (
                       <video
@@ -528,6 +529,23 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                         }}
                       />
                     )
+                ) : (
+                  <div
+                    ref={bgRef}
+                    className="profilepanel-bg-gradient"
+                    style={{ 
+                      position: 'absolute', 
+                      left: 0, 
+                      top: 0, 
+                      width: '100%', 
+                      height: '100%', 
+                      zIndex: 0,
+                      transform: 'scale(1.1)',
+                      transition: 'transform 0.1s ease-out',
+                      filter: isActive ? 'none' : 'blur(8px) brightness(0.8)',
+                      background: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)'
+                    }}
+                  />
                 )}
                 <div className="profilepanel-info-overlay" style={{ 
                   position: 'relative', 
@@ -551,9 +569,14 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                     marginBottom: isActive ? 10 : 0, 
                     marginRight: isActive ? 0 : 15,
                     border: '2px solid #fff',
-                    transition: 'all 0.3s ease'
+                    transition: 'all 0.3s ease',
+                    background: '#fff'
                   }}>
-                    <img src={resolveUrl(profile.avatarUrl)} alt={profile.nickname} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img 
+                      src={profile.avatarUrl ? resolveUrl(profile.avatarUrl) : resolveUrl(getDefaultAvatar(profile.id || userId))} 
+                      alt={profile.nickname} 
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                    />
                   </div>
                   <div className="profile-name-large" style={{ 
                     fontSize: isActive ? '1.5rem' : '1.1rem', 

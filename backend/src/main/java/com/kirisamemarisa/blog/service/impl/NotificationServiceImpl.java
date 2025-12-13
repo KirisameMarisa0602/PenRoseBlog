@@ -151,7 +151,7 @@ public class NotificationServiceImpl implements NotificationService {
     public void markAsRead(Long notificationId) {
         notificationRepository.findById(notificationId).ifPresent(n -> {
             n.setRead(true);
-            notificationRepository.save(n);
+            notificationRepository.saveAndFlush(n);
         });
     }
 
@@ -184,6 +184,46 @@ public class NotificationServiceImpl implements NotificationService {
         }
     }
 
+    @Override
+    public java.util.Map<String, Long> getUnreadStats(Long userId) {
+        java.util.Map<String, Long> stats = new java.util.HashMap<>();
+
+        // LIKES: POST_LIKE, POST_FAVORITE, COMMENT_LIKE, REPLY_LIKE
+        stats.put("LIKES", notificationRepository.countByReceiverIdAndIsReadFalseAndTypeIn(userId,
+                java.util.Arrays.asList(
+                        NotificationType.POST_LIKE,
+                        NotificationType.POST_FAVORITE,
+                        NotificationType.COMMENT_LIKE,
+                        NotificationType.REPLY_LIKE)));
+
+        // COMMENTS: POST_COMMENT, COMMENT_REPLY
+        stats.put("COMMENTS", notificationRepository.countByReceiverIdAndIsReadFalseAndTypeIn(userId,
+                java.util.Arrays.asList(
+                        NotificationType.POST_COMMENT,
+                        NotificationType.COMMENT_REPLY)));
+
+        // FOLLOW: FOLLOW, UNFOLLOW
+        stats.put("FOLLOW", notificationRepository.countByReceiverIdAndIsReadFalseAndTypeIn(userId,
+                java.util.Arrays.asList(
+                        NotificationType.FOLLOW,
+                        NotificationType.UNFOLLOW)));
+
+        // REQUESTS: FRIEND_REQUEST, FRIEND_REQUEST_ACCEPTED, FRIEND_REQUEST_REJECTED
+        stats.put("REQUESTS", notificationRepository.countByReceiverIdAndIsReadFalseAndTypeIn(userId,
+                java.util.Arrays.asList(
+                        NotificationType.FRIEND_REQUEST,
+                        NotificationType.FRIEND_REQUEST_ACCEPTED,
+                        NotificationType.FRIEND_REQUEST_REJECTED)));
+
+        // ALL: Sum of above (or just query all)
+        // Note: This excludes SYSTEM or other types if they exist but aren't in
+        // categories
+        // Better to query all unread
+        stats.put("ALL", notificationRepository.countByReceiverIdAndIsReadFalse(userId));
+
+        return stats;
+    }
+
     private NotificationDTO convertToDTO(Notification n) {
         NotificationDTO dto = new NotificationDTO();
         dto.setRequestId(n.getId());
@@ -194,6 +234,7 @@ public class NotificationServiceImpl implements NotificationService {
         dto.setCreatedAt(n.getCreatedAt());
         dto.setReferenceId(n.getReferenceId());
         dto.setReferenceExtraId(n.getReferenceExtraId());
+        dto.setRead(n.isRead());
 
         Optional<UserProfile> senderProfile = userProfileRepository.findById(n.getSenderId());
         senderProfile.ifPresent(p -> {

@@ -33,45 +33,28 @@ export default function NotificationCenter() {
     };
 
     useEffect(() => {
-        // Check unread status for tabs
+        // Check unread status for tabs using the new stats API
         const checkUnread = async () => {
-            const tabs = ['LIKES', 'COMMENTS', 'FOLLOW', 'REQUESTS'];
-            const newStatus = {
-                ALL: false,
-                LIKES: false,
-                COMMENTS: false,
-                FOLLOW: false,
-                MESSAGES: false,
-                REQUESTS: false
-            };
-            
-            // Check global unread count first if available, otherwise check ALL list
             try {
-                const countRes = await notificationApi.getUnreadCount();
-                if (countRes && countRes.code === 200 && countRes.data > 0) {
-                    newStatus.ALL = true;
+                const res = await notificationApi.getUnreadStats();
+                if (res && res.code === 200 && res.data) {
+                    const stats = res.data;
+                    setUnreadStatus(prev => ({
+                        ...prev,
+                        ALL: (stats.ALL || 0) > 0,
+                        LIKES: (stats.LIKES || 0) > 0,
+                        COMMENTS: (stats.COMMENTS || 0) > 0,
+                        FOLLOW: (stats.FOLLOW || 0) > 0,
+                        REQUESTS: (stats.REQUESTS || 0) > 0
+                        // MESSAGES is handled by global context or separate logic usually
+                    }));
                 }
-            } catch (error) { /* ignore */ }
-
-            // Check each category
-            for (const tab of tabs) {
-                try {
-                    const types = getTypes(tab);
-                    // Fetch just 1 item to check if it's unread
-                    const res = await notificationApi.getNotifications(0, 1, types);
-                    if (res.code === 200) {
-                        const list = res.data.list || res.data.content || [];
-                        if (list.length > 0 && !list[0].read) {
-                            newStatus[tab] = true;
-                        }
-                    }
-                } catch (error) { /* ignore */ }
+            } catch (err) {
+                console.error("Failed to fetch unread stats", err);
             }
-            setUnreadStatus(newStatus);
         };
         checkUnread();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [activeTab]); // Check when tab changes, instead of when notifications list changes
+    }, [activeTab]); // Refresh when tab changes to ensure sync
 
     useEffect(() => {
         if (activeTab === 'MESSAGES') {
@@ -141,11 +124,28 @@ export default function NotificationCenter() {
                 localStorage.setItem(`notification_unread_count_${userId}`, '0');
                 window.dispatchEvent(new Event('pm-unread-refresh'));
             }
-            // No need to reload immediately if we updated state, but reloading ensures consistency
-            // if (activeTab !== 'MESSAGES') {
-            //     setPage(0);
-            //     loadNotifications(0, activeTab);
-            // }
+            
+            // Force reload stats to ensure sync
+            setTimeout(() => {
+                const checkUnread = async () => {
+                    try {
+                        const res = await notificationApi.getUnreadStats();
+                        if (res && res.code === 200 && res.data) {
+                            const stats = res.data;
+                            setUnreadStatus(prev => ({
+                                ...prev,
+                                ALL: (stats.ALL || 0) > 0,
+                                LIKES: (stats.LIKES || 0) > 0,
+                                COMMENTS: (stats.COMMENTS || 0) > 0,
+                                FOLLOW: (stats.FOLLOW || 0) > 0,
+                                REQUESTS: (stats.REQUESTS || 0) > 0
+                            }));
+                        }
+                    } catch (err) { console.error(err); }
+                };
+                checkUnread();
+            }, 500);
+
         } catch (error) {
             console.error("Failed to mark all as read", error);
         }
@@ -161,8 +161,8 @@ export default function NotificationCenter() {
         // Mark as read if not already
         if (!note.read) {
             try {
-                await notificationApi.markAsRead(note.id);
-                setNotifications(prev => prev.map(n => n.id === note.id ? { ...n, read: true } : n));
+                await notificationApi.markAsRead(note.requestId);
+                setNotifications(prev => prev.map(n => n.requestId === note.requestId ? { ...n, read: true } : n));
                 // Trigger global unread count refresh
                 window.dispatchEvent(new Event('pm-unread-refresh'));
             } catch (e) {

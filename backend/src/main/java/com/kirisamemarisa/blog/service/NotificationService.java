@@ -55,4 +55,9 @@ public interface NotificationService {
      * 标记指定类型的通知为已读
      */
     void markAllAsRead(Long userId, java.util.List<String> types);
+
+    /**
+     * 获取各类通知的未读数量统计
+     */
+    java.util.Map<String, Long> getUnreadStats(Long userId);
 }

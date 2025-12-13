@@ -19,6 +19,11 @@ export const notificationApi = {
         return response.data;
     },
 
+    getUnreadStats: async () => {
+        const response = await httpClient.get(`${API_BASE_URL}/unread-stats`);
+        return response.data;
+    },
+
     markAsRead: async (id) => {
         const response = await httpClient.put(`${API_BASE_URL}/${id}/read`);
         return response.data;

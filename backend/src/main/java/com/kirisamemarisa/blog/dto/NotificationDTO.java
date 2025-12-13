@@ -26,6 +26,8 @@ public class NotificationDTO {
     private String senderNickname;
     private String senderAvatarUrl;
 
+    private boolean read;
+
     public String getType() {
         return type;
     }
@@ -112,5 +114,13 @@ public class NotificationDTO {
 
     public void setSenderAvatarUrl(String senderAvatarUrl) {
         this.senderAvatarUrl = senderAvatarUrl;
+    }
+
+    public boolean isRead() {
+        return read;
+    }
+
+    public void setRead(boolean read) {
+        this.read = read;
     }
 }
