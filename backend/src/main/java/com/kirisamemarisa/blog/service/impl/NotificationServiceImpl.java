@@ -220,7 +220,7 @@ public class NotificationServiceImpl implements NotificationService {
                         NotificationType.FRIEND_REQUEST,
                         NotificationType.FRIEND_REQUEST_ACCEPTED,
                         NotificationType.FRIEND_REQUEST_REJECTED));
-        long pendingRequests = friendRequestRepository.countByReceiver_IdAndStatus(userId,
+        long pendingRequests = friendRequestRepository.countByReceiverIdAndStatus(userId,
                 FriendRequest.Status.PENDING);
         stats.put("REQUESTS", unreadRequestNotes + pendingRequests);
 
