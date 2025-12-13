@@ -65,6 +65,10 @@ img {
 	overflow: visible;
 }
 
+.app-layout--welcome {
+	display: block;
+}
+
 .app-main {
 	min-width: 0;
 	overflow: visible;

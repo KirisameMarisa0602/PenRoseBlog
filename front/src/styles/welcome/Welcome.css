@@ -1,11 +1,12 @@
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400|Lora");
 
 .welcome-container {
-  width: 100%;
-  min-height: calc(100vh - var(--navH, 15vh));
+  width: 120vw;
+  min-height: 100vh;
   position: relative;
   /* background: #adc3ea;  Removed to use global background */
   margin: 0;
+  margin-left: -10vw;
   padding: 0;
   overflow: hidden;
   z-index: 0;
@@ -144,7 +145,7 @@
   text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
-p {
+.welcome-container p {
   font-family: "Open Sans", sans-serif;
   font-size: 0.7em;
   letter-spacing: 2px;
@@ -152,7 +153,7 @@ p {
   text-align: center;
 }
 
-span {
+.welcome-container span {
   color: #eac7cc;
 }
 
@@ -173,7 +174,7 @@ span {
   opacity: 0.9;
 }
 
-button {
+.welcome-container button {
   padding: 12px;
   font-family: "Open Sans", sans-serif;
   text-transform: uppercase;
@@ -185,7 +186,7 @@ button {
   display: block;
 }
 
-button:hover {
+.welcome-container button:hover {
   background: #eac7cc;
   color: #f6f6f6;
   transition: background-color 1s ease-out;
@@ -200,7 +201,7 @@ button:hover {
   backdrop-filter: blur(4px);
 }
 
-form {
+.welcome-container form {
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -279,7 +280,7 @@ form {
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
-input {
+.welcome-container input {
   background: transparent;
   width: 75%;
   color: #555;
@@ -292,14 +293,14 @@ input {
   transition: all 0.3s ease;
 }
 
-input::placeholder {
+.welcome-container input::placeholder {
   color: #999;
   letter-spacing: 1px;
   font-size: 0.9em;
   font-weight: 300;
 }
 
-input:focus {
+.welcome-container input:focus {
   background: transparent;
   color: #333;
   outline: none;
@@ -307,11 +308,11 @@ input:focus {
   box-shadow: none;
 }
 
-input:focus::placeholder {
+.welcome-container input:focus::placeholder {
   opacity: 0.7;
 }
 
-label {
+.welcome-container label {
   font-family: "Open Sans", sans-serif;
   color: #555;
   font-size: 0.9em;
@@ -328,7 +329,7 @@ label {
   gap: 8px;
 }
 
-input[type=checkbox] {
+.welcome-container input[type=checkbox] {
   width: 16px;
   height: 16px;
   margin: 0;
@@ -473,4 +474,138 @@ input[type=checkbox] {
   .gender-selector {
     width: 85%;
   }
+}
+/* --- Beautification Updates --- */
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap');
+
+/* Modern Font Updates */
+.welcome-card h1, 
+.welcome-title {
+  font-family: 'Montserrat', sans-serif;
+  letter-spacing: 4px; /* Slightly reduced for Montserrat */
+}
+
+.welcome-title span {
+  font-weight: 600;
+}
+
+.welcome-container button, .submit {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  letter-spacing: 2px;
+}
+
+/* Input Group & Floating Labels */
+.welcome-container .input-group {
+  position: relative;
+  margin-bottom: 30px; /* Space for label and error msg */
+  width: 75%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.signup .input-group {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.welcome-container .input-group input {
+  font-size: 16px;
+  padding: 10px 10px 10px 5px;
+  display: block;
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid #ccc;
+  background: transparent;
+  color: #555;
+  margin: 0;
+  border-radius: 0;
+}
+
+.welcome-container .input-group input:focus {
+  outline: none;
+}
+
+/* Label Styling */
+.welcome-container .input-group label {
+  color: #999;
+  font-size: 16px;
+  font-weight: normal;
+  position: absolute;
+  pointer-events: none;
+  left: 5px;
+  top: 10px;
+  transition: 0.2s ease all;
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* Active State (Focus or Valid) - Move Label Up */
+.welcome-container .input-group input:focus ~ label,
+.welcome-container .input-group input:not(:placeholder-shown) ~ label {
+  top: -20px;
+  font-size: 12px;
+  color: #d8b5ba;
+  font-weight: 600;
+}
+
+/* Animated Bar Effect */
+.welcome-container .bar {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.welcome-container .bar:before, .welcome-container .bar:after {
+  content: '';
+  height: 2px;
+  width: 0;
+  bottom: 0;
+  position: absolute;
+  background: #d8b5ba;
+  transition: 0.2s ease all;
+}
+
+.welcome-container .bar:before {
+  left: 50%;
+}
+
+.welcome-container .bar:after {
+  right: 50%;
+}
+
+/* Active Bar Animation */
+.welcome-container .input-group input:focus ~ .bar:before,
+.welcome-container .input-group input:focus ~ .bar:after {
+  width: 50%;
+}
+
+/* Hover State Adjustments (Dark Background) */
+.pinkbox:hover .input-group input {
+  color: #f6f6f6;
+  border-bottom-color: rgba(246, 246, 246, 0.3);
+}
+
+.pinkbox:hover .input-group label {
+  color: #ccc;
+}
+
+.pinkbox:hover .input-group input:focus ~ label,
+.pinkbox:hover .input-group input:not(:placeholder-shown) ~ label {
+  color: #eac7cc;
+}
+
+.pinkbox:hover .bar:before, 
+.pinkbox:hover .bar:after {
+  background: #eac7cc;
+}
+
+/* Remove default placeholder since we use floating label */
+.welcome-container .input-group input::placeholder {
+  color: transparent;
+}
+
+/* Adjust form padding to accommodate new spacing */
+.more-padding {
+  padding-top: 20px;
 }

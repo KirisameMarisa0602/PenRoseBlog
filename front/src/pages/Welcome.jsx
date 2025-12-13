@@ -187,7 +187,7 @@ export default function Welcome() {
           position: 'absolute',
           top: `-${(mousePos.y / window.innerHeight) * 5}vh`,
           left: `-${(mousePos.x / window.innerWidth) * 5}vw`,
-          width: '105vw',
+          width: '120vw',
           height: '105vh',
           objectFit: 'cover',
           zIndex: -1,
@@ -212,9 +212,24 @@ export default function Welcome() {
             <form autoComplete="off" onSubmit={handleRegister}>
               <div className="form-grid">
                 <div className="form-fields">
-                  <input type="text" placeholder="Username" value={registerData.username} onChange={e => setRegisterData({ ...registerData, username: e.target.value })} autoComplete="username" />
-                  <input type="password" placeholder="Password" value={registerData.password} onChange={e => setRegisterData({ ...registerData, password: e.target.value })} autoComplete="new-password" />
-                  <input type="password" placeholder="Confirm Password" value={registerData.confirmPassword} onChange={e => setRegisterData({ ...registerData, confirmPassword: e.target.value })} autoComplete="new-password" />
+                  <div className="input-group">
+                    <input type="text" required placeholder=" " value={registerData.username} onChange={e => setRegisterData({ ...registerData, username: e.target.value })} autoComplete="username" />
+                    <label>Username</label>
+                    <span className="highlight"></span>
+                    <span className="bar"></span>
+                  </div>
+                  <div className="input-group">
+                    <input type="password" required placeholder=" " value={registerData.password} onChange={e => setRegisterData({ ...registerData, password: e.target.value })} autoComplete="new-password" />
+                    <label>Password</label>
+                    <span className="highlight"></span>
+                    <span className="bar"></span>
+                  </div>
+                  <div className="input-group">
+                    <input type="password" required placeholder=" " value={registerData.confirmPassword} onChange={e => setRegisterData({ ...registerData, confirmPassword: e.target.value })} autoComplete="new-password" />
+                    <label>Confirm Password</label>
+                    <span className="highlight"></span>
+                    <span className="bar"></span>
+                  </div>
                 </div>
                 <div className="form-gender">
                   <div className="gender-selector" role="group" aria-label="Gender">
@@ -254,8 +269,18 @@ export default function Welcome() {
           <div className={`signin${showRegister ? ' nodisplay' : ''}`}>
             <h1>Sign In</h1>
             <form className="more-padding" autoComplete="off" onSubmit={handleLogin}>
-              <input type="text" placeholder="Username" value={loginData.username} onChange={e => setLoginData({ ...loginData, username: e.target.value })} autoComplete="username" />
-              <input type="password" placeholder="Password" value={loginData.password} onChange={e => setLoginData({ ...loginData, password: e.target.value })} autoComplete="current-password" />
+              <div className="input-group">
+                <input type="text" required placeholder=" " value={loginData.username} onChange={e => setLoginData({ ...loginData, username: e.target.value })} autoComplete="username" />
+                <label>Username</label>
+                <span className="highlight"></span>
+                <span className="bar"></span>
+              </div>
+              <div className="input-group">
+                <input type="password" required placeholder=" " value={loginData.password} onChange={e => setLoginData({ ...loginData, password: e.target.value })} autoComplete="current-password" />
+                <label>Password</label>
+                <span className="highlight"></span>
+                <span className="bar"></span>
+              </div>
               <div className="checkbox">
                 <input type="checkbox" id="remember" checked={rememberMe} onChange={e => setRememberMe(e.target.checked)} />
                 <label htmlFor="remember">Remember Me</label>

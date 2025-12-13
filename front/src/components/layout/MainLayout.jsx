@@ -12,13 +12,13 @@ export default function MainLayout({ children, onMaidLoaded }) {
   const [sidebarWidth, setSidebarWidth] = React.useState(0);
 
   return (
-    <div className="app-layout">
+    <div className={`app-layout${isWelcomePage ? ' app-layout--welcome' : ''}`}>
       {!isWelcomePage && <BannerNavbar />}
       <div className={mainClassName}>
         {children}
       </div>
       {/* 右侧列仅用于对齐，实际 Maid 作为全局 overlay 固定在右侧 */}
-      <div className="app-ai-sidebar" aria-hidden="true" style={{ width: sidebarWidth, flexShrink: 0 }} />
+      {!isWelcomePage && <div className="app-ai-sidebar" aria-hidden="true" style={{ width: sidebarWidth, flexShrink: 0 }} />}
       {!isWelcomePage && <Maid defaultCollapsed={true} onModelLoaded={onMaidLoaded} onWidthChange={setSidebarWidth} />}
       <GlobalUploadIndicator />
     </div>
