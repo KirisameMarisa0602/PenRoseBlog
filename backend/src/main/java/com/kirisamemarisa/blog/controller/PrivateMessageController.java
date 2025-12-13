@@ -8,8 +8,9 @@ import com.kirisamemarisa.blog.model.PrivateMessage;
 import com.kirisamemarisa.blog.model.User;
 import com.kirisamemarisa.blog.model.UserProfile;
 import com.kirisamemarisa.blog.service.PrivateMessageService;
+// 分层：控制器避免直接依赖仓库
 import com.kirisamemarisa.blog.repository.PrivateMessageRepository;
-import com.kirisamemarisa.blog.repository.UserRepository;
+import com.kirisamemarisa.blog.service.UserService;
 import com.kirisamemarisa.blog.dto.PrivateMessageOperationDTO;
 import com.kirisamemarisa.blog.dto.ConversationSummaryDTO;
 import com.kirisamemarisa.blog.repository.UserProfileRepository;
@@ -40,7 +41,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RestController
 @RequestMapping("/api/messages")
 public class PrivateMessageController {
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final PrivateMessageService privateMessageService;
     private final PrivateMessageRepository privateMessageRepository;
     private final MessageEventPublisher publisher;
@@ -51,7 +52,7 @@ public class PrivateMessageController {
     private final CurrentUserResolver currentUserResolver;
     private final PrivateMessageDtoService privateMessageDtoService;
 
-    public PrivateMessageController(UserRepository userRepository,
+    public PrivateMessageController(UserService userService,
             PrivateMessageService privateMessageService,
             PrivateMessageRepository privateMessageRepository,
             MessageEventPublisher publisher,
@@ -61,7 +62,7 @@ public class PrivateMessageController {
             FileStorageService fileStorageService,
             CurrentUserResolver currentUserResolver,
             PrivateMessageDtoService privateMessageDtoService) {
-        this.userRepository = userRepository;
+        this.userService = userService;
         this.privateMessageService = privateMessageService;
         this.privateMessageRepository = privateMessageRepository;
         this.publisher = publisher;
@@ -148,7 +149,7 @@ public class PrivateMessageController {
             return emitter;
         }
 
-        User other = userRepository.findById(otherId).orElse(null);
+        User other = userService.getUserById(otherId);
         if (other == null) {
             SseEmitter emitter = new SseEmitter(0L);
             emitter.complete();
@@ -170,7 +171,7 @@ public class PrivateMessageController {
         User me = resolveCurrent(principal, headerUserId);
         if (me == null)
             return new ApiResponse<>(401, "未认证", null);
-        User other = userRepository.findById(otherId).orElse(null);
+        User other = userService.getUserById(otherId);
         if (other == null)
             return new ApiResponse<>(404, "用户不存在", null);
 
@@ -199,7 +200,7 @@ public class PrivateMessageController {
         User me = resolveCurrent(principal, headerUserId);
         if (me == null)
             return new ApiResponse<>(401, "未认证", null);
-        long total = privateMessageRepository.countUnreadTotal(me.getId());
+        long total = privateMessageService.countUnreadTotal(me.getId());
         return new ApiResponse<>(200, "OK", total);
     }
 
@@ -211,7 +212,7 @@ public class PrivateMessageController {
         User me = resolveCurrent(principal, headerUserId);
         if (me == null)
             return new ApiResponse<>(401, "未认证", null);
-        int updated = privateMessageRepository.markConversationRead(otherId, me.getId());
+        int updated = privateMessageService.markConversationRead(otherId, me.getId());
         return new ApiResponse<>(200, "OK", updated);
     }
 
@@ -235,7 +236,7 @@ public class PrivateMessageController {
             return new ApiResponse<>(400, "receiverId and content are required", null);
         }
 
-        User other = userRepository.findById(receiverId).orElse(null);
+        User other = userService.getUserById(receiverId);
         if (other == null)
             return new ApiResponse<>(404, "用户不存在", null);
 
@@ -257,7 +258,7 @@ public class PrivateMessageController {
         User me = resolveCurrent(principal, headerUserId);
         if (me == null)
             return new ApiResponse<>(401, "未认证", null);
-        User other = userRepository.findById(otherId).orElse(null);
+        User other = userService.getUserById(otherId);
         if (other == null)
             return new ApiResponse<>(404, "用户不存在", null);
 
@@ -284,7 +285,7 @@ public class PrivateMessageController {
         User me = resolveCurrent(principal, headerUserId);
         if (me == null)
             return new ApiResponse<>(401, "未认证", null);
-        User other = userRepository.findById(otherId).orElse(null);
+        User other = userService.getUserById(otherId);
         if (other == null)
             return new ApiResponse<>(404, "用户不存在", null);
 

@@ -34,4 +34,8 @@ public interface UserService {
     UserStatsDTO getUserStats(Long userId);
 
     boolean isVip(Long userId);
+
+    // 分层解耦：为控制器提供只读查询，避免直接依赖 Repository
+    com.kirisamemarisa.blog.model.User getUserById(Long userId);
+    com.kirisamemarisa.blog.model.User getUserByUsername(String username);
 }

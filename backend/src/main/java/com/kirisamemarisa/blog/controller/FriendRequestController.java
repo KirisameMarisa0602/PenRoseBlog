@@ -10,7 +10,8 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.kirisamemarisa.blog.common.ApiResponse;
 import com.kirisamemarisa.blog.dto.FriendRequestDTO;
 import com.kirisamemarisa.blog.model.User;
-import com.kirisamemarisa.blog.repository.UserRepository;
+// 分层：控制器不直接依赖仓库，改为依赖服务
+import com.kirisamemarisa.blog.service.UserService;
 import com.kirisamemarisa.blog.service.FriendRequestService;
 import com.kirisamemarisa.blog.service.NotificationService;
 import com.kirisamemarisa.blog.service.FriendService;
@@ -24,15 +25,15 @@ import com.kirisamemarisa.blog.dto.PageResult;
 public class FriendRequestController {
     private static final Logger logger = LoggerFactory.getLogger(FriendRequestController.class);
 
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final FriendRequestService friendRequestService;
     private final NotificationService notificationService;
     private final FriendService friendService;
 
-    public FriendRequestController(UserRepository userRepository, FriendRequestService friendRequestService,
+    public FriendRequestController(UserService userService, FriendRequestService friendRequestService,
             NotificationService notificationService,
             FriendService friendService) {
-        this.userRepository = userRepository;
+        this.userService = userService;
         this.friendRequestService = friendRequestService;
         this.notificationService = notificationService;
         this.friendService = friendService;
@@ -40,14 +41,14 @@ public class FriendRequestController {
 
     private User resolveCurrentUser(UserDetails principal, Long headerUserId, String authorizationHeader) {
         if (principal != null)
-            return userRepository.findByUsername(principal.getUsername());
+            return userService.getUserByUsername(principal.getUsername());
         if (headerUserId != null)
-            return userRepository.findById(headerUserId).orElse(null);
+            return userService.getUserById(headerUserId);
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             String token = authorizationHeader.substring("Bearer ".length()).trim();
             Long uid = com.kirisamemarisa.blog.common.JwtUtil.getUserIdFromToken(token);
             if (uid != null)
-                return userRepository.findById(uid).orElse(null);
+                return userService.getUserById(uid);
         }
         return null;
     }
@@ -63,7 +64,7 @@ public class FriendRequestController {
             logger.info("Unauthenticated request to send friend request to {}", targetId);
             return new ApiResponse<>(401, "未认证", null);
         }
-        User target = userRepository.findById(targetId).orElse(null);
+        User target = userService.getUserById(targetId);
         if (target == null) {
             logger.info("Friend request target {} not found (from user {})", targetId, me.getId());
             return new ApiResponse<>(404, "目标用户不存在", null);
@@ -85,7 +86,7 @@ public class FriendRequestController {
         if (me == null) {
             return new ApiResponse<>(401, "未认证", null);
         }
-        User target = userRepository.findById(targetId).orElse(null);
+        User target = userService.getUserById(targetId);
         if (target == null) {
             return new ApiResponse<>(404, "目标用户不存在", null);
         }
@@ -135,7 +136,7 @@ public class FriendRequestController {
         if (me == null && token != null && !token.isEmpty()) {
             Long uid = com.kirisamemarisa.blog.common.JwtUtil.getUserIdFromToken(token);
             if (uid != null)
-                me = userRepository.findById(uid).orElse(null);
+                me = userService.getUserById(uid);
         }
         if (me == null) {
             logger.info("Unauthenticated SSE subscribe attempt");
@@ -197,7 +198,7 @@ public class FriendRequestController {
         if (me == null) {
             return new ApiResponse<>(401, "未认证", null);
         }
-        User other = userRepository.findById(otherId).orElse(null);
+        User other = userService.getUserById(otherId);
         if (other == null) {
             return new ApiResponse<>(404, "用户不存在", null);
         }

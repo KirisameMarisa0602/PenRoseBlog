@@ -8,7 +8,7 @@ import com.qcloud.cos.region.Region;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration
+// @Configuration
 public class CosConfig {
 
     private final CosProperties cosProperties;
@@ -17,7 +17,7 @@ public class CosConfig {
         this.cosProperties = cosProperties;
     }
 
-    @Bean
+    // @Bean
     public COSClient cosClient() {
         COSCredentials cred = new BasicCOSCredentials(cosProperties.getSecretId(), cosProperties.getSecretKey());
         ClientConfig clientConfig = new ClientConfig(new Region(cosProperties.getRegion()));

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './MatchboxTagEditor.css';
+import '@styles/selfspace/MatchboxTagEditor.css';
 
 const MatchboxTagEditor = ({ tags, onTagsChange, readOnly = false }) => {
     const [tagList, setTagList] = useState([]);
@@ -64,7 +64,7 @@ const MatchboxTagEditor = ({ tags, onTagsChange, readOnly = false }) => {
 
         const trimmed = editValue.trim();
         let newList;
-        
+
         if (trimmed) {
             newList = [...tagList];
             newList[editingIndex] = trimmed;
@@ -87,15 +87,15 @@ const MatchboxTagEditor = ({ tags, onTagsChange, readOnly = false }) => {
     return (
         <div className={`matchbox-wrapper ${readOnly ? 'readonly' : ''}`}>
             <div className="matchbox-container">
-                
+
                 {/* The Inner Drawer (Tags) */}
                 <div className="mb-inner">
                     <div className="floor"></div>
                     <div className="mb-tray">
                         <div className="mb-tray-scroll">
                             {tagList.map((tag, index) => (
-                                <div 
-                                    key={index} 
+                                <div
+                                    key={index}
                                     className={`mb-match ${readOnly ? 'readonly' : ''}`}
                                     onClick={() => startEditing(index)}
                                     style={{ cursor: readOnly ? 'default' : 'pointer' }}
@@ -114,7 +114,7 @@ const MatchboxTagEditor = ({ tags, onTagsChange, readOnly = false }) => {
                                         <>
                                             <span className="mb-match-text">{tag}</span>
                                             {!readOnly && (
-                                                <span 
+                                                <span
                                                     className="mb-match-delete"
                                                     onClick={(e) => handleDeleteTag(e, index)}
                                                 >
@@ -125,11 +125,11 @@ const MatchboxTagEditor = ({ tags, onTagsChange, readOnly = false }) => {
                                     )}
                                 </div>
                             ))}
-                            
+
                             {/* Add New Button */}
                             {editingIndex === null && !readOnly && (
                                 <div className="mb-match add-new" onClick={handleAddTag}>
-                                    <span className="mb-match-text" style={{textAlign: 'center', color: '#555'}}>
+                                    <span className="mb-match-text" style={{ textAlign: 'center', color: '#555' }}>
                                         + New Tag
                                     </span>
                                 </div>
@@ -148,7 +148,7 @@ const MatchboxTagEditor = ({ tags, onTagsChange, readOnly = false }) => {
                     <div className="mb-face front">
                         <div className="mb-label-circle">
                             <div className="mb-label-text">
-                                个人<br/>标签
+                                个人<br />标签
                             </div>
                         </div>
                         <div className="mb-subtext">PERSONALITY</div>

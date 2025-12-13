@@ -150,18 +150,18 @@ public class UserServiceImpl implements UserService {
             return p;
         });
 
-        profile.setNickname(dto.getNickname());
-        profile.setAvatarUrl(dto.getAvatarUrl());
-        profile.setBackgroundUrl(dto.getBackgroundUrl());
-        profile.setSignature(dto.getSignature());
-        profile.setBio(dto.getBio());
-        profile.setTags(dto.getTags());
-        profile.setQq(dto.getQq());
-        profile.setWechat(dto.getWechat());
-        profile.setQqQrCode(dto.getQqQrCode());
-        profile.setWechatQrCode(dto.getWechatQrCode());
-        profile.setGithubLink(dto.getGithubLink());
-        profile.setBilibiliLink(dto.getBilibiliLink());
+        if (dto.getNickname() != null) profile.setNickname(dto.getNickname());
+        if (dto.getAvatarUrl() != null) profile.setAvatarUrl(dto.getAvatarUrl());
+        if (dto.getBackgroundUrl() != null) profile.setBackgroundUrl(dto.getBackgroundUrl());
+        if (dto.getSignature() != null) profile.setSignature(dto.getSignature());
+        if (dto.getBio() != null) profile.setBio(dto.getBio());
+        if (dto.getTags() != null) profile.setTags(dto.getTags());
+        if (dto.getQq() != null) profile.setQq(dto.getQq());
+        if (dto.getWechat() != null) profile.setWechat(dto.getWechat());
+        if (dto.getQqQrCode() != null) profile.setQqQrCode(dto.getQqQrCode());
+        if (dto.getWechatQrCode() != null) profile.setWechatQrCode(dto.getWechatQrCode());
+        if (dto.getGithubLink() != null) profile.setGithubLink(dto.getGithubLink());
+        if (dto.getBilibiliLink() != null) profile.setBilibiliLink(dto.getBilibiliLink());
 
         // 修复：同步性别字段到 User 表
         if (dto.getGender() != null) {
@@ -323,5 +323,18 @@ public class UserServiceImpl implements UserService {
         return userRepository.findById(userId)
                 .map(User::getIsVip)
                 .orElse(false);
+    }
+
+    // 分层解耦：供控制器层只读查询用户
+    @Override
+    public User getUserById(Long userId) {
+        if (userId == null) return null;
+        return userRepository.findById(userId).orElse(null);
+    }
+
+    @Override
+    public User getUserByUsername(String username) {
+        if (username == null || username.isEmpty()) return null;
+        return userRepository.findByUsername(username);
     }
 }

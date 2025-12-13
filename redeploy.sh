@@ -6,10 +6,10 @@ BRANCH=${1:-main}
 echo "Starting deployment process for branch: $BRANCH..."
 
 # 拉取最新代码
-echo "Pulling latest changes from git..."
-git fetch origin
-git checkout $BRANCH
-git pull origin $BRANCH
+# echo "Pulling latest changes from git..."
+# git fetch origin
+# git checkout $BRANCH
+# git pull origin $BRANCH
 
 # 重新构建并启动容器
 echo "Rebuilding and restarting containers..."

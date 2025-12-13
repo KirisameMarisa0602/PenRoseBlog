@@ -6,7 +6,8 @@ import com.kirisamemarisa.blog.dto.PrivateMessageDTO;
 import com.kirisamemarisa.blog.events.MessageEventPublisher;
 import com.kirisamemarisa.blog.model.PrivateMessage;
 import com.kirisamemarisa.blog.model.User;
-import com.kirisamemarisa.blog.repository.UserRepository;
+// 分层：控制器避免直接依赖仓库
+import com.kirisamemarisa.blog.service.UserService;
 import com.kirisamemarisa.blog.common.JwtUtil;
 import com.kirisamemarisa.blog.repository.UserProfileRepository;
 import com.kirisamemarisa.blog.service.PrivateMessageService;
@@ -25,18 +26,18 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/messages")
 public class PrivateMessageStreamController {
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final PrivateMessageService privateMessageService;
     private final MessageEventPublisher publisher;
     private final UserProfileRepository userProfileRepository;
     private final BlogUrlPreviewService blogUrlPreviewService; // NEW
 
-    public PrivateMessageStreamController(UserRepository userRepository,
+    public PrivateMessageStreamController(UserService userService,
                                           PrivateMessageService privateMessageService,
                                           MessageEventPublisher publisher,
                                           UserProfileRepository userProfileRepository,
                                           BlogUrlPreviewService blogUrlPreviewService) { // CHANGED
-        this.userRepository = userRepository;
+        this.userService = userService;
         this.privateMessageService = privateMessageService;
         this.publisher = publisher;
         this.userProfileRepository = userProfileRepository;
@@ -45,13 +46,13 @@ public class PrivateMessageStreamController {
 
     private User resolveCurrent(UserDetails principal, Long headerUserId, String token) {
         if (principal != null)
-            return userRepository.findByUsername(principal.getUsername());
+            return userService.getUserByUsername(principal.getUsername());
         if (headerUserId != null)
-            return userRepository.findById(headerUserId).orElse(null);
+            return userService.getUserById(headerUserId);
         if (token != null && !token.isEmpty()) {
             Long uid = JwtUtil.getUserIdFromToken(token);
             if (uid != null)
-                return userRepository.findById(uid).orElse(null);
+                return userService.getUserById(uid);
         }
         return null;
     }
@@ -112,7 +113,7 @@ public class PrivateMessageStreamController {
             failed.complete();
             return failed;
         }
-        User other = userRepository.findById(otherId).orElse(null);
+        User other = userService.getUserById(otherId);
         if (other == null) {
             SseEmitter failed = new SseEmitter();
             try {

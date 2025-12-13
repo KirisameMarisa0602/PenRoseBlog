@@ -154,41 +154,15 @@ export default function CommunicationPage() {
             });
     }, [userId, otherId]);
 
-    /** ---------------- Block API helpers ---------------- */
+    /** ---------------- Block API helpers (Disabled) ---------------- */
 
     const checkBlockStatus = async (targetId) => {
-        if (!userId || !targetId) return false;
-        try {
-            const res = await api.get(`/block/status/${targetId}`);
-            const j = res.data;
-            if (j && j.code === 200) return !!j.data;
-        } catch (err) {
-            console.warn('checkBlockStatus failed', err);
-        }
+        // Feature disabled
         return false;
     };
 
     const toggleBlockUser = async (targetId) => {
-        if (!userId || !targetId) return null;
-        try {
-            const res = await api.post(`/block/toggle/${targetId}`);
-            const j = res.data;
-            if (j && j.code === 200) {
-                setConversations(prev => {
-                    if (!Array.isArray(prev)) return prev;
-                    return prev.map(c => c && String(c.otherId) === String(targetId)
-                        ? { ...c, blocked: j.data === true }
-                        : c
-                    );
-                });
-                return !!j.data;
-            } else {
-                alert((j && (j.msg || j.message)) || '操作失败');
-            }
-        } catch (err) {
-            console.error('toggleBlockUser failed', err);
-            alert('网络错误');
-        }
+        alert("拉黑功能暂未开放");
         return null;
     };
 
@@ -843,7 +817,7 @@ export default function CommunicationPage() {
         const uploadUrl = oid
             ? `/messages/upload?otherId=${encodeURIComponent(oid)}`
             : `/messages/upload`;
-        
+
         const sendUrl = `/messages/media/${otherId}`;
         const sendBody = { type, text: '' };
         const headers = { 'X-User-Id': userId };
@@ -860,16 +834,16 @@ export default function CommunicationPage() {
             }).then(dto => {
                 // If user is still on this page, update the list optimistically or via result
                 if (dto && String(dto.receiverId) === String(otherId) || String(dto.senderId) === String(otherId)) {
-                     // The global event 'pm-event' will likely trigger a refresh, 
-                     // but we can also manually update if we want instant feedback.
-                     // For now, we rely on the 'pm-event' dispatched by GlobalUploadContext or the SSE/Poll.
-                     console.log('Background upload completed for current conversation');
+                    // The global event 'pm-event' will likely trigger a refresh, 
+                    // but we can also manually update if we want instant feedback.
+                    // For now, we rely on the 'pm-event' dispatched by GlobalUploadContext or the SSE/Poll.
+                    console.log('Background upload completed for current conversation');
                 }
             }).catch(err => {
                 console.error('Background upload failed', err);
                 alert(err.message || '上传失败');
             });
-            
+
         } catch (err) {
             console.error(err);
             alert('启动上传失败');
@@ -1266,10 +1240,10 @@ export default function CommunicationPage() {
                         {/* 顶部好友信息栏 */}
                         <div className="conversation-chat-header">
                             <div className="conversation-chat-header-info">
-                                <img 
-                                    src={isValidAvatar(otherInfo.avatarUrl) ? resolveUrl(otherInfo.avatarUrl) : getDefaultAvatar(otherId)} 
+                                <img
+                                    src={isValidAvatar(otherInfo.avatarUrl) ? resolveUrl(otherInfo.avatarUrl) : getDefaultAvatar(otherId)}
                                     className="conversation-chat-header-avatar"
-                                    onError={(e) => {e.target.onerror=null; e.target.src=getDefaultAvatar(otherId)}}
+                                    onError={(e) => { e.target.onerror = null; e.target.src = getDefaultAvatar(otherId) }}
                                     alt="avatar"
                                 />
                                 <span className="conversation-chat-header-name">{otherInfo.nickname || '用户'}</span>
@@ -1417,9 +1391,9 @@ export default function CommunicationPage() {
                                                         </h3>
                                                         <div className="pm-blog-preview-meta">
                                                             <div className="pm-blog-preview-author-info">
-                                                                <img 
-                                                                    src={isValidAvatar(msg.blogPreview.authorAvatarUrl) ? resolveUrl(msg.blogPreview.authorAvatarUrl) : getDefaultAvatar(msg.blogPreview.authorId)} 
-                                                                    alt="" 
+                                                                <img
+                                                                    src={isValidAvatar(msg.blogPreview.authorAvatarUrl) ? resolveUrl(msg.blogPreview.authorAvatarUrl) : getDefaultAvatar(msg.blogPreview.authorId)}
+                                                                    alt=""
                                                                     className="pm-blog-preview-avatar-small"
                                                                     onError={(e) => { e.target.onerror = null; e.target.src = getDefaultAvatar(msg.blogPreview.authorId); }}
                                                                 />

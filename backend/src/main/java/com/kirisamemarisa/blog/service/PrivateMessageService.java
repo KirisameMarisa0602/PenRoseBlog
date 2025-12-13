@@ -26,4 +26,8 @@ public interface PrivateMessageService {
     void revokeMessage(Long messageId, Long userId);
 
     void deleteMessage(Long messageId, Long userId);
+
+    // 供控制器使用的会话辅助统计与状态更新
+    long countUnreadTotal(Long userId);
+    int markConversationRead(Long otherUserId, Long meUserId);
 }

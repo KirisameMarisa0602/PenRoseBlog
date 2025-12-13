@@ -1,347 +1,293 @@
-.maid-splitter {
-	height: 8px;
-	cursor: ns-resize;
-	background: linear-gradient(90deg, rgba(99,102,241,0.18), rgba(99,102,241,0.08));
-	border-top: 1px solid rgba(99,102,241,0.25);
-	border-bottom: 1px solid rgba(99,102,241,0.25);
-	border-radius: 8px;
-	margin: 8px 0;
-	position: relative;
-}
-.maid-splitter:hover { background: linear-gradient(90deg, rgba(99,102,241,0.28), rgba(99,102,241,0.14)); }
-.maid-splitter::after { content: ''; position: absolute; left: 50%; transform: translateX(-50%); top: 1px; width: 42px; height: 4px; border-radius: 4px; background: rgba(99,102,241,0.35); }
-/* Copied from styles/home/maidstyle/Maid.css - moved to common/aimaid */
-.maid-widget {
-	--maid-header-h: 42px;
-	--maid-bar-h: 56px;
-	--maid-stage-collapse: 300ms;
-	--maid-stage-expand: 300ms;
-	--maid-btn-collapse-duration: 260ms;
-	--maid-btn-expand-duration: 260ms;
-	--maid-btn-stagger: 100ms;
-	position: fixed;
-	top: var(--navH, 15vh); /* 默认从导航栏下方开始 */
-	right: 0;
-	height: calc(100vh - var(--navH, 15vh)); /* 默认只占导航栏以下区域 */
-	width: 25vw; /* 展开时的目标宽度，收起时通过 transform + handle 控制视觉效果 */
-	display: flex;
-	flex-direction: column;
-	background: linear-gradient(180deg, #f9fafb 0%, #ffffff 50%, #f8fafc 100%);
-	box-shadow: -8px 0 28px rgba(0,0,0,0.10);
-	z-index: 2000; /* 高于导航栏等其他固定元素 */
-	color: inherit;
-	-webkit-user-select: none;
-	user-select: none;
-	z-index: 10;
-	overflow: visible; /* allow popouts (emotion panel etc) to be visible */
-	transform: translateX(0);
-	transition: transform .2s ease;
-}
-.maid-resizer {
-	position: absolute;
-	left: -10px;
-	top: 0;
-	bottom: 0;
-	width: 12px;
-	cursor: ew-resize;
-	z-index: 10020;
-	background: linear-gradient(180deg, rgba(99,102,241,0.18), rgba(99,102,241,0.06));
-	border-right: 1px solid rgba(99,102,241,0.35);
-}
-.maid-resizer:hover { background: linear-gradient(180deg, rgba(99,102,241,0.28), rgba(99,102,241,0.12)); }
-.maid-dragging { cursor: grabbing; }
-/* 顶部栏与主体 */
-.maid-header { height: var(--maid-header-h); display: flex; align-items: center; justify-content: flex-end; padding: 6px 8px; border-bottom: 1px solid rgba(0,0,0,0.04); background: rgba(255,255,255,0.98); }
-.maid-header-actions { display: inline-flex; align-items: center; gap: 8px; }
 
-/* 上下分区 */
+.maid-splitter {
+height: 8px;
+cursor: ns-resize;
+background: linear-gradient(90deg, rgba(99,102,241,0.1), rgba(99,102,241,0.05));
+border-top: 1px solid rgba(99,102,241,0.15);
+border-bottom: 1px solid rgba(99,102,241,0.15);
+border-radius: 8px;
+margin: 8px 0;
+position: relative;
+    transition: background 0.3s;
+}
+.maid-splitter:hover { background: linear-gradient(90deg, rgba(99,102,241,0.2), rgba(99,102,241,0.1)); }
+.maid-splitter::after { content: ""; position: absolute; left: 50%; transform: translateX(-50%); top: 2px; width: 40px; height: 4px; border-radius: 4px; background: rgba(99,102,241,0.3); }
+
+.maid-widget {
+--maid-header-h: 48px;
+--maid-bar-h: 60px;
+--maid-stage-collapse: 300ms;
+--maid-stage-expand: 300ms;
+--maid-btn-collapse-duration: 260ms;
+--maid-btn-expand-duration: 260ms;
+--maid-btn-stagger: 100ms;
+position: fixed;
+top: var(--navH, 15vh);
+right: 0;
+height: calc(100vh - var(--navH, 15vh));
+width: 28vw;
+    min-width: 320px;
+display: flex;
+flex-direction: column;
+background: rgba(255, 255, 255, 0.85);
+backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+box-shadow: -10px 0 40px rgba(0,0,0,0.15);
+z-index: 2000;
+color: #333;
+-webkit-user-select: none;
+user-select: none;
+overflow: visible;
+transform: translateX(0);
+transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    border-left: 1px solid rgba(255,255,255,0.3);
+}
+
+.maid-resizer {
+position: absolute;
+left: -6px;
+top: 0;
+bottom: 0;
+width: 12px;
+cursor: ew-resize;
+z-index: 10020;
+background: transparent;
+}
+.maid-resizer:hover { background: rgba(99,102,241,0.1); }
+
+.maid-header { 
+    height: var(--maid-header-h); 
+    display: flex; 
+    align-items: center; 
+    justify-content: flex-end; 
+    padding: 0 16px; 
+    border-bottom: 1px solid rgba(0,0,0,0.06); 
+    background: rgba(255,255,255,0.5); 
+}
+.maid-header-actions { display: inline-flex; align-items: center; gap: 12px; }
+
 .maid-top {
-	box-sizing: border-box;
-	padding: 12px;
-	background: transparent;
-	display: flex;
-	flex-direction: column;
-	min-height: 0;
-	flex: 3 1 0;
+box-sizing: border-box;
+padding: 0;
+background: transparent;
+display: flex;
+flex-direction: column;
+min-height: 0;
+flex: 3 1 0;
 }
 .maid-bottom {
-	min-height: 0;
-	display: flex;
-	flex-direction: column;
-	background: linear-gradient(180deg, #ffffff 0%, #f7f9fc 100%);
-	border-top: 1px solid #eef2f7;
-	flex: 1 1 auto;
+min-height: 0;
+display: flex;
+flex-direction: column;
+background: rgba(255,255,255,0.4);
+border-top: 1px solid rgba(0,0,0,0.06);
+flex: 1 1 auto;
 }
+
 .maid-ai-chat-wrap { height: 100%; display: flex; flex-direction: column; }
-.maid-ai-panel { flex: 1 1 auto; height: 100%; }
+.maid-ai-panel { 
+    flex: 1 1 auto; 
+    height: 100%; 
+    display: flex;
+    flex-direction: column;
+    background: transparent;
+}
 
 .maid-canvas-area {
-	flex: 1 1 auto;
-	padding: 12px;
-	box-sizing: border-box;
-	display: flex;
-	align-items: flex-end; /* align model toward bottom */
-	justify-content: center; /* horizontally center canvas */
+flex: 1 1 auto;
+padding: 0;
+box-sizing: border-box;
+display: flex;
+align-items: flex-end;
+justify-content: center;
+    position: relative;
 }
 
 .maid-canvas-wrap {
-	width: 100%;
-	height: 100%;
-	border-radius: 10px;
-	background: transparent;
+width: 100%;
+height: 100%;
+background: transparent;
 }
 .maid-canvas-wrap canvas { width: 100%; height: 100%; display: block; }
+
 .maid-controlbar {
-	height: var(--maid-bar-h);
-	display: flex;
-	align-items: center;
-	justify-content: flex-start;
-	gap: 10px;
-	padding: 8px 12px;
-	background: rgba(255,255,255,0.98);
-	border-top: 1px solid rgba(0,0,0,0.04);
-	z-index: 10005; /* ensure controls appear above canvas */
-}
-.maid-controls-label { font-size: 12px; color: #57606a; }
-.maid-field { display: inline-flex; align-items: center; gap: 6px; }
-.maid-select {
-	font-size: 12px;
-	padding: 2px 6px;
-	border-radius: 6px;
-	border: 1px solid #d0d7de;
-	background: white;
-	color: #24292f;
-	outline: none;
-}
-.maid-toggle {
-	height: 30px;
-	padding: 10px;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	border-radius: 8px;
-	border: 1px solid #d0d7de;
-	background: #ffffff;
-	color: #24292f;
-	font-size: 12px;
-	line-height: 1;
-	transition: all .15s ease;
-	margin-left: auto !important;
-}
-.maid-toggle:hover { background: #f6f8fa; transform: translateY(-1px); }
-.maid-toggle:active { transform: translateY(0); }
-.maid-iconbtn {
-	height: 30px;
-	width: 38px;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	border-radius: 8px;
-	border: 1px solid #d0d7de;
-	background: #ffffff;
-	color: #24292f;
-	transition: all .15s ease;
-}
-.maid-iconbtn:hover { background: #f6f8fa; transform: translateY(-1px); }
-.maid-iconbtn:active { transform: translateY(0); }
-.maid-iconbtn img { width: 18px; height: 18px; display: block; }
-.maid-iconbtn:disabled,
-.maid-toggle:disabled { opacity: .55; cursor: not-allowed; transform: none; }
-.maid-iconbtn-active { background: #ebf8f5; border-color: #9fe3d2; }
-.maid-emotion-panel {
-	position: absolute;
-	min-width: 220px;
-	padding: 8px;
-	background: rgba(255,255,255,0.95);
-	-webkit-backdrop-filter: blur(8px) saturate(140%);
-	backdrop-filter: blur(8px) saturate(140%);
-	border: 1px solid rgba(208,215,222,0.9);
-	border-radius: 8px;
-	box-shadow: 0 6px 20px rgba(0,0,0,0.12);
-	z-index: 10010; /* above canvas and controls */
-}
-.maid-emotion-panel-left { left: 0; top: 50%; bottom: auto; transform: translateX(calc(-100% - 8px)) translateY(-50%); }
-/* 改为面板内部浮层：位于左内侧，控制条上方 */
-.maid-emotion-panel-in { left: 12px; right: auto; top: auto; bottom: calc(var(--maid-bar-h) + 12px); transform: none; }
-.maid-emotion-list { margin: 0; padding: 4px; list-style: none; max-height: 220px; overflow: auto; display: flex; flex-direction: column; gap: 6px; -ms-overflow-style: none; }
-.maid-emotion-list::-webkit-scrollbar { width: 0; height: 0; }
-.maid-emotion-item { width: 100%; text-align: left; padding: 6px 8px; border: 1px solid #d0d7de; background: #fff; border-radius: 6px; font-size: 12px; color: #24292f; transition: all .12s ease; }
-.maid-emotion-item:hover { background: #f6f8fa; transform: translateY(-1px); }
-.maid-emotion-item:active { transform: translateY(0); }
-.maid-emotion-item.active { background: #ebf8f5; border-color: #9fe3d2; }
-.maid-section-title { margin: 6px 4px 4px; font-size: 12px; font-weight: 600; color: #334155; }
-.maid-status,
-.maid-error {
-	position: absolute;
-	left: 12px;
-	bottom: calc(var(--maid-bar-h) + 8px);
-	padding: 4px 8px;
-	font-size: 12px;
-	border-radius: 6px;
-	background: rgba(255,255,255,0.9);
-	border: 1px solid #d0d7de;
-	color: #24292f;
-	z-index: 52;
-}
-.maid-error { color: #b42318; background: #fee4e2; border-color: #fecdca; }
-.maid-range { width: 120px; accent-color: #40c2a4; }
-.maid-loading-overlay {
-	position: absolute;
-	left: 12px;
-	right: 12px;
-	top: 12px;
-	bottom: calc(var(--maid-bar-h) + 12px);
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	gap: 10px;
-	background: rgba(255,255,255,0.55);
-	-webkit-backdrop-filter: blur(4px) saturate(140%);
-	backdrop-filter: blur(4px) saturate(140%);
-	z-index: 60;
-	transform-origin: bottom center;
-	transition: none;
-}
-.maid-spinner {
-	width: 36px;
-	height: 36px;
-	border-radius: 50%;
-	border: 3px solid rgba(64, 194, 164, 0.25);
-	border-top-color: #40c2a4;
-	animation: maid-spin 0.9s linear infinite;
-}
-@keyframes maid-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-.maid-loading-text { font-size: 12px; color: #374151; }
-.maid-settings-panel {
-	position: absolute;
-	left: 0;
-	right: 0;
-	top: var(--maid-header-h);
-	bottom: 0;
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-	gap: 16px;
-	padding: 10px 12px;
-	background: rgba(255, 255, 255, 0.9);
-	border: none;
-	color: #24292f;
-	z-index: 300; /* above chat and canvas */
-	transform: none;
-	transition: none;
-}
-.maid-settings-panel .maid-field { width: 100%; }
-@media (max-width: 480px) {
-	.maid-widget { width: 260px; height: 360px; right: 12px; bottom: 12px; }
-}
-@media (max-width: 360px) {
-	.maid-widget { width: 220px; height: 320px; right: 10px; bottom: 10px; }
-}
-.maid-widget.maid-anim-collapsing-stage .maid-canvas-wrap { animation: maid-stage-collapse var(--maid-stage-collapse) ease forwards; }
-@keyframes maid-stage-collapse { 0% { clip-path: inset(0 0 0 0); opacity: 1; } 100% { clip-path: inset(0 0 100% 0); opacity: 0; } }
-.maid-widget.maid-anim-collapsing-controls .maid-controlbar .maid-btn:not(.maid-toggle) { animation: maid-btn-collapse var(--maid-btn-collapse-duration) ease forwards; animation-delay: calc(var(--i) * var(--maid-btn-stagger)); }
-@keyframes maid-btn-collapse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(.6); opacity: 0; } }
-.maid-widget.maid-anim-expanding-controls .maid-controlbar .maid-btn:not(.maid-toggle) { animation: maid-btn-expand var(--maid-btn-expand-duration) cubic-bezier(.22,.8,.3,1) forwards; animation-delay: calc((var(--btnCount) - 1 - var(--i)) * var(--maid-btn-stagger)); }
-@keyframes maid-btn-expand { 0% { transform: scale(.6); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-.maid-widget.maid-anim-expanding-stage .maid-canvas-wrap { animation: maid-stage-expand var(--maid-stage-expand) ease forwards; }
-@keyframes maid-stage-expand { 0% { clip-path: inset(100% 0 0 0); opacity: 0; } 100% { clip-path: inset(0 0 0 0); opacity: 1; } }
-.maid-widget.maid-anim-expanding-stage .maid-canvas-wrap,
-.maid-widget.maid-anim-expanding-stage .maid-loading-overlay { visibility: visible; }
-.maid-widget.maid-collapsed .maid-controlbar .maid-btn:not(.maid-toggle) { opacity: 0; transform: scale(.6); pointer-events: none; }
-.maid-widget.maid-collapsed .maid-controlbar { justify-content: flex-start; }
-.maid-widget.maid-collapsed {
-	/* 面板整体滑出视口，仅保留右侧的拉手按钮 */
-	transform: translateX(100%);
+height: var(--maid-bar-h);
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 16px;
+padding: 0 20px;
+z-index: 60;
+    background: rgba(255,255,255,0.6);
 }
 
-/* 当导航栏收起（BannerNavbar 给 html 加上 banner-is-hidden）时，让助手面板占满整个视窗高度 */
-html.banner-is-hidden .maid-widget {
-	top: 0;
-	height: 100vh;
+/* AI Chat Panel Styles */
+.maid-ai-header { 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    padding: 12px 16px; 
+    border-bottom: 1px solid rgba(0,0,0,0.06); 
+    font-size: 14px; 
+    font-weight: 600;
+    color: #444;
+    background: rgba(255,255,255,0.6);
 }
 
-/* AI 聊天面板样式 */
-.maid-ai-panel {
-	position: relative;
-	width: 100%;
-	height: 100%;
-	background: rgba(255,255,255,0.95);
-	border: 1px solid rgba(208,215,222,0.9);
-	border-radius: 10px;
-	box-shadow: 0 8px 30px rgba(0,0,0,0.15);
-	display: flex;
-	flex-direction: column;
-	z-index: 220;
-	overflow: hidden;
+.maid-ai-messages { 
+    padding: 16px; 
+    overflow-y: auto; 
+    flex: 1 1 auto; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 16px; 
+    min-height: 0; 
+    background: transparent;
 }
-.maid-ai-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-bottom: 1px solid rgba(0,0,0,0.04); font-size: 13px; background: linear-gradient(90deg, #f8fafc, #ffffff); }
-.maid-ai-messages { padding: 8px; overflow: auto; flex: 1 1 auto; display: flex; flex-direction: column; gap: 8px; min-height: 0; background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%); }
-/* 隐藏聊天滚动条（仍可滚动） */
-.maid-ai-messages { -ms-overflow-style: none; }
-.maid-ai-messages::-webkit-scrollbar { width: 0; height: 0; }
-.maid-ai-msg { max-width: 86%; }
-.maid-ai-msg.user { align-self: flex-end; text-align: right; }
-.maid-ai-msg.assistant { align-self: flex-start; text-align: left; }
-.maid-ai-msg-text { padding: 8px 10px; border-radius: 8px; background: #fff; border: 1px solid #e6eef6; font-size: 13px; color: #111827; }
-.maid-ai-msg.user .maid-ai-msg-text { background: #ebf8f5; border-color: #9fe3d2; }
-.maid-ai-msg-actions { display: flex; justify-content: flex-end; gap: 6px; margin: 0 4px 4px; }
-.maid-copy-msg-btn,
-.maid-copy-btn {
-	position: absolute;
-	right: 8px;
-	top: 8px;
-	z-index: 2;
-	display: inline-flex;
-	align-items: center;
-	gap: 6px;
-	padding: 4px 8px;
-	border-radius: 6px;
-	border: 1px solid #d0d7de;
-	background: rgba(255,255,255,0.92);
-	color: #111827;
-	font-size: 12px;
-	line-height: 1;
-	box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-}
-.maid-copy-msg-btn { position: static; }
-.maid-copy-btn:hover,
-.maid-copy-msg-btn:hover { background: #f6f8fa; transform: translateY(-1px); }
-.maid-copy-btn:active,
-.maid-copy-msg-btn:active { transform: translateY(0); }
-.maid-copy-icon { display: inline-block; width: 14px; height: 14px; background: currentColor; -webkit-mask: url('/icons/maid/copy.svg') no-repeat center/contain; mask: url('/icons/maid/copy.svg') no-repeat center/contain; }
-.maid-codeblock-wrap { position: relative; }
-.maid-ai-input-row { display: flex; gap: 8px; padding: 8px; border-top: 1px solid rgba(0,0,0,0.04); background: #0f172a; }
-.maid-input-wrap { position: relative; flex: 1 1 auto; }
-.maid-ai-input { width: 100%; padding: 12px 48px 12px 12px; border-radius: 12px; border: 1px solid #475569; font-size: 13px; color: #e5e7eb; background: #0f172a; }
-.maid-input-actions { position: absolute; right: 10px; bottom: 10px; display: inline-flex; align-items: center; gap: 8px; }
-.maid-send-btn { width: 32px; height: 32px; border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid #334155; background: #1f2937; color: #e5e7eb; }
-.maid-send-btn:hover { background: #374151; }
-.maid-send-icon { display: inline-block; width: 16px; height: 16px; background: #3b82f6; border-radius: 50%; -webkit-mask: url('/icons/maid/send.svg') no-repeat center/contain; mask: url('/icons/maid/send.svg') no-repeat center/contain; }
-.maid-stop-img { width: 16px; height: 16px; display: inline-block; filter: brightness(1) saturate(1); }
-.maid-ai-error { padding: 6px 10px; color: #b42318; background: #fff5f5; border-top: 1px solid rgba(0,0,0,0.03); font-size: 12px; }
-.maid-ai-sending { font-size: 12px; color: #374151; margin-right: 8px; }
 
-/* 收起时露出的侧边小按钮（贴在 Maid 右缘外侧） */
+.maid-ai-messages::-webkit-scrollbar { width: 6px; }
+.maid-ai-messages::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 3px; }
+.maid-ai-messages::-webkit-scrollbar-track { background: transparent; }
+
+.maid-ai-msg { 
+    max-width: 90%; 
+    display: flex;
+    flex-direction: column;
+    animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.maid-ai-msg.user { align-self: flex-end; align-items: flex-end; }
+.maid-ai-msg.assistant { align-self: flex-start; align-items: flex-start; }
+
+.maid-ai-msg-text { 
+    padding: 10px 14px; 
+    border-radius: 12px; 
+    font-size: 14px; 
+    line-height: 1.6;
+    position: relative;
+    word-break: break-word;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.maid-ai-msg.user .maid-ai-msg-text { 
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); 
+    color: #fff; 
+    border-bottom-right-radius: 2px;
+}
+
+.maid-ai-msg.assistant .maid-ai-msg-text { 
+    background: #fff; 
+    color: #333; 
+    border: 1px solid rgba(0,0,0,0.05);
+    border-bottom-left-radius: 2px;
+}
+
+.maid-ai-msg-actions { 
+    display: flex; 
+    gap: 6px; 
+    margin-bottom: 4px; 
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+.maid-ai-msg:hover .maid-ai-msg-actions { opacity: 1; }
+
+.maid-copy-msg-btn {
+    background: rgba(255,255,255,0.8);
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 10px;
+    cursor: pointer;
+    color: #666;
+}
+
+.maid-ai-input-row { 
+    padding: 12px 16px; 
+    border-top: 1px solid rgba(0,0,0,0.06); 
+    background: rgba(255,255,255,0.6);
+}
+
+.maid-input-wrap { 
+    position: relative; 
+    width: 100%; 
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    border: 1px solid rgba(0,0,0,0.08);
+    transition: all 0.3s;
+}
+.maid-input-wrap:focus-within {
+    box-shadow: 0 4px 16px rgba(99,102,241,0.15);
+    border-color: rgba(99,102,241,0.3);
+}
+
+.maid-ai-input { 
+    width: 100%; 
+    padding: 12px 48px 12px 16px; 
+    border: none; 
+    background: transparent;
+    font-size: 14px; 
+    color: #333; 
+    resize: none;
+    outline: none;
+    min-height: 44px;
+    max-height: 120px;
+    border-radius: 20px;
+}
+
+.maid-input-actions { 
+    position: absolute; 
+    right: 8px; 
+    bottom: 6px; 
+}
+
+.maid-send-btn { 
+    width: 32px; 
+    height: 32px; 
+    border-radius: 50%; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    border: none; 
+    background: #6366f1; 
+    color: #fff; 
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 6px rgba(99,102,241,0.3);
+}
+.maid-send-btn:hover { background: #4f46e5; transform: scale(1.05); }
+.maid-send-btn:disabled { background: #ccc; cursor: not-allowed; box-shadow: none; }
+
+.maid-send-icon { 
+    width: 16px; 
+    height: 16px; 
+    background: #fff; 
+    -webkit-mask: url("/icons/maid/send.svg") no-repeat center/contain; 
+    mask: url("/icons/maid/send.svg") no-repeat center/contain; 
+}
+
 .maid-expand-handle {
-	position: fixed;
-	top: 50%;
-	right: 0; /* 永远贴在窗口最右侧 */
-	transform: translateY(-50%);
-	z-index: 20;
-	background: #fff;
-	border: 1px solid rgba(0,0,0,0.12);
-	border-radius: 10px 0 0 10px;
-	width: 32px;
-	height: 64px;
-	padding: 0;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+position: fixed;
+top: 50%;
+right: 0;
+transform: translateY(-50%);
+z-index: 20;
+background: #fff;
+border: 1px solid rgba(0,0,0,0.1);
+border-radius: 12px 0 0 12px;
+width: 36px;
+height: 72px;
+display: flex;
+align-items: center;
+justify-content: center;
+box-shadow: -4px 0 20px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: all 0.3s;
 }
-.maid-expand-handle img { width: 20px; height: 20px; display: block; }
-.maid-expand-handle:hover { transform: translateY(-50%) scale(1.03); }
+.maid-expand-handle:hover { width: 42px; background: #f8faff; }
 
-/* 收起时隐藏主面板内容（header 仍可见一条窄边） */
+.maid-widget.maid-collapsed { transform: translateX(100%); }
 .maid-widget.maid-collapsed .maid-ai-panel { display: none !important; }
+
+html.banner-is-hidden .maid-widget { top: 0; height: 100vh; }

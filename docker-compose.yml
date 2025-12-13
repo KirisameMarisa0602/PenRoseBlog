@@ -13,6 +13,11 @@ services:
       - "127.0.0.1:3306:3306"
     networks:
       - blog-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-20050602}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     restart: always
 
   redis:
@@ -20,18 +25,28 @@ services:
     container_name: blog-redis
     networks:
       - blog-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     restart: always
 
   rabbitmq:
     image: rabbitmq:3-management
     container_name: blog-rabbitmq
     ports:
-      - "15672:15672" # Management UI
+      - "15672:15672"
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-guest}
     networks:
       - blog-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     restart: always
 
   backend:
@@ -44,13 +59,24 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:-20050602}
       RABBITMQ_USER: ${RABBITMQ_USER:-guest}
       RABBITMQ_PASS: ${RABBITMQ_PASS:-guest}
+      RABBITMQ_EXCHANGE: ${RABBITMQ_EXCHANGE}
       JWT_SECRET: ${JWT_SECRET}
+      COS_SECRET_ID: ${COS_SECRET_ID}
+      COS_SECRET_KEY: ${COS_SECRET_KEY}
+      COS_BUCKET_REGION: ${COS_BUCKET_REGION}
+      COS_BUCKET_NAME: ${COS_BUCKET_NAME}
+      COS_CDN_URL: ${COS_CDN_URL}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY}
+      DEEPSEEK_API_BASE_URL: ${DEEPSEEK_API_BASE_URL}
     volumes:
-      - ./sources:/app/sources # Mount local sources to container
+      - ./sources:/app/sources
     depends_on:
-      - mysql
-      - redis
-      - rabbitmq
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     networks:
       - blog-network
     restart: always
@@ -61,8 +87,8 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./sources:/app/sources # User uploads
-      - ./site_assets:/app/site_assets # Static site assets
+      - ./sources:/app/sources 
+      - ./site_assets:/app/site_assets 
     depends_on:
       - backend
     networks:

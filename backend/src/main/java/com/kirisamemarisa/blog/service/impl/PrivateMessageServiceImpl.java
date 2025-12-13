@@ -9,7 +9,6 @@ import com.kirisamemarisa.blog.repository.PrivateMessageRepository;
 import com.kirisamemarisa.blog.service.FollowService;
 import com.kirisamemarisa.blog.service.FriendService;
 import com.kirisamemarisa.blog.service.PrivateMessageService;
-import com.kirisamemarisa.blog.service.BlockService;
 import com.kirisamemarisa.blog.events.MessageEventPublisher;
 import com.kirisamemarisa.blog.service.PrivateMessageDtoService;
 import com.kirisamemarisa.blog.dto.PrivateMessageDTO;
@@ -27,20 +26,17 @@ public class PrivateMessageServiceImpl implements PrivateMessageService {
     private static final Logger logger = LoggerFactory.getLogger(PrivateMessageServiceImpl.class);
     private final PrivateMessageRepository messageRepository;
     private final FollowService followService;
-    private final BlockService blockService;
     private final FriendService friendService;
     private final MessageEventPublisher publisher;
     private final PrivateMessageDtoService dtoService;
 
     public PrivateMessageServiceImpl(PrivateMessageRepository messageRepository,
             FollowService followService,
-            BlockService blockService,
             FriendService friendService,
             MessageEventPublisher publisher,
             PrivateMessageDtoService dtoService) {
         this.messageRepository = messageRepository;
         this.followService = followService;
-        this.blockService = blockService;
         this.friendService = friendService;
         this.publisher = publisher;
         this.dtoService = dtoService;
@@ -48,10 +44,7 @@ public class PrivateMessageServiceImpl implements PrivateMessageService {
 
     @Override
     public PrivateMessage sendText(User sender, User receiver, String text) {
-        // 拦截：如果 sender 被 receiver 拉黑，则禁止发送
-        if (blockService != null && blockService.isBlocked(receiver, sender)) {
-            throw new IllegalStateException("对方已将你拉黑，无法发送私信。");
-        }
+        // 拉黑功能移除：不进行拦截
 
         PrivateMessage msg = new PrivateMessage();
         msg.setSender(sender);
@@ -81,10 +74,7 @@ public class PrivateMessageServiceImpl implements PrivateMessageService {
     @Override
     public PrivateMessage sendMedia(User sender, User receiver, PrivateMessage.MessageType type, String mediaUrl,
             String caption) {
-        // 拦截：如果 sender 被 receiver 拉黑，则禁止发送
-        if (blockService != null && blockService.isBlocked(receiver, sender)) {
-            throw new IllegalStateException("对方已将你拉黑，无法发送私信。");
-        }
+        // 拉黑功能移除：不进行拦截
 
         if (!canSendMedia(sender, receiver)) {
             throw new IllegalStateException("发送媒体需互相关注或对方已回复。");
@@ -169,5 +159,17 @@ public class PrivateMessageServiceImpl implements PrivateMessageService {
             throw new IllegalStateException("无权删除此消息");
         }
         messageRepository.save(msg);
+    }
+
+    @Override
+    public long countUnreadTotal(Long userId) {
+        if (userId == null) return 0L;
+        return messageRepository.countUnreadTotal(userId);
+    }
+
+    @Override
+    public int markConversationRead(Long otherUserId, Long meUserId) {
+        if (otherUserId == null || meUserId == null) return 0;
+        return messageRepository.markConversationRead(otherUserId, meUserId);
     }
 }

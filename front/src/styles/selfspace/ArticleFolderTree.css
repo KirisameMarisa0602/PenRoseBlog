@@ -1,0 +1,342 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono&display=swap');
+
+.folder-tree-container {
+    width: 100%;
+    margin: 0 auto;
+    font-family: 'Space Mono', monospace;
+}
+
+.folder-node {
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+}
+
+/* =========================================
+   Level 0: Root (My Articles)
+   Style: Bold, Boxed, Accordion-like
+   ========================================= */
+.folder-node.level-0>.folder-header {
+    display: flex;
+    width: 100%;
+    height: 50px;
+    cursor: pointer;
+    border: 3px solid #3E474F;
+    -webkit-user-select: none;
+    user-select: none;
+    background-color: #fff;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.3s ease;
+    color: #3E474F;
+    position: relative;
+    z-index: 2;
+}
+
+.folder-node.level-0>.folder-header:hover {
+    background-color: #f5f5f5;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 0 rgba(62, 71, 79, 0.2);
+}
+
+/* =========================================
+   Level 1: Status (Published, Drafts)
+   Style: Similar to Level 0 but slightly indented or distinct
+   ========================================= */
+.folder-node.level-1>.folder-header {
+    display: flex;
+    width: 100%;
+    height: 48px;
+    cursor: pointer;
+    border: 2px solid #5D6D7E;
+    /* Slightly thinner border */
+    -webkit-user-select: none;
+    user-select: none;
+    background-color: #fff;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.3s ease;
+    color: #5D6D7E;
+    position: relative;
+    z-index: 2;
+}
+
+.folder-node.level-1>.folder-header:hover {
+    background-color: #f5f5f5;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 0 rgba(93, 109, 126, 0.2);
+}
+
+/* Level 1 Variations */
+.folder-children>.folder-node:nth-child(1).level-1>.folder-header {
+    border-color: #3E474F;
+    color: #3E474F;
+}
+
+.folder-children>.folder-node:nth-child(2).level-1>.folder-header {
+    border-color: #5D6D7E;
+    color: #5D6D7E;
+}
+
+.folder-children>.folder-node:nth-child(2).level-1>.folder-header .folder-cross::before,
+.folder-children>.folder-node:nth-child(2).level-1>.folder-header .folder-cross::after {
+    border-top-color: #5D6D7E;
+}
+
+
+/* =========================================
+   Level 2: Categories
+   Style: Card-like, Left-Border Accent
+   ========================================= */
+.folder-node.level-2 {
+    margin-bottom: 8px;
+}
+
+.folder-node.level-2>.folder-header {
+    display: flex;
+    width: 100%;
+    height: 45px;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-left-width: 5px;
+    /* Accent */
+    border-radius: 0 4px 4px 0;
+    transition: all 0.2s ease;
+    padding-right: 10px;
+}
+
+.folder-node.level-2>.folder-header:hover {
+    background-color: #fafafa;
+    transform: translateX(5px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Level 2 Color Variations (Cycling) */
+.folder-children>.folder-node:nth-child(5n+1).level-2>.folder-header {
+    border-left-color: #FF6B6B;
+    color: #2C3E50;
+}
+
+.folder-children>.folder-node:nth-child(5n+2).level-2>.folder-header {
+    border-left-color: #4ECDC4;
+    color: #2C3E50;
+}
+
+.folder-children>.folder-node:nth-child(5n+3).level-2>.folder-header {
+    border-left-color: #FFE66D;
+    color: #2C3E50;
+}
+
+.folder-children>.folder-node:nth-child(5n+4).level-2>.folder-header {
+    border-left-color: #1A535C;
+    color: #2C3E50;
+}
+
+.folder-children>.folder-node:nth-child(5n+5).level-2>.folder-header {
+    border-left-color: #FF9F1C;
+    color: #2C3E50;
+}
+
+/* =========================================
+   Level 3+: Subdirectories
+   Style: Minimal, Text-based
+   ========================================= */
+.folder-node.level-3>.folder-header,
+.folder-node.level-4>.folder-header {
+    display: flex;
+    width: 100%;
+    height: 40px;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+    align-items: center;
+    justify-content: space-between;
+    color: #7f8c8d;
+    border-bottom: 1px dashed #eee;
+    transition: color 0.2s;
+}
+
+.folder-node.level-3>.folder-header:hover {
+    color: #3E474F;
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* Level 3 Variations - Alternating backgrounds slightly */
+.folder-children>.folder-node:nth-child(odd).level-3>.folder-header {
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+.folder-children>.folder-node:nth-child(even).level-3>.folder-header {
+    background-color: rgba(245, 245, 245, 0.5);
+}
+
+
+/* =========================================
+   Common Elements
+   ========================================= */
+.folder-name {
+    line-height: 1.5;
+    margin-left: 10px;
+    font-size: 1em;
+    flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.folder-cross {
+    margin-right: 15px;
+    position: relative;
+    width: 20px;
+    /* Increased size */
+    height: 20px;
+    /* Increased size */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* Bouncy effect */
+}
+
+.folder-cross::before,
+.folder-cross::after {
+    content: '';
+    position: absolute;
+    border-top: 3px solid currentColor;
+    /* Thicker lines */
+    width: 20px;
+    /* Match container width */
+    display: block;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* Bouncy effect */
+    border-radius: 2px;
+    /* Soften edges */
+}
+
+.folder-cross::after {
+    transform: rotate(90deg);
+}
+
+/* Expanded state for cross */
+.folder-node.expanded>.folder-header .folder-cross {
+    transform: rotate(90deg);
+    /* Rotate the whole container for extra movement */
+}
+
+.folder-node.expanded>.folder-header .folder-cross::before {
+    transform: rotate(180deg);
+    opacity: 0;
+    /* Fade out one line to make it a minus */
+}
+
+.folder-node.expanded>.folder-header .folder-cross::after {
+    transform: rotate(0deg);
+    /* This becomes the minus sign */
+}
+
+/* Children container */
+.folder-children {
+    box-sizing: border-box;
+    font-size: 0.9em;
+    margin: 5px 0 15px 0;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(-10px);
+    /* Slide down effect start */
+    transition:
+        max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.2s ease-out,
+        transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: top;
+    will-change: max-height, opacity, transform;
+}
+
+.folder-node.expanded>.folder-children {
+    max-height: 2000px;
+    opacity: 1;
+    transform: translateY(0);
+    /* Slide down effect end */
+    transition:
+        max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.3s ease-in,
+        transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Click feedback for header */
+.folder-header:active {
+    transform: scale(0.99);
+    /* Slight press effect */
+    background-color: #f0f0f0;
+}
+
+/* Icon specific click feedback */
+.folder-cross {
+    cursor: pointer;
+    padding: 10px;
+    /* Increase hit area */
+    margin: -10px;
+    /* Compensate for padding */
+    margin-right: 5px;
+    /* Adjust spacing */
+    z-index: 10;
+    border-radius: 50%;
+    /* Circular hit area */
+}
+
+.folder-cross:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    /* Hover effect for icon */
+}
+
+.folder-cross:active {
+    transform: scale(0.9);
+    /* Press effect for icon */
+}
+
+/* Expanded state for cross - override active scale if needed or combine */
+.folder-node.expanded>.folder-header .folder-cross {
+    transform: rotate(90deg);
+}
+
+.folder-node.expanded>.folder-header .folder-cross:active {
+    transform: rotate(90deg) scale(0.9);
+}
+
+/* Special handling for Level 0 children container */
+.folder-node.level-0.expanded>.folder-children {
+    border-top: none;
+    margin-top: 15px;
+    padding: 0 10px;
+    /* Add padding to indent children visually inside the "box" if we wanted, but here we just space them */
+}
+
+/* File nodes (Articles) */
+.folder-file-node {
+    margin: 5px 0;
+}
+
+.tree-article-card {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 10px;
+    border: 1px solid #eee;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    background: #fff;
+    border-radius: 8px;
+}
+
+.tree-article-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Leaf node specific styling */
+.folder-node.is-leaf .folder-cross {
+    display: none;
+}

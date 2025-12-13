@@ -1,12 +1,12 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import ArticleCard from '@components/common/ArticleCard';
-import './ArticleFolderTree.css';
+import '@styles/selfspace/ArticleFolderTree.css';
 
 // Helper to build tree from posts
 const buildTree = (posts) => {
-  const root = { 
-    name: '我的文章', 
-    path: 'root', 
+  const root = {
+    name: '我的文章',
+    path: 'root',
     type: 'folder',
     children: {
       published: {
@@ -27,10 +27,10 @@ const buildTree = (posts) => {
   posts.forEach(post => {
     const isDraft = post.status === 'DRAFT';
     const statusNode = isDraft ? root.children.drafts : root.children.published;
-    
+
     const category = post.categoryName || '未分类';
     const categoryPath = `${statusNode.path}/${category}`;
-    
+
     if (!statusNode.children[category]) {
       statusNode.children[category] = {
         name: category,
@@ -39,14 +39,14 @@ const buildTree = (posts) => {
         children: {}
       };
     }
-    
+
     let current = statusNode.children[category];
     let currentPath = categoryPath;
-    
+
     // Handle directory path
     if (post.directory) {
       const parts = post.directory.split('/');
-      
+
       parts.forEach(part => {
         currentPath = `${currentPath}/${part}`;
         if (!current.children[part]) {
@@ -77,7 +77,7 @@ const buildTree = (posts) => {
 const FolderNode = ({ node, onSelect, selectedPath, level = 0, onDelete }) => {
   const hasChildren = node.children && Object.keys(node.children).length > 0;
   const [expanded, setExpanded] = useState(false);
-  
+
   // Auto-expand if a child is selected or if this node is selected
   useEffect(() => {
     if (selectedPath && selectedPath.startsWith(node.path)) {
@@ -118,28 +118,28 @@ const FolderNode = ({ node, onSelect, selectedPath, level = 0, onDelete }) => {
 
   return (
     <div className={`folder-node level-${level} ${expanded ? 'expanded' : ''} ${!hasChildren ? 'is-leaf' : ''}`}>
-      <div 
-        className={`folder-header ${isSelected ? 'active' : ''}`} 
+      <div
+        className={`folder-header ${isSelected ? 'active' : ''}`}
         onClick={handleHeaderClick}
       >
         <div className="folder-name">{node.name}</div>
         {hasChildren && (
-          <div 
-            className="folder-cross" 
+          <div
+            className="folder-cross"
             onClick={handleIconClick}
             role="button"
             aria-label={expanded ? "Collapse" : "Expand"}
           ></div>
         )}
       </div>
-      
+
       {hasChildren && (
         <div className="folder-children">
           {Object.values(node.children).map(child => (
-            <FolderNode 
-              key={child.path} 
-              node={child} 
-              onSelect={onSelect} 
+            <FolderNode
+              key={child.path}
+              node={child}
+              onSelect={onSelect}
               selectedPath={selectedPath}
               level={level + 1}
               onDelete={onDelete}
@@ -162,9 +162,9 @@ export default function ArticleFolderTree({ posts, onDelete }) {
 
   return (
     <div className="folder-tree-container">
-      <FolderNode 
-        node={tree} 
-        onSelect={handleSelect} 
+      <FolderNode
+        node={tree}
+        onSelect={handleSelect}
         selectedPath={selectedPath}
         level={0}
         onDelete={onDelete}
