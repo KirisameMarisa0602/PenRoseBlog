@@ -1385,8 +1385,9 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                             {profile.qq && <div style={{ fontSize: '0.9rem', color: '#666', marginTop: '2px' }}>{profile.qq}</div>}
                           </div>
                           {profile.qqQrCode && (
-                            <div className="qr-preview-hover" style={{ position: 'relative', cursor: 'pointer' }}>
-                               <img src={resolveUrl('/icons/profile/qrcode_icon.svg')} alt="QR" style={{ width: '24px', height: '24px', opacity: 0.6 }} onError={(e) => { e.target.onerror = null; e.target.src = resolveUrl('/imgs/loginandwelcomepanel/1.png'); }} />
+                            <div className="qr-preview-hover" style={{ position: 'relative', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                               <span style={{ fontSize: '12px', color: '#999', marginRight: '8px' }}>二维码</span>
+                               <img src={resolveUrl(profile.qqQrCode)} alt="QR" style={{ width: '32px', height: '32px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #eee' }} />
                                <div className="qr-popup" style={{ 
                                  position: 'absolute', 
                                  right: '0', 
@@ -1427,8 +1428,9 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                             {profile.wechat && <div style={{ fontSize: '0.9rem', color: '#666', marginTop: '2px' }}>{profile.wechat}</div>}
                           </div>
                           {profile.wechatQrCode && (
-                            <div className="qr-preview-hover" style={{ position: 'relative', cursor: 'pointer' }}>
-                               <img src={resolveUrl('/icons/profile/qrcode_icon.svg')} alt="QR" style={{ width: '24px', height: '24px', opacity: 0.6 }} onError={(e) => { e.target.onerror = null; e.target.src = resolveUrl('/imgs/loginandwelcomepanel/1.png'); }} />
+                            <div className="qr-preview-hover" style={{ position: 'relative', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                               <span style={{ fontSize: '12px', color: '#999', marginRight: '8px' }}>二维码</span>
+                               <img src={resolveUrl(profile.wechatQrCode)} alt="QR" style={{ width: '32px', height: '32px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #eee' }} />
                                <div className="qr-popup" style={{ 
                                  position: 'absolute', 
                                  right: '0', 
@@ -1444,6 +1446,9 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                                }}>
                                  <img src={resolveUrl(profile.wechatQrCode)} alt="WeChat QR" style={{ width: '150px', height: '150px', objectFit: 'contain', display: 'block' }} />
                                </div>
+                               <style>{`
+                                 .qr-preview-hover:hover .qr-popup { display: block !important; }
+                               `}</style>
                             </div>
                           )}
                         </div>

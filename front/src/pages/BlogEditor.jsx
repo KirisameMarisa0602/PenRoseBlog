@@ -259,7 +259,8 @@ const BlogEditor = () => {
 
     try {
       const url = editId ? `/blogpost/${editId}/withcover` : '/blogpost/withcover';
-      const method = editId ? 'put' : 'post';
+      // Use POST for both create and update to avoid issues with multipart/form-data in PUT requests
+      const method = 'post';
 
       const res = await httpClient[method](url, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -634,8 +635,8 @@ const BlogEditor = () => {
       <div className="blog-editor-body">
         {/* Left Sidebar: Outline & Resources */}
         <div className="blog-editor-left-sidebar">
-           <SidebarAccordion title="文章大纲" defaultOpen={true}>
-              <div className="sidebar-helper-text" style={{ maxHeight: '300px', overflowY: 'auto' }}>
+           <SidebarAccordion title="文章大纲" defaultOpen={true} className="flex-module outline-module">
+              <div className="sidebar-helper-text outline-list-container">
                  {outline.length > 0 ? (
                    <div className="outline-list">
                      {outline.map((item, idx) => (
@@ -654,7 +655,7 @@ const BlogEditor = () => {
               </div>
            </SidebarAccordion>
 
-           <SidebarAccordion title={<span>资源管理 <small style={{fontSize: '11px', color: '#94a3b8', fontWeight: 'normal', marginLeft: '4px'}}>拖动可调整位置</small></span>} defaultOpen={true}>
+           <SidebarAccordion title={<span>资源管理 <small style={{fontSize: '11px', color: '#94a3b8', fontWeight: 'normal', marginLeft: '4px'}}>拖动可调整位置</small></span>} defaultOpen={true} className="flex-module resource-module">
               <ResourceManager 
                 content={content} 
                 editorMode={editorMode} 

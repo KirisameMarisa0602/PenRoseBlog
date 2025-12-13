@@ -301,7 +301,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  overflow-y: auto;
+  overflow: hidden; /* Changed from overflow-y: auto to hidden to allow children to scroll */
   min-width: 0;
 }
 

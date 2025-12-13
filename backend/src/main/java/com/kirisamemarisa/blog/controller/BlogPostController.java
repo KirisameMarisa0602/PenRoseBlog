@@ -130,7 +130,7 @@ public class BlogPostController {
         return blogPostService.createWithCover(title, content, userId, directory, categoryName, tags, status, cover);
     }
 
-    @PutMapping("/{id}/withcover")
+    @PostMapping("/{id}/withcover")
     public ApiResponse<Boolean> updateWithCover(@PathVariable Long id,
             @RequestParam(value = "content", required = false) String content,
             @RequestParam(value = "directory", required = false) String directory,

@@ -328,8 +328,10 @@ public class BlogPostServiceImpl implements BlogPostService {
 
         String statusFilter = "PUBLISHED";
         if (userId != null && currentUserId != null && userId.longValue() == currentUserId.longValue()) {
-            // 只有当明确指定了状态时才使用指定状态，否则默认只查已发布
-            if (status != null && !status.isEmpty()) {
+            // 如果是作者本人查看，且未指定状态，则查看所有状态（包括草稿）
+            if (status == null || status.isEmpty()) {
+                statusFilter = null;
+            } else {
                 statusFilter = status;
             }
         }
@@ -750,8 +752,8 @@ public class BlogPostServiceImpl implements BlogPostService {
         java.util.regex.Matcher mdMatcher = mdPattern.matcher(content);
         while (mdMatcher.find()) {
             String url = mdMatcher.group(1);
-            // 简单过滤，只提取本站 COS 的链接 (包含 sources/)
-            if (url != null && url.contains("sources/")) {
+            // 简单过滤，只提取本站 COS 的链接 (包含 sources/ 或 blogpostcontent/)
+            if (url != null && (url.contains("sources/") || url.contains("blogpostcontent/"))) {
                 // 可能包含 title，如 "url \"title\""
                 int spaceIndex = url.indexOf(" ");
                 if (spaceIndex != -1) {
@@ -767,7 +769,7 @@ public class BlogPostServiceImpl implements BlogPostService {
         java.util.regex.Matcher htmlMatcher = htmlPattern.matcher(content);
         while (htmlMatcher.find()) {
             String url = htmlMatcher.group(1);
-            if (url != null && url.contains("sources/")) {
+            if (url != null && (url.contains("sources/") || url.contains("blogpostcontent/"))) {
                 urls.add(url);
             }
         }
