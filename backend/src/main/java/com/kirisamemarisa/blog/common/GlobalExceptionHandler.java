@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.List;
@@ -48,6 +49,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ApiResponse<Void> handleIllegalArgumentException(IllegalArgumentException ex) {
         return new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), null);
+    }
+
+    // 文件上传大小超限异常
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ApiResponse<Void> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException ex) {
+        return new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), "文件大小超过限制 (128MB)", null);
     }
 
     // 未知异常统一处理

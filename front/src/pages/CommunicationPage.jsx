@@ -851,10 +851,11 @@ export default function CommunicationPage() {
             // Start background upload
             uploadAndSendMedia({
                 file,
-                uploadUrl,
+                uploadUrl, // Legacy, kept for compatibility if needed
                 sendUrl,
                 sendBody,
-                headers
+                headers,
+                otherId // Pass otherId for presigned URL generation
             }).then(dto => {
                 // If user is still on this page, update the list optimistically or via result
                 if (dto && String(dto.receiverId) === String(otherId) || String(dto.senderId) === String(otherId)) {
@@ -865,6 +866,7 @@ export default function CommunicationPage() {
                 }
             }).catch(err => {
                 console.error('Background upload failed', err);
+                alert(err.message || '上传失败');
             });
             
         } catch (err) {

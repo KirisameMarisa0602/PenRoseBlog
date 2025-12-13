@@ -122,8 +122,7 @@ public class CosStorageServiceImpl implements FileStorageService {
         if (fileName != null && fileName.lastIndexOf(".") != -1) {
             ext = fileName.substring(fileName.lastIndexOf("."));
         }
-        // 保持与 storeMessageMedia 一致的路径结构:
-        // sources/messages/{senderId}-{receiverId}/{uuid}.ext
+        // 保持与 storeMessageMedia 一致的路径结构
         String key = "sources/messages/" + senderId + "-" + receiverId + "/" + UUID.randomUUID().toString() + ext;
 
         // 生成预签名 URL
@@ -134,19 +133,8 @@ public class CosStorageServiceImpl implements FileStorageService {
         Map<String, String> result = new HashMap<>();
         result.put("uploadUrl", url.toString());
 
-        // 计算最终访问 URL
-        String cdnUrl = cosProperties.getCdnUrl();
-        String publicUrl;
-        if (cdnUrl != null && !cdnUrl.isEmpty()) {
-            if (!cdnUrl.endsWith("/"))
-                cdnUrl += "/";
-            publicUrl = cdnUrl + key;
-        } else {
-            publicUrl = "https://" + cosProperties.getBucketName() + ".cos." + cosProperties.getRegion()
-                    + ".myqcloud.com/" + key;
-        }
-        result.put("publicUrl", publicUrl);
-
+        // 计算最终访问 URL (相对路径，由前端 resolveUrl 处理)
+        result.put("publicUrl", "/" + key);
         return result;
     }
 
