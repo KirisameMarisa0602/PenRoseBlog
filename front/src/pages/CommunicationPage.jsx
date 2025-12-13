@@ -10,6 +10,7 @@ import React, {
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import '@styles/message/ConversationDetail.css';
 import { useAuthState } from '@hooks/useAuthState';
+import { useGlobalUpload } from '@contexts/useGlobalUpload';
 import { fetchConversationDetail, fetchConversations } from '@utils/api/messageService';
 import { fetchFriendsList } from '@utils/api/friendService';
 import SimpleEmojiPicker from '@components/common/SimpleEmojiPicker';
@@ -56,9 +57,8 @@ export default function CommunicationPage() {
         return el.scrollHeight - el.scrollTop - el.clientHeight <= thresh;
     };
 
-    // 上传
-    const [uploading, setUploading] = useState(false);
-    const [uploadProgress, setUploadProgress] = useState(0);
+    // 上传 (Global)
+    const { uploadAndSendMedia } = useGlobalUpload();
     const imageInputRef = useRef(null);
     const videoInputRef = useRef(null);
 
@@ -831,130 +831,45 @@ export default function CommunicationPage() {
         }
     };
 
-    /** ---------------- 带进度上传 & 发送媒体 ---------------- */
-
-    const uploadFile = (file) => {
-        return new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            const form = new FormData();
-            form.append('file', file);
-            const oid = otherId ? String(otherId) : '';
-            
-            // 使用相对路径，通过 Vite 代理转发，避免 CORS 问题
-            const uploadUrl = oid
-                ? `/api/messages/upload?otherId=${encodeURIComponent(oid)}`
-                : `/api/messages/upload`;
-                
-            xhr.open('POST', uploadUrl);
-            if (userId) xhr.setRequestHeader('X-User-Id', userId);
-            try {
-                const token = typeof localStorage !== 'undefined' ? localStorage.getItem('token') : null;
-                if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-            } catch { /* ignore */ }
-
-            xhr.upload.onprogress = (e) => {
-                if (e.lengthComputable) {
-                    const p = Math.round((e.loaded / e.total) * 100);
-                    setUploadProgress(p);
-                }
-            };
-            xhr.onload = () => {
-                try {
-                    const res = JSON.parse(xhr.responseText || '{}');
-                    if (res && res.code === 200 && res.data) {
-                        resolve(res.data);
-                    } else {
-                        reject(new Error(res?.message || '上传失败'));
-                    }
-                } catch (err) {
-                    // 可按需记录日志，这里仅为满足 eslint，避免未使用变量
-                    void err;
-                    reject(new Error('上传响应解析失败'));
-                }
-            };
-            xhr.onerror = () => reject(new Error('网络错误，上传失败'));
-            xhr.send(form);
-        });
-    };
+    /** ---------------- 带进度上传 & 发送媒体 (Global) ---------------- */
 
     const handleFileChosen = async (e, type) => {
         const file = e.target.files && e.target.files[0];
         e.target.value = '';
         if (!file) return;
 
-        setUploading(true);
-        setUploadProgress(0);
+        const oid = otherId ? String(otherId) : '';
+        const uploadUrl = oid
+            ? `/messages/upload?otherId=${encodeURIComponent(oid)}`
+            : `/messages/upload`;
+        
+        const sendUrl = `/messages/media/${otherId}`;
+        const sendBody = { type, text: '' };
+        const headers = { 'X-User-Id': userId };
+
         try {
-            const url = await uploadFile(file);
-
-            const body = { type, mediaUrl: url, text: '' };
-            const res = await api.post(`/messages/media/${otherId}`, body, {
-                headers: { 'X-User-Id': userId }
+            // Start background upload
+            uploadAndSendMedia({
+                file,
+                uploadUrl,
+                sendUrl,
+                sendBody,
+                headers
+            }).then(dto => {
+                // If user is still on this page, update the list optimistically or via result
+                if (dto && String(dto.receiverId) === String(otherId) || String(dto.senderId) === String(otherId)) {
+                     // The global event 'pm-event' will likely trigger a refresh, 
+                     // but we can also manually update if we want instant feedback.
+                     // For now, we rely on the 'pm-event' dispatched by GlobalUploadContext or the SSE/Poll.
+                     console.log('Background upload completed for current conversation');
+                }
+            }).catch(err => {
+                console.error('Background upload failed', err);
             });
-
-            const j = res.data;
-            if (j && j.code === 200 && j.data) {
-                const dto = j.data;
-
-                setMessages(prev => {
-                    const next = Array.isArray(prev) ? prev.slice() : [];
-                    next.push({
-                        id: dto.id,
-                        senderId: dto.senderId,
-                        receiverId: dto.receiverId,
-                        text: dto.text || '',
-                        mediaUrl: dto.mediaUrl || '',
-                        type: dto.type || type,
-                        createdAt: dto.createdAt,
-                        senderNickname: dto.senderNickname || '你',
-                        senderAvatarUrl: dto.senderAvatarUrl || (otherInfo?.avatarUrl || ''),
-                        receiverNickname: dto.receiverNickname || otherInfo?.nickname || '',
-                        receiverAvatarUrl: dto.receiverAvatarUrl || (otherInfo?.avatarUrl || '')
-                    });
-                    next.sort((a, b) => {
-                        const ta = a?.createdAt ? new Date(a.createdAt).getTime() : 0;
-                        const tb = b?.createdAt ? new Date(b.createdAt).getTime() : 0;
-                        return ta - tb;
-                    });
-                    return next;
-                });
-
-                setViewRecords(prev => {
-                    const next = Array.isArray(prev) ? prev.slice() : [];
-                    next.push({
-                        id: dto.id,
-                        senderId: dto.senderId,
-                        receiverId: dto.receiverId,
-                        createdAt: dto.createdAt,
-                        recalled: false,
-                        displayText: dto.text || ''
-                    });
-                    next.sort((a, b) => {
-                        const ta = a?.createdAt ? new Date(a.createdAt).getTime() : 0;
-                        const tb = b?.createdAt ? new Date(b.createdAt).getTime() : 0;
-                        return ta - tb;
-                    });
-                    return next;
-                });
-
-                cacheConversationMessages(userId, otherId, [dto], 1000)
-                    .then(() => console.log('[PM] cache after send media, id=', dto.id))
-                    .catch(() => { });
-
-                requestAnimationFrame(() => {
-                    const el = rightScrollRef.current;
-                    if (el) el.scrollTop = el.scrollHeight;
-                });
-            } else {
-                alert((j && (j.message || j.msg)) || '发送失败');
-            }
+            
         } catch (err) {
             console.error(err);
-            alert('上传或发送失败');
-        } finally {
-            setUploading(false);
-            setUploadProgress(0);
-            refreshView();
+            alert('启动上传失败');
         }
     };
 
@@ -1568,27 +1483,23 @@ export default function CommunicationPage() {
                                         className="icon-btn icon-image"
                                         onClick={onPickImageClick}
                                         title="发送图片"
-                                        disabled={uploading}
                                     ></button>
                                     <button
                                         type="button"
                                         className="icon-btn icon-video"
                                         onClick={onPickVideoClick}
                                         title="发送视频"
-                                        disabled={uploading}
                                     ></button>
                                     <button
                                         type="button"
                                         className="icon-btn icon-emoji"
                                         onClick={() => setShowEmoji(!showEmoji)}
                                         title="发送表情"
-                                        disabled={uploading}
                                         style={{ fontSize: '1.2rem', lineHeight: 1, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                                     >😊</button>
                                     <button
                                         type="submit"
                                         className="conversation-detail-sendbtn"
-                                        disabled={uploading}
                                     >
                                         发送
                                     </button>
@@ -1609,7 +1520,6 @@ export default function CommunicationPage() {
                                     onKeyDown={onInputKeyDown}
                                     placeholder="请输入消息内容..."
                                     className="conversation-detail-input"
-                                    disabled={uploading}
                                 />
                             </div>
 
@@ -1628,20 +1538,6 @@ export default function CommunicationPage() {
                                 onChange={(e) => handleFileChosen(e, 'VIDEO')}
                             />
                         </form>
-
-                        {uploading && (
-                            <div className="conversation-upload-overlay">
-                                <div className="conversation-upload-box">
-                                    <div className="conversation-upload-text">正在发送... {uploadProgress}%</div>
-                                    <div className="conversation-upload-track">
-                                        <div
-                                            className="conversation-upload-bar"
-                                            style={{ width: `${uploadProgress}%` }}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        )}
                     </div>
                 )}
             </div>

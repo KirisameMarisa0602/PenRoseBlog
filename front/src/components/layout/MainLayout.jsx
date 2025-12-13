@@ -2,6 +2,7 @@ import React from 'react';
 import { useLocation } from 'react-router-dom';
 import Maid from '@components/common/maid/Maid';
 import BannerNavbar from '@components/common/BannerNavbar';
+import GlobalUploadIndicator from '@components/common/GlobalUploadIndicator';
 import '../../styles/components/MainLayout.css';
 
 export default function MainLayout({ children, onMaidLoaded }) {
@@ -19,6 +20,7 @@ export default function MainLayout({ children, onMaidLoaded }) {
       {/* 右侧列仅用于对齐，实际 Maid 作为全局 overlay 固定在右侧 */}
       <div className="app-ai-sidebar" aria-hidden="true" style={{ width: sidebarWidth, flexShrink: 0 }} />
       {!isWelcomePage && <Maid defaultCollapsed={true} onModelLoaded={onMaidLoaded} onWidthChange={setSidebarWidth} />}
+      <GlobalUploadIndicator />
     </div>
   );
 }
