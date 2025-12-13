@@ -24,8 +24,8 @@ export const notificationApi = {
         return response.data;
     },
 
-    markAllAsRead: async () => {
-        const response = await httpClient.put(`${API_BASE_URL}/read-all`);
+    markAllAsRead: async (types = []) => {
+        const response = await httpClient.put(`${API_BASE_URL}/read-all`, types);
         return response.data;
     }
 };

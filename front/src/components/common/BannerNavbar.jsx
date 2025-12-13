@@ -20,11 +20,11 @@ const SplitNavItem = ({ to, text, badge }) => (
     {to ? (
       <Link to={to} className="split-btn-link">
         {text}
-        {badge > 0 && <span className="nav-badge-dot" style={{ position: 'absolute', top: '-5px', right: '-10px', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#ff4d4f' }}></span>}
       </Link>
     ) : (
       <span className="split-btn-link" style={{ cursor: 'default', color: 'rgba(255,255,255,0.6)' }}>{text}</span>
     )}
+    {badge > 0 && <span className="nav-badge-dot"></span>}
   </div>
 );
 

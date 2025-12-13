@@ -85,14 +85,19 @@ public class NotificationController {
     @PutMapping("/read-all")
     public ApiResponse<Void> markAllAsRead(
             @AuthenticationPrincipal UserDetails userDetails,
-            @RequestHeader(value = "X-User-Id", required = false) Long headerUserId) {
+            @RequestHeader(value = "X-User-Id", required = false) Long headerUserId,
+            @RequestBody(required = false) java.util.List<String> types) {
 
         User currentUser = currentUserResolver.resolve(userDetails, headerUserId);
         if (currentUser == null) {
             return new ApiResponse<>(401, "Unauthorized", null);
         }
 
-        notificationService.markAllAsRead(currentUser.getId());
+        if (types != null && !types.isEmpty()) {
+            notificationService.markAllAsRead(currentUser.getId(), types);
+        } else {
+            notificationService.markAllAsRead(currentUser.getId());
+        }
         return new ApiResponse<>(200, "Success", null);
     }
 }

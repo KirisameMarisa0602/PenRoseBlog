@@ -12,6 +12,14 @@ export default function NotificationCenter() {
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const [activeTab, setActiveTab] = useState('ALL');
+    const [unreadStatus, setUnreadStatus] = useState({
+        ALL: false,
+        LIKES: false,
+        COMMENTS: false,
+        FOLLOW: false,
+        MESSAGES: false,
+        REQUESTS: false
+    });
     const navigate = useNavigate();
 
     const getTypes = (tab) => {
@@ -23,6 +31,47 @@ export default function NotificationCenter() {
             default: return [];
         }
     };
+
+    useEffect(() => {
+        // Check unread status for tabs
+        const checkUnread = async () => {
+            const tabs = ['LIKES', 'COMMENTS', 'FOLLOW', 'REQUESTS'];
+            const newStatus = {
+                ALL: false,
+                LIKES: false,
+                COMMENTS: false,
+                FOLLOW: false,
+                MESSAGES: false,
+                REQUESTS: false
+            };
+            
+            // Check global unread count first if available, otherwise check ALL list
+            try {
+                const countRes = await notificationApi.getUnreadCount();
+                if (countRes && countRes.code === 200 && countRes.data > 0) {
+                    newStatus.ALL = true;
+                }
+            } catch (error) { /* ignore */ }
+
+            // Check each category
+            for (const tab of tabs) {
+                try {
+                    const types = getTypes(tab);
+                    // Fetch just 1 item to check if it's unread
+                    const res = await notificationApi.getNotifications(0, 1, types);
+                    if (res.code === 200) {
+                        const list = res.data.list || res.data.content || [];
+                        if (list.length > 0 && !list[0].read) {
+                            newStatus[tab] = true;
+                        }
+                    }
+                } catch (error) { /* ignore */ }
+            }
+            setUnreadStatus(newStatus);
+        };
+        checkUnread();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [activeTab]); // Check when tab changes, instead of when notifications list changes
 
     useEffect(() => {
         if (activeTab === 'MESSAGES') {
@@ -67,16 +116,36 @@ export default function NotificationCenter() {
 
     const markAllRead = async () => {
         try {
-            await notificationApi.markAllAsRead();
+            const types = activeTab === 'ALL' ? [] : getTypes(activeTab);
+            await notificationApi.markAllAsRead(types);
+            // Optimistic update: mark all loaded notifications as read
+            setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+
+            // Clear unread badges for current tab
+            setUnreadStatus(prev => {
+                if (activeTab === 'ALL') {
+                    return {
+                        ALL: false,
+                        LIKES: false,
+                        COMMENTS: false,
+                        FOLLOW: false,
+                        MESSAGES: false,
+                        REQUESTS: false
+                    };
+                }
+                return { ...prev, [activeTab]: false };
+            });
+            
             const userId = localStorage.getItem('userId');
             if (userId) {
                 localStorage.setItem(`notification_unread_count_${userId}`, '0');
                 window.dispatchEvent(new Event('pm-unread-refresh'));
             }
-            if (activeTab !== 'MESSAGES') {
-                setPage(0);
-                loadNotifications(0, activeTab);
-            }
+            // No need to reload immediately if we updated state, but reloading ensures consistency
+            // if (activeTab !== 'MESSAGES') {
+            //     setPage(0);
+            //     loadNotifications(0, activeTab);
+            // }
         } catch (error) {
             console.error("Failed to mark all as read", error);
         }
@@ -88,7 +157,19 @@ export default function NotificationCenter() {
         loadNotifications(nextPage, activeTab);
     };
 
-    const handleNotificationClick = (note) => {
+    const handleNotificationClick = async (note) => {
+        // Mark as read if not already
+        if (!note.read) {
+            try {
+                await notificationApi.markAsRead(note.id);
+                setNotifications(prev => prev.map(n => n.id === note.id ? { ...n, read: true } : n));
+                // Trigger global unread count refresh
+                window.dispatchEvent(new Event('pm-unread-refresh'));
+            } catch (e) {
+                console.error("Failed to mark notification as read", e);
+            }
+        }
+
         if (note.type === 'POST_LIKE' || note.type === 'POST_FAVORITE' || note.type === 'POST_COMMENT') {
             navigate(`/post/${note.referenceId}`);
         } else if (note.type === 'COMMENT_REPLY' || note.type === 'COMMENT_LIKE' || note.type === 'REPLY_LIKE') {
@@ -147,11 +228,10 @@ export default function NotificationCenter() {
                 actionText = '关注了你';
                 break;
             case 'UNFOLLOW':
-                iconSrc = resolveUrl('/icons/message/取关.svg');
+                iconSrc = resolveUrl('/icons/message/关注.svg');
                 actionText = '取消关注了你';
                 break;
             default:
-                iconSrc = resolveUrl('/icons/message/通知.svg');
                 actionText = '新通知';
         }
 
@@ -179,12 +259,30 @@ export default function NotificationCenter() {
         <div className="notification-layout">
             <div className="notification-sidebar">
                 <div className="sidebar-title" style={{ padding: '20px 24px', fontSize: '1.2rem', fontWeight: 'bold' }}>通知中心</div>
-                <div className={`notification-sidebar-item ${activeTab === 'ALL' ? 'active' : ''}`} onClick={() => setActiveTab('ALL')}>全部通知</div>
-                <div className={`notification-sidebar-item ${activeTab === 'LIKES' ? 'active' : ''}`} onClick={() => setActiveTab('LIKES')}>赞与收藏</div>
-                <div className={`notification-sidebar-item ${activeTab === 'COMMENTS' ? 'active' : ''}`} onClick={() => setActiveTab('COMMENTS')}>评论与回复</div>
-                <div className={`notification-sidebar-item ${activeTab === 'FOLLOW' ? 'active' : ''}`} onClick={() => setActiveTab('FOLLOW')}>关注通知</div>
-                <div className={`notification-sidebar-item ${activeTab === 'MESSAGES' ? 'active' : ''}`} onClick={() => setActiveTab('MESSAGES')}>好友消息</div>
-                <div className={`notification-sidebar-item ${activeTab === 'REQUESTS' ? 'active' : ''}`} onClick={() => setActiveTab('REQUESTS')}>好友申请</div>
+                <div className={`notification-sidebar-item ${activeTab === 'ALL' ? 'active' : ''}`} onClick={() => setActiveTab('ALL')}>
+                    全部通知
+                    {unreadStatus.ALL && <span className="sidebar-badge-dot"></span>}
+                </div>
+                <div className={`notification-sidebar-item ${activeTab === 'LIKES' ? 'active' : ''}`} onClick={() => setActiveTab('LIKES')}>
+                    赞与收藏
+                    {unreadStatus.LIKES && <span className="sidebar-badge-dot"></span>}
+                </div>
+                <div className={`notification-sidebar-item ${activeTab === 'COMMENTS' ? 'active' : ''}`} onClick={() => setActiveTab('COMMENTS')}>
+                    评论与回复
+                    {unreadStatus.COMMENTS && <span className="sidebar-badge-dot"></span>}
+                </div>
+                <div className={`notification-sidebar-item ${activeTab === 'FOLLOW' ? 'active' : ''}`} onClick={() => setActiveTab('FOLLOW')}>
+                    关注通知
+                    {unreadStatus.FOLLOW && <span className="sidebar-badge-dot"></span>}
+                </div>
+                <div className={`notification-sidebar-item ${activeTab === 'MESSAGES' ? 'active' : ''}`} onClick={() => setActiveTab('MESSAGES')}>
+                    好友消息
+                    {unreadStatus.MESSAGES && <span className="sidebar-badge-dot"></span>}
+                </div>
+                <div className={`notification-sidebar-item ${activeTab === 'REQUESTS' ? 'active' : ''}`} onClick={() => setActiveTab('REQUESTS')}>
+                    好友申请
+                    {unreadStatus.REQUESTS && <span className="sidebar-badge-dot"></span>}
+                </div>
             </div>
 
             <div className="notification-content-wrapper">

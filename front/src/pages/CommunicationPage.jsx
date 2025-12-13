@@ -1450,12 +1450,15 @@ export default function CommunicationPage() {
                                                     controlsList="nodownload"
                                                 />
                                             ) : (
-                                                msg?.text ||
-                                                (msg?.type === 'IMAGE'
-                                                    ? '[图片]'
-                                                    : msg?.type === 'VIDEO'
-                                                        ? '[视频]'
-                                                        : '')
+                                                // 如果有博客预览且文本是链接，则不显示文本（避免重复显示链接）
+                                                (!hasPreview || !/^https?:\/\//.test(msg?.text)) && (
+                                                    msg?.text ||
+                                                    (msg?.type === 'IMAGE'
+                                                        ? '[图片]'
+                                                        : msg?.type === 'VIDEO'
+                                                            ? '[视频]'
+                                                            : '')
+                                                )
                                             )}
 
                                             {/* 博客预览卡片 */}

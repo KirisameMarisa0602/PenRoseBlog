@@ -15,11 +15,16 @@ import java.util.Collection;
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
     Page<Notification> findByReceiverIdOrderByCreatedAtDesc(Long receiverId, Pageable pageable);
 
-    Page<Notification> findByReceiverIdAndTypeInOrderByCreatedAtDesc(Long receiverId, Collection<NotificationType> types, Pageable pageable);
+    Page<Notification> findByReceiverIdAndTypeInOrderByCreatedAtDesc(Long receiverId,
+            Collection<NotificationType> types, Pageable pageable);
 
     long countByReceiverIdAndIsReadFalse(Long receiverId);
 
     @Modifying
     @Query("UPDATE Notification n SET n.isRead = true WHERE n.receiverId = :userId")
     void markAllAsRead(Long userId);
+
+    @Modifying
+    @Query("UPDATE Notification n SET n.isRead = true WHERE n.receiverId = :userId AND n.type IN :types")
+    void markAllAsRead(Long userId, Collection<NotificationType> types);
 }

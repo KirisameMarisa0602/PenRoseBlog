@@ -290,7 +290,7 @@ export default function ConversationDetail() {
         }
 
         // 无论是否自动发送，都让输入框先带上这段文字，方便用户查看/编辑
-        setText(parsed);
+        // setText(parsed); // 移除此处预填充，避免用户看到链接
 
         // 检查是否已对当前会话自动发送过这条分享链接
         let alreadySent = false;
@@ -1357,6 +1357,20 @@ export default function ConversationDetail() {
 
                             const hasPreview = msg.blogPreview && msg.blogPreview.blogId;
 
+                            // 过滤掉纯博客链接的文本消息（如果它看起来像是自动发送的分享链接）
+                            // 避免在显示了卡片（或即将显示卡片）的同时显示冗余的 URL 文本
+                            if (!hasPreview && msg.text && (msg.text.includes('/post/') || msg.text.includes('/article/'))) {
+                                // 简单判断：如果是本站链接，且内容仅为链接，则隐藏
+                                const trimmed = msg.text.trim();
+                                // 匹配 http(s)://.../post/123 或 /post/123，允许末尾斜杠和参数
+                                // 使用更宽松的正则以确保匹配
+                                const isPostUrl = /^(https?:\/\/[^\s]+)?\/(post|article)\/\d+(\?.*)?\/?$/.test(trimmed);
+                                // 只要包含文章链接且长度接近链接长度（允许少量空白或标点），就隐藏
+                                if (isPostUrl || (trimmed.length < 100 && (trimmed.startsWith('http') || trimmed.startsWith('/')))) {
+                                    return null;
+                                }
+                            }
+
                             return (
                                 <div
                                     key={msg.id}
@@ -1453,6 +1467,9 @@ export default function ConversationDetail() {
                                                         <span className="pm-blog-preview-author">
                                                             {msg.blogPreview.authorNickname || ''}
                                                         </span>
+                                                    </div>
+                                                    <div className="pm-blog-preview-footer">
+                                                        <span className="pm-blog-preview-btn">查看原文</span>
                                                     </div>
                                                 </div>
                                             </div>

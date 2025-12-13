@@ -817,7 +817,9 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                                         onError={e => { e.target.onerror = null; e.target.src = '/imgs/loginandwelcomepanel/1.png'; }}
                                       />
                                     ) : (
-                                      <div className="upload-zone-icon">📱</div>
+                                      <div className="upload-zone-icon">
+                                        <img src={resolveUrl('/icons/profile/qqqr.svg')} alt="QQ QR Placeholder" style={{ width: '40px', height: '40px', opacity: 0.5 }} />
+                                      </div>
                                     )}
                                     <div className="upload-zone-text">{ (qqQrPreview || profile.qqQrCode) ? '点击更换二维码' : '上传QQ二维码' }</div>
                                   </div>
@@ -834,7 +836,9 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                                         onError={e => { e.target.onerror = null; e.target.src = '/imgs/loginandwelcomepanel/1.png'; }}
                                       />
                                     ) : (
-                                      <div className="upload-zone-icon">💬</div>
+                                      <div className="upload-zone-icon">
+                                        <img src={resolveUrl('/icons/profile/wechatqr.svg')} alt="WeChat QR Placeholder" style={{ width: '40px', height: '40px', opacity: 0.5 }} />
+                                      </div>
                                     )}
                                     <div className="upload-zone-text">{ (wechatQrPreview || profile.wechatQrCode) ? '点击更换二维码' : '上传微信二维码' }</div>
                                   </div>

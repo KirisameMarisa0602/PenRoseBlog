@@ -52,7 +52,8 @@ public class NotificationServiceImpl implements NotificationService {
         if (payload == null || userId == null)
             return;
 
-        // 1. Save to DB (Skip PRIVATE_MESSAGE as they are stored in private_messages table)
+        // 1. Save to DB (Skip PRIVATE_MESSAGE as they are stored in private_messages
+        // table)
         if (!"PRIVATE_MESSAGE".equals(payload.getType())) {
             try {
                 NotificationType type;
@@ -128,7 +129,8 @@ public class NotificationServiceImpl implements NotificationService {
             return Page.empty(pageable);
         }
 
-        Page<Notification> notifications = notificationRepository.findByReceiverIdAndTypeInOrderByCreatedAtDesc(userId, typeEnums, pageable);
+        Page<Notification> notifications = notificationRepository.findByReceiverIdAndTypeInOrderByCreatedAtDesc(userId,
+                typeEnums, pageable);
         return notifications.map(this::convertToDTO);
     }
 
@@ -157,6 +159,29 @@ public class NotificationServiceImpl implements NotificationService {
     @Transactional
     public void markAllAsRead(Long userId) {
         notificationRepository.markAllAsRead(userId);
+    }
+
+    @Override
+    @Transactional
+    public void markAllAsRead(Long userId, java.util.List<String> types) {
+        if (types == null || types.isEmpty()) {
+            markAllAsRead(userId);
+            return;
+        }
+        java.util.List<NotificationType> typeEnums = types.stream()
+                .map(t -> {
+                    try {
+                        return NotificationType.valueOf(t);
+                    } catch (IllegalArgumentException e) {
+                        return null;
+                    }
+                })
+                .filter(java.util.Objects::nonNull)
+                .collect(java.util.stream.Collectors.toList());
+
+        if (!typeEnums.isEmpty()) {
+            notificationRepository.markAllAsRead(userId, typeEnums);
+        }
     }
 
     private NotificationDTO convertToDTO(Notification n) {

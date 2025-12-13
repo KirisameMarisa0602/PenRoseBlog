@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './Category3DCarousel.css';
+import '../../styles/selfspace/Category3DCarousel.css';
 import { CATEGORY_CONFIG, DEFAULT_CATEGORY_CONFIG } from '@utils/categoryConfig';
 
 const Category3DCarousel = ({ categories, selectedCategory, onSelect }) => {

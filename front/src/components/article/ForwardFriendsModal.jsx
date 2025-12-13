@@ -1,4 +1,5 @@
 import React from 'react';
+import resolveUrl from '@utils/resolveUrl';
 
 export default function ForwardFriendsModal({
     show,
@@ -92,7 +93,7 @@ export default function ForwardFriendsModal({
                             >
                                 <img
                                     src={
-                                        f.avatarUrl ||
+                                        f.avatarUrl ? resolveUrl(f.avatarUrl) :
                                         '/imgs/loginandwelcomepanel/1.png'
                                     }
                                     alt="avatar"

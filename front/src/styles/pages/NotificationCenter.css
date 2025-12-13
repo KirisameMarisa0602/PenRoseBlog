@@ -109,8 +109,9 @@
 }
 
 .notification-item.unread {
-    background: rgba(24, 144, 255, 0.05);
-    border-color: rgba(24, 144, 255, 0.2);
+    background: rgba(24, 144, 255, 0.08);
+    border-color: rgba(24, 144, 255, 0.3);
+    box-shadow: 0 2px 8px rgba(24, 144, 255, 0.1);
 }
 
 .notification-item.unread::after {
@@ -118,8 +119,8 @@
     position: absolute;
     top: 1.5rem;
     right: 1.5rem;
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
     background: #1890ff;
     border-radius: 50%;
     box-shadow: 0 0 0 4px rgba(24, 144, 255, 0.2);
@@ -364,7 +365,7 @@
     color: var(--text-secondary);
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: space-between;
 }
 
 .notification-sidebar-item:hover {
@@ -376,6 +377,15 @@
     background: #e6f7ff;
     color: #1890ff;
     font-weight: 600;
+}
+
+.sidebar-badge-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #ff4d4f;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 0 2px #fff;
 }
 
 .notification-content-wrapper {

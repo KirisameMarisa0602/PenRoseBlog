@@ -50,4 +50,9 @@ public interface NotificationService {
      * 标记所有通知为已读
      */
     void markAllAsRead(Long userId);
+
+    /**
+     * 标记指定类型的通知为已读
+     */
+    void markAllAsRead(Long userId, java.util.List<String> types);
 }
