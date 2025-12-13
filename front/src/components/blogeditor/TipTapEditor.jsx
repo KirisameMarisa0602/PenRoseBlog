@@ -23,7 +23,7 @@ import '@styles/blogeditor/tiptap/TipTapEditor.css';
 import { marked } from 'marked';
 import resolveUrl from '@utils/resolveUrl';
 import httpClient from '@utils/api/httpClient';
-import axios from 'axios';
+import COS from 'cos-js-sdk-v5';
 
 // 自定义视频扩展
 const Video = Node.create({
@@ -135,37 +135,81 @@ const MediaModal = ({ isOpen, onClose, onSubmit, title, placeholder, userId }) =
       const isLargeFile = file.size > 10 * 1024 * 1024;
 
       if (isVideo || isLargeFile) {
-        // --- 大文件/视频：前端直传 COS ---
-        // 1. 获取预签名 URL
-        const presignRes = await httpClient.get('/blogpost/presigned-url', {
-          params: {
-            fileName: file.name,
-            userId: userId
-          }
-        });
+        // --- 大文件/视频：前端直传 COS (使用分片上传) ---
         
-        if (presignRes.data.code !== 200) {
-          throw new Error(presignRes.data.message || '获取上传链接失败');
-        }
-
-        const { uploadUrl, publicUrl } = presignRes.data.data;
-
-        // 2. 直传 COS (PUT)
-        // 使用纯 axios 避免带上 Authorization 头
-        await axios.put(uploadUrl, file, {
-          headers: {
-            'Content-Type': file.type 
-          },
-          onUploadProgress: (progressEvent) => {
-            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            setUploadProgress(percentCompleted);
+        // 1. 初始化 COS 实例 (使用 STS)
+        const cos = new COS({
+          getAuthorization: async (options, callback) => {
+            try {
+              const res = await httpClient.get('/blogpost/sts', {
+                params: { userId: userId }
+              });
+              if (res.data.code === 200) {
+                const data = res.data.data;
+                callback({
+                  TmpSecretId: data.credentials.tmpSecretId,
+                  TmpSecretKey: data.credentials.tmpSecretKey,
+                  XCosSecurityToken: data.credentials.sessionToken,
+                  StartTime: data.startTime,
+                  ExpiredTime: data.expiredTime,
+                });
+              } else {
+                console.error('获取 STS 失败', res.data);
+                callback({ error: '获取 STS 失败' });
+              }
+            } catch (err) {
+              console.error('获取 STS 异常', err);
+              callback({ error: err });
+            }
           }
         });
 
-        // 3. 上传成功
-        const finalUrl = resolveUrl(publicUrl);
-        onSubmit(finalUrl);
-        onClose();
+        // 2. 生成文件名 (保持与后端一致的路径结构)
+        const ext = file.name.substring(file.name.lastIndexOf('.'));
+        const userSegment = userId ? userId : 'common';
+        const key = `sources/blogpostcontent/${userSegment}/${Date.now()}_${Math.random().toString(36).substring(2, 10)}${ext}`;
+
+        // 3. 执行分片上传
+        cos.uploadFile({
+          Bucket: import.meta.env.VITE_COS_BUCKET || 'penroseblogsources-1329628039', /* 需在 .env 配置或硬编码 */
+          Region: import.meta.env.VITE_COS_REGION || 'ap-hongkong',
+          Key: key,
+          Body: file,
+          SliceSize: 1024 * 1024 * 5, // 5MB 分片
+          onProgress: (progressData) => {
+            setUploadProgress(Math.round(progressData.percent * 100));
+          }
+        }, (err, data) => {
+          if (err) {
+            console.error('COS 上传失败', err);
+            alert('上传出错: ' + (err.message || '未知错误'));
+            setUploading(false);
+          } else {
+            // 上传成功
+            // data.Location 通常是 bucket.cos.region.myqcloud.com/key
+            // 我们需要将其转换为 https://...
+            let finalUrl = 'https://' + data.Location;
+            if (!finalUrl.startsWith('http')) {
+                finalUrl = 'https://' + data.Location;
+            }
+            // 如果配置了 CDN，resolveUrl 会处理，或者我们手动替换域名
+            // 这里简单起见，直接传给 resolveUrl，它会识别并处理
+            // 但注意 data.Location 可能不带协议头
+            
+            // 更好的方式：直接构造路径传给 resolveUrl
+            // resolveUrl 逻辑：如果以 http 开头则直接返回。
+            // 我们希望它走 CDN (如果配置了)。
+            // 我们可以只传 key (sources/...)，让 resolveUrl 处理
+            // 但 resolveUrl 目前逻辑是：如果不是 / 开头，且符合正则...
+            // 让我们直接传 /key
+            const relativePath = '/' + key;
+            const resolved = resolveUrl(relativePath);
+            
+            onSubmit(resolved);
+            onClose();
+            setUploading(false);
+          }
+        });
 
       } else {
         // --- 小文件/图片：走后端代理 ---

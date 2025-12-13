@@ -6,6 +6,7 @@ import ArticleCard from '@components/common/ArticleCard';
 import Category3DCarousel from '@components/selfspace/Category3DCarousel';
 import { useAuthState } from '@hooks/useAuthState';
 import resolveUrl from '@utils/resolveUrl';
+import httpClient from '@utils/api/httpClient';
 import { BLOG_CATEGORIES } from '@utils/constants';
 import { CATEGORY_CONFIG, DEFAULT_CATEGORY_CONFIG } from '@utils/categoryConfig';
 
@@ -152,6 +153,26 @@ export default function SelfSpace() {
     e.preventDefault();
     setKeyword(searchInput);
     setPage(0);
+  };
+
+  const handleDeletePost = async (postId) => {
+    if (!window.confirm('确定要删除这篇文章吗？删除后无法恢复。')) {
+      return;
+    }
+    try {
+      const res = await httpClient.delete(`/blogpost/${postId}?userId=${myId}`);
+      if (res && (res.status === 200 || res.data?.code === 200)) {
+        alert('删除成功');
+        // Refresh list
+        setPosts(posts.filter(p => (p.id || p.postId) !== postId));
+        if (totalCount !== null) setTotalCount(totalCount - 1);
+      } else {
+        alert('删除失败: ' + (res.data?.message || '未知错误'));
+      }
+    } catch (e) {
+      console.error(e);
+      alert('网络错误');
+    }
   };
 
   return (
@@ -322,7 +343,12 @@ export default function SelfSpace() {
                 <div className="selfspace-articles-empty">暂无文章</div>
               ) : (
                 posts.map(p => (
-                  <ArticleCard key={p.id || p.postId} post={p} className="selfspace-article-card" />
+                  <ArticleCard 
+                    key={p.id || p.postId} 
+                    post={p} 
+                    className="selfspace-article-card" 
+                    onDelete={isOwner ? handleDeletePost : undefined}
+                  />
                 ))
               )}
             </div>

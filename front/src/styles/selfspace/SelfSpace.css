@@ -418,3 +418,60 @@
   border-radius: 2px;
 }
 
+
+/* Tabs for Published/Drafts */
+.selfspace-tabs {
+  display: flex;
+  gap: 30px;
+  margin-right: auto; /* Push search box to right */
+}
+
+.selfspace-tab-btn {
+  background: none;
+  border: none;
+  padding: 10px 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #888;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.selfspace-tab-btn.active {
+  color: #333;
+}
+
+.selfspace-tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 4px;
+  background: #1890ff;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.selfspace-tab-btn:hover {
+  color: #1890ff;
+}
+
+/* Adjust header row to align tabs and search */
+.selfspace-articles-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+/* Ensure search box stays on the right */
+.selfspace-search-box {
+  margin-left: 20px;
+}
+

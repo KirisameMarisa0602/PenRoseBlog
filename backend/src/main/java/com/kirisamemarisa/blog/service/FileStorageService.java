@@ -25,4 +25,11 @@ public interface FileStorageService {
      * 生成私信媒体的预签名上传 URL
      */
     java.util.Map<String, String> generateMessagePresignedUrl(String fileName, Long senderId, Long receiverId);
+
+    /**
+     * 删除文件
+     * 
+     * @param fileUrl 文件URL或路径
+     */
+    void deleteFile(String fileUrl);
 }

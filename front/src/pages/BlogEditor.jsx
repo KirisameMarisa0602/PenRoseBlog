@@ -357,6 +357,31 @@ const BlogEditor = () => {
     }
   }, [previewMode, previewHtml]);
 
+  const handleDelete = async () => {
+    if (!editId) return;
+    if (!window.confirm('确定要删除这篇草稿吗？删除后无法恢复，且关联的图片资源也会被清理。')) {
+      return;
+    }
+    try {
+      const res = await httpClient.delete(`/blogpost/${editId}?userId=${userId}`);
+      if (res && (res.status === 200 || res.data?.code === 200)) {
+        alert('删除成功');
+        // Clear local storage if it matches
+        try {
+          localStorage.removeItem('blog.editor.title');
+          localStorage.removeItem('blog.editor.content');
+          localStorage.removeItem('blog.editor.tags');
+        } catch { /* ignore */ }
+        navigate('/');
+      } else {
+        alert('删除失败: ' + (res.data?.message || '未知错误'));
+      }
+    } catch (e) {
+      console.error(e);
+      alert('网络错误');
+    }
+  };
+
   return (
     <div className="blog-editor-container">
       {/* Top Header: Title & Main Actions */}
@@ -374,6 +399,18 @@ const BlogEditor = () => {
         />
 
         <div className="blog-editor-header-actions">
+           {/* Delete Draft Button */}
+           {editId && (
+             <button 
+               className="blog-editor-btn danger" 
+               onClick={handleDelete}
+               title="删除草稿"
+               style={{ marginRight: '8px', backgroundColor: '#fee2e2', color: '#ef4444', border: '1px solid #fecaca' }}
+             >
+               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+             </button>
+           )}
+
            {/* Mode Switch */}
            <button 
              className={`blog-editor-btn secondary ${editorMode === 'markdown' ? 'active' : ''}`}

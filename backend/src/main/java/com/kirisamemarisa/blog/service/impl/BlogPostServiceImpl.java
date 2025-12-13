@@ -571,6 +571,26 @@ public class BlogPostServiceImpl implements BlogPostService {
             return new ApiResponse<>(403, "无权限删除该博客", false);
         }
 
+        // 0. 清理关联的 COS 资源 (封面和正文图片)
+        // 仅当是草稿时，或者我们确定要彻底删除资源时执行。
+        // 这里我们对所有删除操作都尝试清理资源，因为博客被删除了，其专属资源也不再需要。
+        // 注意：如果图片被其他文章引用（虽然不常见），可能会误删。但通常博客图片是专属的。
+        try {
+            // 删除封面
+            if (post.getCoverImageUrl() != null && !post.getCoverImageUrl().isEmpty()) {
+                fileStorageService.deleteFile(post.getCoverImageUrl());
+            }
+
+            // 解析并删除正文中的图片
+            List<String> contentImages = extractImageUrls(post.getContent());
+            for (String imgUrl : contentImages) {
+                fileStorageService.deleteFile(imgUrl);
+            }
+        } catch (Exception e) {
+            logger.warn("清理博客 {} 的资源失败", blogPostId, e);
+            // 不阻断删除流程
+        }
+
         // 1. 找到该博客下所有评论
         List<Comment> comments = commentRepository.findByBlogPost_Id(blogPostId);
         List<Long> commentIds = comments.stream()
@@ -696,5 +716,45 @@ public class BlogPostServiceImpl implements BlogPostService {
             logger.error("Failed to get view stats for post " + postId, e);
             dto.setViewCount(0L);
         }
+    }
+
+    /**
+     * 从 Markdown/HTML 内容中提取图片 URL
+     * 简单正则匹配 Markdown ![...](url) 和 HTML <img src="url">
+     */
+    private List<String> extractImageUrls(String content) {
+        List<String> urls = new java.util.ArrayList<>();
+        if (content == null || content.isEmpty()) {
+            return urls;
+        }
+
+        // 匹配 Markdown 图片: ![alt](url)
+        java.util.regex.Pattern mdPattern = java.util.regex.Pattern.compile("!\\[.*?\\]\\((.*?)\\)");
+        java.util.regex.Matcher mdMatcher = mdPattern.matcher(content);
+        while (mdMatcher.find()) {
+            String url = mdMatcher.group(1);
+            // 简单过滤，只提取本站 COS 的链接 (包含 sources/)
+            if (url != null && url.contains("sources/")) {
+                // 可能包含 title，如 "url \"title\""
+                int spaceIndex = url.indexOf(" ");
+                if (spaceIndex != -1) {
+                    url = url.substring(0, spaceIndex);
+                }
+                urls.add(url);
+            }
+        }
+
+        // 匹配 HTML 图片: <img ... src="url" ...>
+        java.util.regex.Pattern htmlPattern = java.util.regex.Pattern
+                .compile("<img[^>]+src\\s*=\\s*['\"]([^'\"]+)['\"][^>]*>");
+        java.util.regex.Matcher htmlMatcher = htmlPattern.matcher(content);
+        while (htmlMatcher.find()) {
+            String url = htmlMatcher.group(1);
+            if (url != null && url.contains("sources/")) {
+                urls.add(url);
+            }
+        }
+
+        return urls;
     }
 }

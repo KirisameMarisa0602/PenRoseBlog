@@ -24,7 +24,7 @@ function truncateByUnits(text = '', limitUnits = 48) {
     return out;
 }
 
-export default function ArticleCard({ post, className }) {
+export default function ArticleCard({ post, className, onDelete }) {
     const coverSrc = resolveUrl(post.coverImageUrl) || null;
     const avatar = resolveUrl(post.authorAvatarUrl || post.avatarUrl);
     const author = post.authorNickname || post.authorName || post.author || post.username || '匿名';
@@ -43,6 +43,14 @@ export default function ArticleCard({ post, className }) {
         if (!dateStr) return '';
         const date = new Date(dateStr);
         return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    };
+
+    const handleDeleteClick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (onDelete) {
+            onDelete(id);
+        }
     };
 
     return (
@@ -69,6 +77,31 @@ export default function ArticleCard({ post, className }) {
                         }}>
                             草稿
                         </div>
+                    )}
+                    {onDelete && (
+                        <button 
+                            onClick={handleDeleteClick}
+                            style={{
+                                position: 'absolute',
+                                top: '10px',
+                                left: '10px',
+                                backgroundColor: 'rgba(239, 68, 68, 0.9)',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: '4px',
+                                padding: '4px 8px',
+                                cursor: 'pointer',
+                                zIndex: 20,
+                                fontSize: '12px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px'
+                            }}
+                            title="删除"
+                        >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            删除
+                        </button>
                     )}
                 </div>
                 <div className="article-card-info">

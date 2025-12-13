@@ -150,6 +150,40 @@ public class CosStorageServiceImpl implements FileStorageService {
         return result;
     }
 
+    @Override
+    public void deleteFile(String fileUrl) {
+        if (fileUrl == null || fileUrl.isEmpty()) {
+            return;
+        }
+        // 提取 Key
+        // 假设 fileUrl 可能是完整 URL (https://...) 或相对路径 (/sources/...) 或 key (sources/...)
+        String key = fileUrl;
+        if (key.startsWith("http")) {
+            // 尝试从 URL 中提取 key
+            // 简单做法：找到 /sources/ 之后的部分
+            int index = key.indexOf("/sources/");
+            if (index != -1) {
+                key = key.substring(index + 1); // 去掉前面的部分，保留 sources/...
+            }
+        } else if (key.startsWith("/")) {
+            key = key.substring(1);
+        }
+
+        // 再次确认 key 是否以 sources/ 开头 (根据当前存储结构)
+        if (!key.startsWith("sources/")) {
+            logger.warn("尝试删除非 sources 目录下的文件或无法解析 Key: {}", fileUrl);
+            return;
+        }
+
+        try {
+            cosClient.deleteObject(cosProperties.getBucketName(), key);
+            logger.info("成功删除 COS 文件: {}", key);
+        } catch (Exception e) {
+            logger.error("删除 COS 文件失败: {}", key, e);
+            // 不抛出异常，以免影响主流程
+        }
+    }
+
     private String generateFileName(MultipartFile file) {
         String originalFilename = file.getOriginalFilename();
         String ext = "";
