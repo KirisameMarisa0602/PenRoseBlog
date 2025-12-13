@@ -1,10 +1,12 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import { marked } from 'marked';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/atom-one-dark.css';
 import '@styles/article/ArticleDetail.css';
-import ArticleHeader from '@components/article/ArticleHeader';
+import '@styles/article/ArticleSidebars.css';
+import AuthorSidebar from '@components/article/AuthorSidebar';
+import ArticleSidebar from '@components/article/ArticleSidebar';
 import ArticleActions from '@components/article/ArticleActions';
 import CommentsSection from '@components/article/CommentsSection';
 import ForwardFriendsModal from '@components/article/ForwardFriendsModal';
@@ -58,6 +60,29 @@ export default function ArticleDetail() {
 
     // Cover image scroll effect
     const [coverOpacity, setCoverOpacity] = useState(1);
+    
+    // TOC State
+    const [toc, setToc] = useState([]);
+
+    useEffect(() => {
+        if (post?.content) {
+            const div = document.createElement('div');
+            div.innerHTML = post.content;
+            const headers = div.querySelectorAll('h1, h2, h3');
+            const newToc = [];
+            headers.forEach((h) => {
+                if (h.id) {
+                    newToc.push({
+                        id: h.id,
+                        text: h.innerText,
+                        level: parseInt(h.tagName.substring(1))
+                    });
+                }
+            });
+            setToc(newToc);
+        }
+    }, [post?.content]);
+
     useEffect(() => {
         const handleScroll = () => {
             const scrollTop = window.scrollY;
@@ -92,6 +117,17 @@ export default function ArticleDetail() {
                         });
 
                         p.content = await marked.parse(fixedContent);
+                        
+                        // Add IDs to headers for TOC
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = p.content;
+                        const headers = tempDiv.querySelectorAll('h1, h2, h3');
+                        if (headers.length > 0) {
+                            headers.forEach((h, index) => {
+                                if (!h.id) h.id = `article-heading-${index}`;
+                            });
+                            p.content = tempDiv.innerHTML;
+                        }
                     } catch (e) {
                         console.error('Markdown parsing failed', e);
                     }
@@ -995,12 +1031,23 @@ export default function ArticleDetail() {
                 </div>
             )}
             <div className={`article-detail-container ${coverUrl ? 'has-cover' : ''}`}>
+                {/* Left Sidebar: Author Info */}
+                <AuthorSidebar 
+                    post={post} 
+                    currentUserId={userId} 
+                />
+
+                {/* Center: Article Content */}
                 <article className="article-main">
-                    <ArticleHeader
-                        post={post}
-                        isOwner={isOwner}
-                        onDelete={handleDeletePost}
-                    />
+                    {/* Inline Header */}
+                    <div className="article-main-header">
+                        <h1 className="article-title-text" style={{ fontSize: '28px', marginBottom: '16px' }}>{post.title}</h1>
+                        <div className="article-meta-info" style={{ marginBottom: '24px', color: '#888', fontSize: '14px' }}>
+                            <span style={{ marginRight: '16px' }}>{post.createdAt || post.createTime}</span>
+                            <span>阅读 {post.viewCount || 0}</span>
+                        </div>
+                    </div>
+
                     <div className="article-content tiptap-content" dangerouslySetInnerHTML={{ __html: post.content || '' }} />
 
                     <ArticleActions
@@ -1043,6 +1090,14 @@ export default function ArticleDetail() {
                         handleSubmitReply={handleSubmitReply}
                     />
                 </article>
+
+                {/* Right Sidebar: TOC & Info */}
+                <ArticleSidebar 
+                    post={post} 
+                    isOwner={isOwner} 
+                    onDelete={handleDeletePost} 
+                    toc={toc}
+                />
             </div>
 
             <ForwardFriendsModal

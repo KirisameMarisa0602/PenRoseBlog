@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { notificationApi } from '../utils/api/notificationApi';
 import { useNavigate } from 'react-router-dom';
 import resolveUrl from '../utils/resolveUrl';
+import { getDefaultAvatar } from '../utils/avatarUtils';
 import '@styles/pages/NotificationCenter.css';
 import MessageList from './MessageList';
 import PendingFriendRequests from './PendingFriendRequests';
@@ -235,10 +236,21 @@ export default function NotificationCenter() {
                 actionText = '新通知';
         }
 
+        const avatarUrl = note.senderAvatarUrl 
+            ? resolveUrl(note.senderAvatarUrl) 
+            : getDefaultAvatar(note.senderId);
+
         return (
             <div className={`notification-item ${!note.read ? 'unread' : ''}`} key={note.requestId || note.id} onClick={() => handleNotificationClick(note)}>
                 <div className="notification-avatar">
-                    <img src={resolveUrl(note.senderAvatarUrl) || '/imgs/loginandwelcomepanel/1.png'} alt="avatar" onError={(e) => { e.target.onerror = null; e.target.src = '/imgs/loginandwelcomepanel/1.png' }} />
+                    <img 
+                        src={avatarUrl} 
+                        alt="avatar" 
+                        onError={(e) => { 
+                            e.target.onerror = null; 
+                            e.target.src = getDefaultAvatar(note.senderId); 
+                        }} 
+                    />
                 </div>
                 <div className="notification-content">
                     <div className="notification-header">

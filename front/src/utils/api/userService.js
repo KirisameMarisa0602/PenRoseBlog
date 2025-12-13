@@ -15,6 +15,11 @@ export async function fetchUserProfile(userId) {
   return response.data;
 }
 
+export async function fetchUserStats(userId) {
+  const response = await httpClient.get(`/user/${userId}/stats`);
+  return response.data;
+}
+
 export async function searchUsers(params) {
   // Backend mapping is `/api/users/search` (plural)
   const response = await httpClient.get('/users/search', { params });
