@@ -15,6 +15,7 @@ export default function FavoritesPage() {
     const [selectedCategory, setSelectedCategory] = useState('全部');
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
+    const [viewMode, setViewMode] = useState('horizontal'); // 'horizontal' or 'grid'
     const size = 12;
 
     // Add '全部' to the categories list
@@ -68,6 +69,20 @@ export default function FavoritesPage() {
             <div className="favorites-content">
                 <div className="favorites-header">
                     <h2 className="favorites-title">我的收藏</h2>
+                    <div className="favorites-view-toggle">
+                        <button 
+                            className={`view-toggle-btn ${viewMode === 'horizontal' ? 'active' : ''}`}
+                            onClick={() => setViewMode('horizontal')}
+                        >
+                            横向滑动
+                        </button>
+                        <button 
+                            className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
+                            onClick={() => setViewMode('grid')}
+                        >
+                            网格视图
+                        </button>
+                    </div>
                 </div>
 
                 {/* 3D Category Carousel */}
@@ -79,32 +94,34 @@ export default function FavoritesPage() {
                     />
                 </div>
 
-                {/* Post Grid */}
-                <div className="favorites-grid">
-                    {posts.map(post => (
-                        <ArticleCard key={post.id} post={post} className="favorites-card-item" />
-                    ))}
+                {/* Post List Container */}
+                <div className="favorites-list-wrapper">
+                    <div className={`favorites-list-scroll mode-${viewMode}`}>
+                        {posts.map(post => (
+                            <ArticleCard key={post.id} post={post} className="favorites-card-item" />
+                        ))}
+                        
+                        {posts.length === 0 && !loading && (
+                            <div className="favorites-empty-state">
+                                {selectedCategory && selectedCategory !== '全部' 
+                                    ? `"${selectedCategory}" 分类下暂无收藏` 
+                                    : '暂无收藏文章'}
+                            </div>
+                        )}
+                        
+                        {hasMore && (
+                            <div className="favorites-load-more">
+                                <button 
+                                    className="load-more-btn"
+                                    onClick={loadMore} 
+                                    disabled={loading}
+                                >
+                                    {loading ? '加载中...' : '加载更多'}
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
-
-                {posts.length === 0 && !loading && (
-                    <div className="favorites-empty-state">
-                        {selectedCategory && selectedCategory !== '全部' 
-                            ? `"${selectedCategory}" 分类下暂无收藏` 
-                            : '暂无收藏文章'}
-                    </div>
-                )}
-                
-                {hasMore && (
-                    <div className="favorites-load-more">
-                        <button 
-                            className="load-more-btn"
-                            onClick={loadMore} 
-                            disabled={loading}
-                        >
-                            {loading ? '加载中...' : '加载更多'}
-                        </button>
-                    </div>
-                )}
             </div>
         </div>
     );

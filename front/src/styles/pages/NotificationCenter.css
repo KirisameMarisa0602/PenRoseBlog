@@ -60,6 +60,9 @@
     flex-direction: column;
     gap: 1.2rem;
     flex: 1;
+    overflow-y: auto;
+    padding-right: 8px;
+    min-height: 0;
 }
 
 .no-notifications {
@@ -341,9 +344,16 @@
 .notification-layout {
     display: flex;
     gap: 20px;
-    max-width: 1200px;
-    margin: 2rem auto;
-    align-items: flex-start;
+    max-width: 1400px;
+    margin: 0 auto;
+    align-items: stretch;
+    height: calc(100vh - var(--navH));
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .notification-sidebar {
@@ -355,6 +365,10 @@
     box-shadow: 0 4px 20px var(--shadow-color);
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
+    height: 100%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
 }
 
 .notification-sidebar-item {
@@ -391,13 +405,18 @@
 .notification-content-wrapper {
     flex: 1;
     min-width: 0; /* Prevent flex overflow */
+    height: 100%;
 }
 
 /* Override container styles when inside layout */
 .notification-layout .notification-center-container {
     margin: 0;
     max-width: none;
-    min-height: 70vh;
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Adjustments for embedded components */
@@ -406,6 +425,7 @@
     min-height: 0;
     background: transparent;
     padding: 0;
+    height: 100%;
 }
 
 .notification-content-wrapper .message-list-container,
@@ -419,4 +439,8 @@
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
     border: 1px solid var(--border-glass);
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }

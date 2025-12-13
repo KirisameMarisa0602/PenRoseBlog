@@ -1,41 +1,144 @@
 .favorites-page-container {
-    /* padding-top: 80px; Removed duplicate placeholder */
-    min-height: 100vh;
+    margin-top: calc(-1 * var(--navH));
+    padding-top: var(--navH);
+    height: 100vh; /* Fixed height */
+    overflow: hidden; /* No scroll on body */
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    padding-bottom: 60px;
+    display: flex;
+    flex-direction: column;
 }
 
 .favorites-content {
     width: 100%;
-    max-width: 1400px;
+    max-width: 1600px; /* Wider for horizontal view */
     margin: 0 auto;
     padding: 0 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Contain children */
 }
 
 .favorites-header {
-    margin-bottom: 40px;
+    margin-bottom: 20px;
     text-align: center;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
 }
 
 .favorites-title {
     font-size: 2rem;
     color: #333;
-    margin-bottom: 10px;
+    margin: 0;
     font-weight: 600;
     text-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.favorites-carousel-container {
-    margin-bottom: 50px;
-    height: 400px; /* Ensure enough space for 3D effect */
-    position: relative;
+.favorites-view-toggle {
+    display: flex;
+    gap: 10px;
 }
 
-.favorites-grid {
+.view-toggle-btn {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #555; /* Ensure text is visible */
+    transition: all 0.3s;
+    -webkit-backdrop-filter: blur(5px); /* Safari support */
+    backdrop-filter: blur(5px);
+}
+
+.view-toggle-btn.active {
+    background: #6366f1;
+    color: white;
+    border-color: #6366f1;
+}
+
+.favorites-carousel-container {
+    margin-bottom: 20px;
+    height: 300px; /* Reduced height */
+    position: relative;
+    flex-shrink: 0;
+}
+
+/* Main List Container */
+.favorites-list-wrapper {
+    flex: 1;
+    position: relative;
+    min-height: 0; /* Important for flex child scrolling */
+    margin-bottom: 20px;
+}
+
+/* Horizontal Mode */
+.favorites-list-scroll.mode-horizontal {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    align-items: center;
+    height: 100%;
+    padding: 0 20px;
+    gap: 30px;
+    scroll-behavior: smooth;
+}
+
+.favorites-list-scroll.mode-horizontal::-webkit-scrollbar {
+    height: 8px;
+}
+
+.favorites-list-scroll.mode-horizontal::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.05);
+    border-radius: 4px;
+}
+
+.favorites-list-scroll.mode-horizontal::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.2);
+    border-radius: 4px;
+}
+
+.favorites-list-scroll.mode-horizontal .favorites-card-item {
+    width: 320px;
+    flex-shrink: 0;
+    height: auto;
+    margin: 0;
+    transform-origin: center center;
+    transition: transform 0.3s;
+}
+
+.favorites-list-scroll.mode-horizontal .favorites-card-item:hover {
+    transform: scale(1.05) translateY(-10px);
+    z-index: 10;
+}
+
+/* Grid Mode */
+.favorites-list-scroll.mode-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 24px;
-    padding: 20px 0;
+    padding: 20px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 100%;
+}
+
+.favorites-list-scroll.mode-grid::-webkit-scrollbar {
+    width: 8px;
+}
+
+.favorites-list-scroll.mode-grid::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.05);
+}
+
+.favorites-list-scroll.mode-grid::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.2);
+    border-radius: 4px;
 }
 
 .favorites-empty-state {
@@ -46,53 +149,19 @@
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     border-radius: 16px;
-    margin-top: 20px;
+    margin: auto;
     box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    width: fit-content;
 }
 
 .favorites-load-more {
     text-align: center;
-    margin-top: 40px;
-    margin-bottom: 60px;
+    padding: 20px;
+    width: 100%;
+    /* In horizontal mode, this might need to be at the end of the flex container */
 }
 
-.load-more-btn {
-    padding: 12px 40px;
-    border-radius: 30px;
-    border: none;
-    background: linear-gradient(90deg, #6366f1, #8b5cf6);
-    color: white;
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
-}
-
-.load-more-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
-}
-
-.load-more-btn:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .favorites-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .favorites-carousel-container {
-        height: 300px;
-    }
-}
-
-/* Fix for ArticleCard in Grid Layout */
+/* Fix for ArticleCard in Grid/Horizontal Layout */
 .favorites-card-item .article-card-link {
     flex-direction: column;
     height: auto;

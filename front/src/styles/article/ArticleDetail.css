@@ -17,7 +17,7 @@
   z-index: 0;
   background-size: cover;
   background-position: center;
-  filter: blur(30px) brightness(0.7);
+  filter: blur(8px) brightness(0.85);
   pointer-events: none;
 }
 
@@ -289,18 +289,26 @@
 /* --- Article Actions --- */
 .article-actions-container {
   margin-top: 60px;
-  padding-top: 30px;
+  padding: 30px 50px;
   border-top: 1px solid #f1f5f9;
   display: flex;
-  justify-content: center;
-  gap: 24px;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* Make all children (buttons/wrappers) take equal width */
+.article-actions-container > * {
+  flex: 1;
+  min-width: 0; /* Prevent overflow */
 }
 
 .action-btn {
   display: flex;
   align-items: center;
+  justify-content: center; /* Center content */
+  width: 100%; /* Fill container */
   gap: 8px;
-  padding: 10px 24px;
+  padding: 10px 0; /* Reduce horizontal padding since we use width: 100% */
   border-radius: 24px;
   border: 1px solid #e2e8f0;
   background: #fff;
@@ -309,6 +317,7 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 
 .action-btn:hover {
@@ -337,7 +346,14 @@
 }
 .action-btn .count { font-weight: 600; margin-left: 4px; }
 
-.share-wrapper { position: relative; }
+.share-wrapper { 
+  position: relative; 
+  display: flex; /* Ensure it behaves as a flex container for the button */
+}
+.share-wrapper .action-btn {
+  width: 100%;
+}
+
 .share-menu {
   position: absolute;
   bottom: 100%;
@@ -348,11 +364,27 @@
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   padding: 8px;
-  min-width: 140px;
+  min-width: 120px;
+  z-index: 10;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  z-index: 10;
+}
+
+@media (max-width: 768px) {
+  .article-actions-container {
+    padding: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .article-actions-container > * {
+    flex: 0 0 calc(33.33% - 11px); /* 3 per row */
+    min-width: auto;
+  }
+  .action-btn {
+    padding: 8px 0;
+    font-size: 13px;
+  }
 }
 
 .share-menu-item {
@@ -372,13 +404,13 @@
 .article-comments {
   margin-top: 40px;
   padding-top: 40px;
-  border-top: 1px solid #4d94ef;
+  border-top: 1px solid #e3e5e7;
 }
 
 .comments-title {
   font-size: 20px;
   font-weight: 700;
-  color: #1a202c;
+  color: #18191c;
   margin-bottom: 24px;
 }
 
@@ -393,9 +425,9 @@
   width: 100%;
   min-height: 80px;
   padding: 12px;
-  border: 1px solid #f5b0e7;
+  border: 1px solid #f1f2f3;
   border-radius: 6px;
-  background: #f7d9e9;
+  background: #f1f2f3;
   color: #18191c;
   font-size: 14px;
   resize: vertical;
@@ -406,13 +438,12 @@
 
 .comment-textarea:focus {
   background: #fff;
-  border-color: #00aeec;
-  box-shadow: 0 0 0 2px rgba(0, 174, 236, 0.1);
+  border-color: #c9ccd0;
 }
 
 .comment-textarea:hover {
   background: #fff;
-  border-color: #00aeec;
+  border-color: #c9ccd0;
 }
 
 .comment-form-footer {
@@ -491,7 +522,7 @@
   display: flex;
   gap: 16px;
   padding: 24px 0;
-  border-bottom: 1px solid #923cf5;
+  border-bottom: 1px solid #e3e5e7;
 }
 .comment-item:last-child { border-bottom: none; }
 
@@ -599,10 +630,10 @@
 /* Replies Container */
 .replies-container {
     margin-top: 16px;
-    background: #b3f3f1;
+    background: #f9fafb;
     padding: 20px;
     border-radius: 8px;
-    border: 1px solid #c65ffa;
+    border: none;
 }
 
 .reply-form {
@@ -615,7 +646,7 @@
 .reply-textarea {
   flex: 1;
   padding: 8px 10px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid #e3e5e7;
   border-radius: 4px;
   background: #fff;
   color: #18191c;
@@ -625,7 +656,7 @@
   outline: none;
   transition: all 0.2s;
 }
-.reply-textarea:focus { border-color: #00aeec; box-shadow: 0 0 0 2px rgba(0, 174, 236, 0.1); }
+.reply-textarea:focus { border-color: #00aeec; }
 
 .reply-submit-btn {
   background: #00aeec;
@@ -645,7 +676,7 @@
     display: flex;
     gap: 10px;
     padding: 16px 0;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e3e5e7;
 }
 
 .reply-item:last-child {
