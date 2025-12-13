@@ -9,6 +9,7 @@ import TurndownService from 'turndown';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/atom-one-dark.css';
 import { BLOG_CATEGORIES } from '@utils/constants';
+import resolveUrl from '@utils/resolveUrl';
 
 const turndownService = new TurndownService();
 
@@ -17,7 +18,9 @@ const BlogEditor = () => {
   const [content, setContent] = useState('');
   const [cover, setCover] = useState(null);
   const [coverPreview, setCoverPreview] = useState(null);
+  const [removeCover, setRemoveCover] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [submitType, setSubmitType] = useState(null); // 'DRAFT' or 'PUBLISHED'
   const [previewMode, setPreviewMode] = useState(false);
   const [editorMode, setEditorMode] = useState('rich'); // 'rich' or 'markdown'
   const [previewHtml, setPreviewHtml] = useState('');
@@ -117,7 +120,7 @@ const BlogEditor = () => {
             setCategory(post.categoryName || '');
             setDirectory(post.directory || '');
             if (post.coverImageUrl) {
-              setCoverPreview(post.coverImageUrl);
+              setCoverPreview(resolveUrl(post.coverImageUrl));
             }
             // Default to rich editor for existing posts as they are stored as HTML
             setEditorMode('rich');
@@ -190,6 +193,7 @@ const BlogEditor = () => {
       return;
     }
     setCover(file);
+    setRemoveCover(false);
     if (file) {
       const reader = new FileReader();
       reader.onload = (ev) => setCoverPreview(ev.target.result);
@@ -218,6 +222,7 @@ const BlogEditor = () => {
       return;
     }
     setSubmitting(true);
+    setSubmitType(status);
     const formData = new FormData();
     formData.append('title', title);
 
@@ -231,6 +236,7 @@ const BlogEditor = () => {
         console.error('Markdown parsing failed', e);
         alert('Markdown 解析失败');
         setSubmitting(false);
+        setSubmitType(null);
         return;
       }
     }
@@ -239,6 +245,7 @@ const BlogEditor = () => {
     if (!editId) {
       formData.append('userId', userId);
     }
+    if (removeCover) formData.append('removeCover', true);
     if (cover) formData.append('cover', cover);
 
     // Add tags, category, directory, status
@@ -287,6 +294,7 @@ const BlogEditor = () => {
       alert('网络错误');
     } finally {
       setSubmitting(false);
+      setSubmitType(null);
     }
   };
 
@@ -453,15 +461,14 @@ const BlogEditor = () => {
              className="blog-editor-btn secondary"
              onClick={(e) => handleSubmit(e, 'DRAFT')}
              disabled={submitting || !title.trim()}
-           >
-             保存草稿
+           >{submitting && submitType === 'DRAFT' ? '保存中...' : '保存草稿'}
            </button>
            <button 
              className="blog-editor-btn primary"
              onClick={(e) => handleSubmit(e, 'PUBLISHED')}
              disabled={submitting || !title.trim() || contentLen < CONTENT_MIN}
            >
-             {submitting ? '发布中...' : (editId ? '更新' : '发布')}
+             {submitting && submitType === 'PUBLISHED' ? '发布中...' : '正式发布'}
            </button>
         </div>
       </div>
@@ -551,12 +558,19 @@ const BlogEditor = () => {
               <div className="sidebar-cover-upload">
                  {coverPreview ? (
                    <div className="cover-preview-large">
-                     <img src={coverPreview} alt="Cover" />
+                     <img 
+                        src={coverPreview} 
+                        alt="Cover" 
+                        onError={() => {
+                          console.error('Cover image load failed:', coverPreview);
+                          setCoverPreview(null);
+                        }}
+                     />
                      <div className="cover-actions">
                         <label className="change-cover-btn">
                            更换
                            <input type="file" accept="image/*" onChange={handleCoverChange} hidden />
-                        </label>
+                        </label> setRemoveCover(true);
                         <button className="remove-cover-btn" onClick={() => {setCover(null); setCoverPreview(null);}}>移除</button>
                      </div>
                    </div>

@@ -137,8 +137,9 @@ public class BlogPostController {
             @RequestParam(value = "categoryName", required = false) String categoryName,
             @RequestParam(value = "tags", required = false) java.util.List<String> tags,
             @RequestParam(value = "status", required = false) String status,
-            @RequestParam(value = "cover", required = false) MultipartFile cover) {
-        return blogPostService.updateWithCover(id, content, directory, categoryName, tags, status, cover);
+            @RequestParam(value = "cover", required = false) MultipartFile cover,
+            @RequestParam(value = "removeCover", required = false) Boolean removeCover) {
+        return blogPostService.updateWithCover(id, content, directory, categoryName, tags, status, cover, removeCover);
     }
 
     // 新增：删除博客接口

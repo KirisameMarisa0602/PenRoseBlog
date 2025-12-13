@@ -29,7 +29,8 @@ public interface BlogPostService {
         PageResult<BlogPostDTO> pageList(int page, int size, Long currentUserId);
 
         // 搜索文章
-        PageResult<BlogPostDTO> search(String keyword, Long userId, String directory, String categoryName, String status, int page,
+        PageResult<BlogPostDTO> search(String keyword, Long userId, String directory, String categoryName,
+                        String status, int page,
                         int size,
                         Long currentUserId);
 
@@ -43,7 +44,7 @@ public interface BlogPostService {
                         List<String> tags, String status, MultipartFile cover);
 
         ApiResponse<Boolean> updateWithCover(Long id, String content, String directory, String categoryName,
-                        List<String> tags, String status, MultipartFile cover);
+                        List<String> tags, String status, MultipartFile cover, Boolean removeCover);
 
         // 新增：删除博客接口（只能作者删除）
         ApiResponse<Boolean> delete(Long blogPostId, Long userId);

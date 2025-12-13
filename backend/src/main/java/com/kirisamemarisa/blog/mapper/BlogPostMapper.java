@@ -47,6 +47,7 @@ public interface BlogPostMapper {
             @Mapping(target = "authorAvatarUrl", ignore = true),
             // map title from entity to DTO
             @Mapping(target = "title", source = "title"),
+            @Mapping(target = "coverImageUrl", source = "coverImageUrl"),
             @Mapping(target = "categoryName", source = "category.name"),
             @Mapping(target = "tags", expression = "java(mapTagsToStrings(entity.getTags()))")
     })

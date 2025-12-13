@@ -328,7 +328,10 @@ public class BlogPostServiceImpl implements BlogPostService {
 
         String statusFilter = "PUBLISHED";
         if (userId != null && userId.equals(currentUserId)) {
-            statusFilter = status;
+            // 只有当明确指定了状态时才使用指定状态，否则默认只查已发布
+            if (status != null && !status.isEmpty()) {
+                statusFilter = status;
+            }
         }
 
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -488,7 +491,7 @@ public class BlogPostServiceImpl implements BlogPostService {
     @Override
     @Transactional
     public ApiResponse<Boolean> updateWithCover(Long id, String content, String directory, String categoryName,
-            java.util.List<String> tags, String status, MultipartFile cover) {
+            java.util.List<String> tags, String status, MultipartFile cover, Boolean removeCover) {
         Optional<BlogPost> opt = blogPostRepository.findById(id);
         if (opt.isEmpty())
             return new ApiResponse<>(404, "博客不存在", false);
@@ -537,6 +540,13 @@ public class BlogPostServiceImpl implements BlogPostService {
                 }
             }
             post.setTags(tagSet);
+        }
+
+        // 处理封面逻辑：优先处理删除，再处理上传
+        if (Boolean.TRUE.equals(removeCover)) {
+            // 如果原先有封面，尝试删除文件（可选，取决于是否想保留历史文件）
+            // 这里选择保留文件或由定时任务清理，只清除引用
+            post.setCoverImageUrl(null);
         }
 
         // 保存新封面文件
