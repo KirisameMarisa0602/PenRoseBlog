@@ -38,6 +38,9 @@ services:
     build: ./backend
     container_name: blog-backend
     environment:
+      DB_HOST: mysql
+      REDIS_HOST: redis
+      RABBITMQ_HOST: rabbitmq
       DB_PASSWORD: ${DB_PASSWORD:-20050602}
       RABBITMQ_USER: ${RABBITMQ_USER:-guest}
       RABBITMQ_PASS: ${RABBITMQ_PASS:-guest}
