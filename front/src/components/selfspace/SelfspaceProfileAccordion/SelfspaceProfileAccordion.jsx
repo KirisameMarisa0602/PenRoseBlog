@@ -907,7 +907,34 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                       )}
                     </div>
                   </div>
-                ) : <div className="profilepanel-empty-panel" />}
+                ) : (
+                   <div className="profilepanel-collapsed-preview" style={{ 
+                     display: 'flex', 
+                     alignItems: 'center', 
+                     justifyContent: 'space-between', 
+                     padding: '0 30px',
+                     height: '100%', 
+                     color: '#fff', 
+                     background: 'linear-gradient(to right, rgba(0,0,0,0.1), transparent)',
+                     cursor: 'pointer'
+                   }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                        <div style={{ 
+                           width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255,255,255,0.2)', 
+                           display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(4px)'
+                        }}>
+                           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                           </svg>
+                        </div>
+                        <span style={{ fontSize: '1.1rem', fontWeight: '600', letterSpacing: '1px', textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>编辑资料</span>
+                      </div>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.7 }}>
+                         <polyline points="6 9 12 15 18 9"></polyline>
+                      </svg>
+                   </div>
+                )}
               </div>
             </div>
           );
@@ -982,15 +1009,28 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                    <div className="profilepanel-collapsed-preview" style={{ 
                      display: 'flex', 
                      alignItems: 'center', 
-                     justifyContent: 'center', 
+                     justifyContent: 'space-between', 
+                     padding: '0 30px',
                      height: '100%', 
                      color: '#fff', 
-                     fontSize: '1.4rem', 
-                     fontWeight: 'bold', 
-                     textShadow: '0 2px 4px rgba(0,0,0,0.6)',
-                     letterSpacing: '2px'
+                     background: 'linear-gradient(to right, rgba(0,0,0,0.1), transparent)',
+                     cursor: 'pointer'
                    }}>
-                      关于我
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                        <div style={{ 
+                           width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255,255,255,0.2)', 
+                           display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(4px)'
+                        }}>
+                           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                              <circle cx="12" cy="7" r="4"></circle>
+                           </svg>
+                        </div>
+                        <span style={{ fontSize: '1.1rem', fontWeight: '600', letterSpacing: '1px', textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>关于我</span>
+                      </div>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.7 }}>
+                         <polyline points="6 9 12 15 18 9"></polyline>
+                      </svg>
                    </div>
                 )}
               </div>
@@ -1185,15 +1225,28 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                    <div className="profilepanel-collapsed-preview" style={{ 
                      display: 'flex', 
                      alignItems: 'center', 
-                     justifyContent: 'center', 
+                     justifyContent: 'space-between', 
+                     padding: '0 30px',
                      height: '100%', 
                      color: '#fff', 
-                     fontSize: '1.4rem', 
-                     fontWeight: 'bold', 
-                     textShadow: '0 2px 4px rgba(0,0,0,0.6)',
-                     letterSpacing: '2px'
+                     background: 'linear-gradient(to right, rgba(0,0,0,0.1), transparent)',
+                     cursor: 'pointer'
                    }}>
-                      联系方式
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                        <div style={{ 
+                           width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255,255,255,0.2)', 
+                           display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(4px)'
+                        }}>
+                           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                              <polyline points="22,6 12,13 2,6"></polyline>
+                           </svg>
+                        </div>
+                        <span style={{ fontSize: '1.1rem', fontWeight: '600', letterSpacing: '1px', textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>联系方式</span>
+                      </div>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.7 }}>
+                         <polyline points="6 9 12 15 18 9"></polyline>
+                      </svg>
                    </div>
                 )}
               </div>

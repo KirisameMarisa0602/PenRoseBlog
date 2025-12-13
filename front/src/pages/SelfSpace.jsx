@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import '@styles/selfspace/SelfSpace.css';
 import SelfspaceProfileAccordion from '@components/selfspace/SelfspaceProfileAccordion/SelfspaceProfileAccordion.jsx';
 import ArticleCard from '@components/common/ArticleCard';
-import Category3DCarousel from '@components/selfspace/Category3DCarousel';
 import { useAuthState } from '@hooks/useAuthState';
 import resolveUrl from '@utils/resolveUrl';
 import httpClient from '@utils/api/httpClient';
@@ -13,7 +12,6 @@ import { CATEGORY_CONFIG, DEFAULT_CATEGORY_CONFIG } from '@utils/categoryConfig'
 // SelfSpace 页面：左侧 25vw 手风琴资料面板 + 右侧内容区域
 export default function SelfSpace() {
   const location = useLocation();
-  const navigate = useNavigate();
   const params = new URLSearchParams(location.search);
   const urlUserId = params.get('userId');                 // 被查看用户ID（可能为空）
   const urlCategory = params.get('category');             // URL中的分类参数
@@ -206,33 +204,6 @@ export default function SelfSpace() {
 
         <main className="selfspace-right-panel" aria-label="个人空间内容区">
           <div className="selfspace-articles-wrap">
-            {/* 3D Category Carousel */}
-            <Category3DCarousel 
-              categories={BLOG_CATEGORIES} 
-              selectedCategory={selectedCategory}
-              onSelect={(cat) => {
-                const newCat = (selectedCategory === cat) ? '' : cat;
-                // 更新 URL 参数
-                const newParams = new URLSearchParams(location.search);
-                if (newCat) {
-                  newParams.set('category', newCat);
-                } else {
-                  newParams.delete('category');
-                }
-                // 保持 userId 参数（如果有）
-                if (urlUserId) {
-                  newParams.set('userId', urlUserId);
-                }
-                
-                navigate(`${location.pathname}?${newParams.toString()}`);
-                
-                // State 会通过 useEffect 自动更新，这里只需重置页码和目录
-                if (newCat) {
-                  setSelectedDirectory('');
-                }
-                setPage(0);
-              }}
-            />
 
             {/* 分类详情展示横幅 */}
             {selectedCategory && (

@@ -1,9 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import '@styles/blogeditor/BlogEditor.css';
+import '@styles/blogeditor/Outline.css';
 import httpClient from '@utils/api/httpClient';
 import TipTapEditor from '@components/blogeditor/TipTapEditor';
 import MarkdownEditor from '@components/blogeditor/MarkdownEditor';
+import { SidebarAccordion, ResourceManager } from '@components/blogeditor/SidebarModules';
 import { marked } from 'marked';
 import TurndownService from 'turndown';
 import hljs from 'highlight.js';
@@ -29,6 +31,7 @@ const BlogEditor = () => {
   const [category, setCategory] = useState('');
   const [directory, setDirectory] = useState('');
   const [existingDirectories, setExistingDirectories] = useState([]); // 用户已有的目录列表
+  const [outline, setOutline] = useState([]); // 文章大纲
 
   const TITLE_MAX = 80;
   const CONTENT_MIN = 10;
@@ -365,6 +368,147 @@ const BlogEditor = () => {
     }
   }, [previewMode, previewHtml]);
 
+  // Generate Outline
+  useEffect(() => {
+    if (!content) {
+      setOutline([]);
+      return;
+    }
+
+    const generateOutline = () => {
+      const newOutline = [];
+      if (editorMode === 'rich') {
+        // Parse HTML content
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(content, 'text/html');
+        const headers = doc.querySelectorAll('h1, h2, h3');
+        headers.forEach((header, index) => {
+          newOutline.push({
+            level: parseInt(header.tagName.substring(1)),
+            text: header.textContent || '',
+            index: index
+          });
+        });
+      } else {
+        // Parse Markdown content
+        // Simple regex to find headers at start of line
+        const lines = content.split('\n');
+        let headerIndex = 0;
+        lines.forEach((line) => {
+          const match = line.match(/^(#{1,3})\s+(.*)/);
+          if (match) {
+            newOutline.push({
+              level: match[1].length,
+              text: match[2].trim(),
+              index: headerIndex++
+            });
+          }
+        });
+      }
+      setOutline(newOutline);
+    };
+
+    // Debounce slightly to avoid too many updates
+    const timer = setTimeout(generateOutline, 500);
+    return () => clearTimeout(timer);
+  }, [content, editorMode]);
+
+  const scrollToHeader = (item) => {
+    let container;
+    let headers;
+    
+    if (previewMode) {
+       container = document.querySelector('.tiptap-content'); // In preview mode
+    } else if (editorMode === 'rich') {
+       container = document.querySelector('.ProseMirror'); // TipTap editor content
+    } else {
+       // Markdown mode - scroll the preview pane if visible, or just do nothing as textarea scrolling is hard
+       container = document.querySelector('.markdown-preview-content');
+    }
+
+    if (container) {
+      headers = container.querySelectorAll('h1, h2, h3');
+      if (headers && headers[item.index]) {
+        headers[item.index].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  };
+
+  const scrollToResource = (res) => {
+    let container;
+    if (previewMode) {
+       container = document.querySelector('.tiptap-content');
+    } else if (editorMode === 'rich') {
+       container = document.querySelector('.ProseMirror');
+    } else {
+       container = document.querySelector('.markdown-preview-content');
+    }
+
+    if (container) {
+      const images = container.querySelectorAll('img, video');
+      if (images && images[res.index]) {
+        images[res.index].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Highlight effect
+        images[res.index].style.transition = 'box-shadow 0.3s';
+        images[res.index].style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.5)';
+        setTimeout(() => {
+          images[res.index].style.boxShadow = '';
+        }, 1500);
+      }
+    }
+  };
+
+  const handleResourceReorder = (fromIndex, toIndex) => {
+    if (fromIndex === toIndex) return;
+    
+    // Simple string replacement strategy
+    // We need to find the exact strings in content and swap them
+    // Note: This is risky if there are identical tags. We rely on the order.
+    
+    // Re-find all tags to ensure we have current positions
+    let tags = [];
+    let match;
+    if (editorMode === 'rich') {
+      const imgRegex = /<img\s+[^>]*src="([^"]*)"[^>]*>/g;
+      while ((match = imgRegex.exec(content)) !== null) {
+        tags.push({ start: match.index, end: match.index + match[0].length, text: match[0] });
+      }
+    } else {
+      // Markdown logic is more complex due to mixed syntax, simplifying to just standard md images for now
+      // Or use the same regex as ResourceManager
+      const mdImgRegex = /!\[(.*?)\]\((.*?)\)/g;
+      while ((match = mdImgRegex.exec(content)) !== null) {
+        tags.push({ start: match.index, end: match.index + match[0].length, text: match[0] });
+      }
+      const htmlImgRegex = /<img\s+[^>]*src="([^"]*)"[^>]*>/g;
+      while ((match = htmlImgRegex.exec(content)) !== null) {
+         tags.push({ start: match.index, end: match.index + match[0].length, text: match[0] });
+      }
+      tags.sort((a, b) => a.start - b.start);
+    }
+
+    if (!tags[fromIndex] || !tags[toIndex]) return;
+
+    const tagA = tags[fromIndex];
+    const tagB = tags[toIndex];
+
+    // Swap logic
+    // We need to construct new string carefully
+    // Assume fromIndex < toIndex for simplicity in logic, swap if not
+    let first = fromIndex < toIndex ? tagA : tagB;
+    let second = fromIndex < toIndex ? tagB : tagA;
+    
+    // If we are swapping, we put second's text in first's place and vice versa
+    const newContent = 
+      content.substring(0, first.start) + 
+      second.text + 
+      content.substring(first.end, second.start) + 
+      first.text + 
+      content.substring(second.end);
+      
+    setContent(newContent);
+  };
+
   const handleDelete = async () => {
     if (!editId) return;
     if (!window.confirm('确定要删除这篇草稿吗？删除后无法恢复，且关联的图片资源也会被清理。')) {
@@ -475,7 +619,39 @@ const BlogEditor = () => {
 
       {/* Main Layout: Editor + Sidebar */}
       <div className="blog-editor-body">
-        {/* Main Editor Area */}
+        {/* Left Sidebar: Outline & Resources */}
+        <div className="blog-editor-left-sidebar">
+           <SidebarAccordion title="文章大纲" defaultOpen={true}>
+              <div className="sidebar-helper-text" style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                 {outline.length > 0 ? (
+                   <div className="outline-list">
+                     {outline.map((item, idx) => (
+                       <div 
+                         key={idx} 
+                         className={`outline-item level-${item.level}`}
+                         onClick={() => scrollToHeader(item)}
+                       >
+                         {item.text}
+                       </div>
+                     ))}
+                   </div>
+                 ) : (
+                   <p style={{ color: '#94a3b8', textAlign: 'center', padding: '10px 0' }}>暂无大纲内容</p>
+                 )}
+              </div>
+           </SidebarAccordion>
+
+           <SidebarAccordion title="资源管理" defaultOpen={true}>
+              <ResourceManager 
+                content={content} 
+                editorMode={editorMode} 
+                onReorder={handleResourceReorder}
+                onItemClick={scrollToResource}
+              />
+           </SidebarAccordion>
+        </div>
+
+        {/* Center: Editor Area */}
         <div className="blog-editor-content-area">
            {previewMode ? (
              <div className="blog-editor-preview-wrapper">
@@ -494,7 +670,7 @@ const BlogEditor = () => {
            )}
         </div>
 
-        {/* Right Sidebar */}
+        {/* Right Sidebar: Settings */}
         <div className="blog-editor-sidebar">
            {/* Publish Settings Card */}
            <div className="sidebar-card">
@@ -545,7 +721,7 @@ const BlogEditor = () => {
                         value={tagInput}
                         onChange={e => setTagInput(e.target.value)}
                         onKeyDown={handleTagKeyDown}
-                        className="tag-input-field"
+                        className="blog-editor-input"
                       />
                     )}
                 </div>
@@ -554,18 +730,11 @@ const BlogEditor = () => {
 
            {/* Cover Card */}
            <div className="sidebar-card">
-              <h3>文章封面</h3>
-              <div className="sidebar-cover-upload">
+              <h3>封面</h3>
+              <div className="cover-upload-area">
                  {coverPreview ? (
-                   <div className="cover-preview-large">
-                     <img 
-                        src={coverPreview} 
-                        alt="Cover" 
-                        onError={() => {
-                          console.error('Cover image load failed:', coverPreview);
-                          setCoverPreview(null);
-                        }}
-                     />
+                   <div className="cover-preview">
+                     <img src={coverPreview} alt="Cover" />
                      <div className="cover-actions">
                         <label className="change-cover-btn">
                            更换

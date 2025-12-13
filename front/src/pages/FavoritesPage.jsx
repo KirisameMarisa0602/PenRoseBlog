@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import ArticleCard from '@components/common/ArticleCard';
 import { useAuthState } from '@hooks/useAuthState';
 import '@styles/selfspace/SelfSpace.css'; // Reuse SelfSpace styles for grid
+import Category3DCarousel from '@components/selfspace/Category3DCarousel';
+import { BLOG_CATEGORIES } from '@utils/constants';
 
 export default function FavoritesPage() {
     const { user } = useAuthState();
@@ -9,24 +11,10 @@ export default function FavoritesPage() {
 
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const size = 12;
-
-    // Fetch categories
-    useEffect(() => {
-        if (!userId) return;
-        fetch(`/api/blogpost/favorites/categories?userId=${userId}`)
-            .then(r => r.json())
-            .then(j => {
-                if (j && (j.code === 200 || j.status === 200)) {
-                    setCategories(j.data || []);
-                }
-            })
-            .catch(console.error);
-    }, [userId]);
 
     // Fetch favorites
     useEffect(() => {
@@ -68,25 +56,18 @@ export default function FavoritesPage() {
     return (
         <div className="selfspace-container" style={{ paddingTop: '80px', minHeight: '100vh' }}>
             <div className="selfspace-content" style={{ width: '100%', maxWidth: '1200px', margin: '0 auto' }}>
-                <h2 style={{ marginBottom: '20px', color: '#333' }}>我的收藏</h2>
+                <h2 style={{ marginBottom: '20px', color: '#333', textAlign: 'center' }}>我的收藏</h2>
 
-                {/* Category Filter */}
-                <div className="selfspace-filter-bar">
-                    <button
-                        className={`filter-btn ${selectedCategory === '' ? 'active' : ''}`}
-                        onClick={() => handleCategoryChange('')}
-                    >
-                        全部
-                    </button>
-                    {categories.map(c => (
-                        <button
-                            key={c}
-                            className={`filter-btn ${selectedCategory === c ? 'active' : ''}`}
-                            onClick={() => handleCategoryChange(c)}
-                        >
-                            {c}
-                        </button>
-                    ))}
+                {/* 3D Category Carousel */}
+                <div style={{ marginBottom: '40px' }}>
+                    <Category3DCarousel 
+                        categories={BLOG_CATEGORIES} 
+                        selectedCategory={selectedCategory}
+                        onSelect={(cat) => {
+                            const newCat = (selectedCategory === cat) ? '' : cat;
+                            handleCategoryChange(newCat);
+                        }}
+                    />
                 </div>
 
                 {/* Post Grid */}
@@ -97,12 +78,25 @@ export default function FavoritesPage() {
                 </div>
 
                 {posts.length === 0 && !loading && (
-                    <div className="empty-state">暂无收藏文章</div>
+                    <div className="empty-state" style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
+                        {selectedCategory ? `"${selectedCategory}" 分类下暂无收藏` : '暂无收藏文章'}
+                    </div>
                 )}
-
+                
                 {hasMore && (
-                    <div style={{ textAlign: 'center', marginTop: '20px' }}>
-                        <button onClick={loadMore} disabled={loading} className="load-more-btn">
+                    <div style={{ textAlign: 'center', marginTop: '30px', marginBottom: '50px' }}>
+                        <button 
+                            onClick={loadMore} 
+                            disabled={loading}
+                            style={{
+                                padding: '10px 30px',
+                                borderRadius: '20px',
+                                border: '1px solid #ddd',
+                                background: '#fff',
+                                cursor: 'pointer',
+                                color: '#666'
+                            }}
+                        >
                             {loading ? '加载中...' : '加载更多'}
                         </button>
                     </div>

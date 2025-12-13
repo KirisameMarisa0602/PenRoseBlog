@@ -495,7 +495,6 @@ export default function BannerNavbar({ bannerId }) {
               </div>
             </div>
           </a>
-          <span style={{ fontSize: '12px', color: '#fff', marginTop: '4px', textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>首页</span>
         </div>
 
         {/* 2. Messages */}

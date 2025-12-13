@@ -1,0 +1,37 @@
+/* Outline Styles */
+.outline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.outline-item {
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.outline-item:hover {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.outline-item.level-1 {
+  font-weight: 600;
+  color: #334155;
+}
+
+.outline-item.level-2 {
+  padding-left: 20px;
+}
+
+.outline-item.level-3 {
+  padding-left: 32px;
+  font-size: 12px;
+}
