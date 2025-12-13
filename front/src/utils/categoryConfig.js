@@ -1,6 +1,12 @@
 import resolveUrl from './resolveUrl';
 
 export const CATEGORY_CONFIG = {
+  '全部': {
+    color: '#6366f1',
+    icon: '🌟',
+    bgImage: `url("${resolveUrl('/imgs/categories/全部.jpg')}")`, // You might need to ensure this image exists or use a fallback
+    description: '所有收藏的文章'
+  },
   '知识': {
     color: '#92d2fdff',
     icon: '💻',

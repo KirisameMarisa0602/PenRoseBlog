@@ -5,7 +5,6 @@ import SelfspaceProfileAccordion from '@components/selfspace/SelfspaceProfileAcc
 import ArticleFolderTree from '@components/selfspace/ArticleFolderTree.jsx';
 import { useAuthState } from '@hooks/useAuthState';
 import resolveUrl from '@utils/resolveUrl';
-import httpClient from '@utils/api/httpClient';
 import { getDefaultAvatar, isValidAvatar } from '@utils/avatarUtils';
 
 // SelfSpace 页面：左侧 25vw 手风琴资料面板 + 右侧内容区域
@@ -75,25 +74,6 @@ export default function SelfSpace() {
     return () => { mounted = false; };
   }, [effectiveUserId, currentUserId]); // 仅依赖用户ID，不依赖筛选条件
 
-  const handleDeletePost = async (postId) => {
-    if (!window.confirm('确定要删除这篇文章吗？删除后无法恢复。')) {
-      return;
-    }
-    try {
-      const res = await httpClient.delete(`/blogpost/${postId}?userId=${myId}`);
-      if (res && (res.status === 200 || res.data?.code === 200)) {
-        alert('删除成功');
-        // Refresh list locally
-        setAllPosts(allPosts.filter(p => (p.id || p.postId) !== postId));
-      } else {
-        alert('删除失败: ' + (res.data?.message || '未知错误'));
-      }
-    } catch (e) {
-      console.error(e);
-      alert('网络错误');
-    }
-  };
-
   return (
     <>
       <div className="selfspace-page" data-page="selfspace">
@@ -130,7 +110,6 @@ export default function SelfSpace() {
                <ArticleFolderTree 
                   posts={allPosts}
                   onFilterChange={() => {}} // No longer needed for filtering right side
-                  onDelete={isOwner ? handleDeletePost : undefined}
                 />
             </div>
           </div>

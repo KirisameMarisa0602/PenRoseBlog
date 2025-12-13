@@ -1026,11 +1026,9 @@ export default function ArticleDetail() {
     return (
         <div className="article-detail-page">
             {coverUrl && (
-                <div className="article-cover-wrapper" style={{ opacity: coverOpacity }}>
-                    <img src={coverUrl} alt="Article Cover" />
-                </div>
+                <div className="page-blur-background" style={{ backgroundImage: `url(${coverUrl})` }}></div>
             )}
-            <div className={`article-detail-container ${coverUrl ? 'has-cover' : ''}`}>
+            <div className="article-detail-container">
                 {/* Left Sidebar: Author Info */}
                 <AuthorSidebar 
                     post={post} 
@@ -1039,13 +1037,14 @@ export default function ArticleDetail() {
 
                 {/* Center: Article Content */}
                 <article className="article-main">
+                    {coverUrl && (
+                        <div className="article-card-cover">
+                            <img src={coverUrl} alt="Article Cover" />
+                        </div>
+                    )}
                     {/* Inline Header */}
                     <div className="article-main-header">
-                        <h1 className="article-title-text" style={{ fontSize: '28px', marginBottom: '16px' }}>{post.title}</h1>
-                        <div className="article-meta-info" style={{ marginBottom: '24px', color: '#888', fontSize: '14px' }}>
-                            <span style={{ marginRight: '16px' }}>{post.createdAt || post.createTime}</span>
-                            <span>阅读 {post.viewCount || 0}</span>
-                        </div>
+                        <h1 className="article-title-text" style={{ fontSize: '28px', marginBottom: '16px', textAlign: 'center' }}>{post.title}</h1>
                     </div>
 
                     <div className="article-content tiptap-content" dangerouslySetInnerHTML={{ __html: post.content || '' }} />

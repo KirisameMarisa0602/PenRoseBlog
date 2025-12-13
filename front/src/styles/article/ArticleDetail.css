@@ -8,30 +8,23 @@
   padding-top: var(--navH);
 }
 
-.article-cover-wrapper {
+.page-blur-background {
   position: fixed;
-  top: var(--navH);
+  top: 0;
   left: 0;
   width: 100vw;
-  height: 35vh;
+  height: 100vh;
   z-index: 0;
-  overflow: hidden;
-}
-
-.article-cover-wrapper img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.article-detail-container.has-cover {
-  margin-top: 35vh;
+  background-size: cover;
+  background-position: center;
+  filter: blur(30px) brightness(0.7);
+  pointer-events: none;
 }
 
 .article-detail-container {
   position: relative;
   z-index: 1;
-  max-width: 1400px; /* Increased from 1200px */
+  max-width: 1400px;
   margin: 0 auto;
   padding: 40px 20px;
   display: flex;
@@ -42,16 +35,46 @@
 .article-main {
   position: relative;
   z-index: 2;
-  background: #fff;
-  padding: 40px 50px; /* Reduced padding */
+  background: rgba(255, 255, 255, 0.95);
+  padding: 0; /* Remove padding to let cover image touch edges */
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   min-height: 60vh;
+  overflow: hidden; /* Ensure cover image respects border radius */
+}
+
+.article-card-cover {
+  width: 100%;
+  height: auto;
+  max-height: 400px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f5f9;
+}
+
+.article-card-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.article-main-header {
+  padding: 40px 50px 0 50px;
+}
+
+.article-content {
+  padding: 20px 50px 40px 50px;
 }
 
 @media (max-width: 768px) {
-  .article-main {
-    padding: 30px 20px;
+  .article-main-header {
+    padding: 30px 20px 0 20px;
+  }
+  .article-content {
+    padding: 20px 20px 30px 20px;
   }
 }
 

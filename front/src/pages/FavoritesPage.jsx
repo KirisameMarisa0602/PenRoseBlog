@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ArticleCard from '@components/common/ArticleCard';
 import { useAuthState } from '@hooks/useAuthState';
-import '@styles/selfspace/SelfSpace.css'; // Reuse SelfSpace styles for grid
+import '@styles/pages/FavoritesPage.css';
 import Category3DCarousel from '@components/selfspace/Category3DCarousel';
 import { BLOG_CATEGORIES } from '@utils/constants';
 
@@ -11,17 +11,25 @@ export default function FavoritesPage() {
 
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [selectedCategory, setSelectedCategory] = useState('');
+    // Default to '全部' so the carousel highlights it
+    const [selectedCategory, setSelectedCategory] = useState('全部');
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const size = 12;
+
+    // Add '全部' to the categories list
+    const displayCategories = ['全部', ...BLOG_CATEGORIES];
 
     // Fetch favorites
     useEffect(() => {
         if (!userId) return;
         setLoading(true);
         let url = `/api/blogpost/favorites?userId=${userId}&page=${page}&size=${size}`;
-        if (selectedCategory) url += `&categoryName=${encodeURIComponent(selectedCategory)}`;
+        
+        // Only append categoryName if it's NOT '全部'
+        if (selectedCategory && selectedCategory !== '全部') {
+            url += `&categoryName=${encodeURIComponent(selectedCategory)}`;
+        }
 
         fetch(url)
             .then(r => r.json())
@@ -41,6 +49,8 @@ export default function FavoritesPage() {
     }, [userId, page, selectedCategory]);
 
     const handleCategoryChange = (cat) => {
+        if (selectedCategory === cat) return;
+        
         setSelectedCategory(cat);
         setPage(0);
         setHasMore(true);
@@ -54,48 +64,42 @@ export default function FavoritesPage() {
     };
 
     return (
-        <div className="selfspace-container" style={{ paddingTop: '80px', minHeight: '100vh' }}>
-            <div className="selfspace-content" style={{ width: '100%', maxWidth: '1200px', margin: '0 auto' }}>
-                <h2 style={{ marginBottom: '20px', color: '#333', textAlign: 'center' }}>我的收藏</h2>
+        <div className="favorites-page-container">
+            <div className="favorites-content">
+                <div className="favorites-header">
+                    <h2 className="favorites-title">我的收藏</h2>
+                </div>
 
                 {/* 3D Category Carousel */}
-                <div style={{ marginBottom: '40px' }}>
+                <div className="favorites-carousel-container">
                     <Category3DCarousel 
-                        categories={BLOG_CATEGORIES} 
+                        categories={displayCategories} 
                         selectedCategory={selectedCategory}
-                        onSelect={(cat) => {
-                            const newCat = (selectedCategory === cat) ? '' : cat;
-                            handleCategoryChange(newCat);
-                        }}
+                        onSelect={handleCategoryChange}
                     />
                 </div>
 
                 {/* Post Grid */}
-                <div className="selfspace-posts-grid">
+                <div className="favorites-grid">
                     {posts.map(post => (
-                        <ArticleCard key={post.id} post={post} />
+                        <ArticleCard key={post.id} post={post} className="favorites-card-item" />
                     ))}
                 </div>
 
                 {posts.length === 0 && !loading && (
-                    <div className="empty-state" style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
-                        {selectedCategory ? `"${selectedCategory}" 分类下暂无收藏` : '暂无收藏文章'}
+                    <div className="favorites-empty-state">
+                        {selectedCategory && selectedCategory !== '全部' 
+                            ? `"${selectedCategory}" 分类下暂无收藏` 
+                            : '暂无收藏文章'}
                     </div>
                 )}
                 
                 {hasMore && (
-                    <div style={{ textAlign: 'center', marginTop: '30px', marginBottom: '50px' }}>
+                    <div className="favorites-load-more">
                         <button 
+                            className="load-more-btn"
                             onClick={loadMore} 
                             disabled={loading}
-                            style={{
-                                padding: '10px 30px',
-                                borderRadius: '20px',
-                                border: '1px solid #ddd',
-                                background: '#fff',
-                                cursor: 'pointer',
-                                color: '#666'
-                            }}
                         >
                             {loading ? '加载中...' : '加载更多'}
                         </button>

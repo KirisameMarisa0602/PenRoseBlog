@@ -103,63 +103,64 @@ export default function AuthorSidebar({ post, currentUserId }) {
     };
 
     return (
-        <div className="author-sidebar">
+        <aside className="author-sidebar">
             <div className="author-card-container">
-                <div className="author-card" style={backgroundUrl ? { backgroundImage: `url(${backgroundUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}>
-                    {backgroundUrl && <div className="author-card-overlay"></div>}
+                <div className="author-card">
+                    {/* Background Image Layer */}
+                    <div 
+                        className="author-card-bg" 
+                        style={{ 
+                            backgroundImage: backgroundUrl ? `url(${backgroundUrl})` : 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)' 
+                        }}
+                    ></div>
                     
                     <div className="author-content-wrapper">
                         <div className="author-header">
                             <Link to={`/selfspace?userId=${authorId}`} className="author-avatar-link">
                                 <img src={avatarUrl} alt={nickname} className="author-avatar" />
                             </Link>
-                            <div className="author-info">
-                                <Link to={`/selfspace?userId=${authorId}`} className="author-name">
-                                    {nickname}
-                                </Link>
-                                <div className="author-bio">
-                                    {post.authorBio || authorProfile?.bio || "这个人很懒，什么都没有写~"}
-                                </div>
+                            <Link to={`/selfspace?userId=${authorId}`} className="author-name">{nickname}</Link>
+                            <div className="author-bio" title={authorProfile?.bio || '这个人很懒，什么都没写'}>
+                                {authorProfile?.bio || '这个人很懒，什么都没写'}
                             </div>
                         </div>
 
-                        <div className="author-details-panel">
-                            <div className="author-stats">
-                                <div className="stat-item">
-                                    <span className="stat-val">{stats.articles}</span>
-                                    <span className="stat-label">文章</span>
-                                </div>
-                                <div className="stat-item">
-                                    <span className="stat-val">{stats.followers}</span>
-                                    <span className="stat-label">粉丝</span>
-                                </div>
-                                <div className="stat-item">
-                                    <span className="stat-val">{stats.following}</span>
-                                    <span className="stat-label">关注</span>
-                                </div>
+                        <div className="author-stats-row">
+                            <div className="stat-item">
+                                <span className="stat-val">{stats.articles}</span>
+                                <span className="stat-label">文章</span>
                             </div>
+                            <div className="stat-item">
+                                <span className="stat-val">{stats.followers}</span>
+                                <span className="stat-label">粉丝</span>
+                            </div>
+                            <div className="stat-item">
+                                <span className="stat-val">{stats.following}</span>
+                                <span className="stat-label">关注</span>
+                            </div>
+                        </div>
 
+                        <div className="author-actions">
                             {String(currentUserId) !== String(authorId) && (
-                                <div className="author-actions">
+                                <>
                                     <button 
-                                        className={`action-btn follow-btn ${isFollowing ? 'following' : ''}`}
+                                        className={`action-btn follow-btn ${isFollowing ? 'following' : ''}`} 
                                         onClick={handleFollow}
                                     >
                                         {isFollowing ? '已关注' : '关注'}
                                     </button>
                                     <button 
-                                        className="action-btn friend-btn"
-                                        onClick={handleAddFriend}
-                                        disabled={isFriendStatus}
+                                        className="action-btn message-btn"
+                                        onClick={() => window.location.href = `/conversation/${authorId}`}
                                     >
-                                        {isFriendStatus ? '已是好友' : '加好友'}
+                                        私信
                                     </button>
-                                </div>
+                                </>
                             )}
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </aside>
     );
 }
