@@ -20,3 +20,9 @@ export function getDefaultAvatar(userId) {
   const index = Math.abs(hash) % CAT_ICONS.length;
   return `/icons/avatar_no_sign_in/${CAT_ICONS[index]}`;
 }
+
+export function isValidAvatar(url) {
+  if (!url) return false;
+  if (url.includes('/imgs/loginandwelcomepanel/1.png')) return false;
+  return true;
+}

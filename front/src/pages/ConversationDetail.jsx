@@ -12,6 +12,7 @@ import '@styles/message/ConversationDetail.css';
 import { useAuthState } from '@hooks/useAuthState';
 import { fetchConversationDetail, fetchConversations } from '@utils/api/messageService';
 import resolveUrl from '@utils/resolveUrl';
+import { getDefaultAvatar, isValidAvatar } from '@utils/avatarUtils';
 
 // 本地缓存服务
 import {
@@ -1262,13 +1263,13 @@ export default function ConversationDetail() {
                             onClick={() => gotoConversation(c.otherId)}
                         >
                             <img
-                                src={c.avatarUrl ? toAbsUrl(c.avatarUrl) : '/imgs/loginandwelcomepanel/1.png'}
+                                src={isValidAvatar(c.avatarUrl) ? toAbsUrl(c.avatarUrl) : getDefaultAvatar(c.otherId)}
                                 alt="avatar"
                                 className="conversation-sidebar-avatar"
                                 onError={(ev) => {
                                     const target = ev.target;
                                     target.onerror = null;
-                                    target.src = '/imgs/loginandwelcomepanel/1.png';
+                                    target.src = getDefaultAvatar(c.otherId);
                                 }}
                                 onContextMenu={async (e) => {
                                     e.preventDefault();
@@ -1304,6 +1305,27 @@ export default function ConversationDetail() {
                 </aside>
 
                 <div className="conversation-main-content">
+                    {/* 顶部用户信息栏 - 补充 Header */}
+                    <div className="conversation-detail-header" style={{
+                        height: '60px',
+                        borderBottom: '1px solid #e6e6e6',
+                        background: '#fff',
+                        display: 'flex',
+                        alignItems: 'center',
+                        padding: '0 20px',
+                        flexShrink: 0
+                    }}>
+                        <img 
+                            src={isValidAvatar(otherInfo.avatarUrl) ? resolveUrl(otherInfo.avatarUrl) : getDefaultAvatar(otherId)} 
+                            alt={otherInfo.nickname}
+                            style={{ width: '36px', height: '36px', borderRadius: '50%', marginRight: '12px', objectFit: 'cover', border: '1px solid #eee' }}
+                            onError={(e) => { e.target.onerror = null; e.target.src = getDefaultAvatar(otherId); }}
+                        />
+                        <span style={{ fontSize: '16px', fontWeight: '600', color: '#333' }}>
+                            {otherInfo.nickname || `用户${otherId}`}
+                        </span>
+                    </div>
+
                     {/* 右侧消息区 */}
                     <div
                         className="conversation-detail-list"
@@ -1381,11 +1403,11 @@ export default function ConversationDetail() {
                                     <div className="conversation-detail-msg-meta">
                                         <img
                                             src={
-                                                msg.senderAvatarUrl
+                                                isValidAvatar(msg.senderAvatarUrl)
                                                     ? resolveUrl(msg.senderAvatarUrl)
-                                                    : otherInfo.avatarUrl
+                                                    : (!isSelf && isValidAvatar(otherInfo.avatarUrl))
                                                         ? resolveUrl(otherInfo.avatarUrl)
-                                                        : '/imgs/loginandwelcomepanel/1.png'
+                                                        : getDefaultAvatar(msg.senderId)
                                             }
                                             className={`conversation-detail-msg-avatar${!isSelf ? ' clickable' : ''}`}
                                             title={!isSelf ? '查看主页' : undefined}
@@ -1393,7 +1415,7 @@ export default function ConversationDetail() {
                                             onError={(ev) => {
                                                 const target = ev.target;
                                                 target.onerror = null;
-                                                target.src = '/imgs/loginandwelcomepanel/1.png';
+                                                target.src = getDefaultAvatar(msg.senderId);
                                             }}
                                         />
                                         <span className="conversation-detail-msg-nickname">
@@ -1461,7 +1483,7 @@ export default function ConversationDetail() {
                                                                 src={toAbsUrl(msg.blogPreview.authorAvatarUrl)}
                                                                 className="pm-blog-preview-avatar"
                                                                 alt=""
-                                                                onError={e => { e.target.onerror = null; e.target.src = '/imgs/loginandwelcomepanel/1.png'; }}
+                                                                onError={e => { e.target.onerror = null; e.target.src = getDefaultAvatar(msg.blogPreview.authorId); }}
                                                             />
                                                         )}
                                                         <span className="pm-blog-preview-author">

@@ -7,6 +7,7 @@ import { searchUsers } from '@utils/api/userService';
 import { useAuthState } from '@hooks/useAuthState';
 import { fetchFriendIds, fetchFollowingIds } from '@utils/api/friendService';
 import resolveUrl from '@utils/resolveUrl';
+import { getDefaultAvatar } from '@utils/avatarUtils';
 
 export default function UserSearch({ embedded = false, externalKeyword = '', externalMode = 'nickname', searchTrigger = 0 }) {
   const [mode, setMode] = useState('nickname'); // 默认优先按昵称搜索
@@ -104,7 +105,7 @@ export default function UserSearch({ embedded = false, externalKeyword = '', ext
             <li className="empty">没有找到用户</li>
           ) : (
             results.map(u => {
-              const avatar = resolveUrl(u.avatarUrl || '') || '/imgs/loginandwelcomepanel/1.png';
+              const avatar = resolveUrl(u.avatarUrl || '') || getDefaultAvatar(u.id);
               return (
                 <li key={u.id} className="user-item">
                   <img
@@ -112,7 +113,7 @@ export default function UserSearch({ embedded = false, externalKeyword = '', ext
                     alt={u.nickname || u.username}
                     title={u.nickname || u.username}
                     className="user-avatar"
-                    onError={e => { e.currentTarget.src = '/imgs/loginandwelcomepanel/1.png'; }}
+                    onError={e => { e.currentTarget.src = getDefaultAvatar(u.id); }}
                   />
                   <div className="user-info">
                     <div className="user-nick">{u.nickname || u.username}</div>

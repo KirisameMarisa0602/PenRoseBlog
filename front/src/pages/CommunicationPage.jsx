@@ -15,6 +15,7 @@ import { fetchConversationDetail, fetchConversations } from '@utils/api/messageS
 import { fetchFriendsList } from '@utils/api/friendService';
 import SimpleEmojiPicker from '@components/common/SimpleEmojiPicker';
 import resolveUrl from '@utils/resolveUrl';
+import { getDefaultAvatar, isValidAvatar } from '@utils/avatarUtils';
 
 // 本地缓存服务
 import {
@@ -1214,13 +1215,13 @@ export default function CommunicationPage() {
                             onClick={() => gotoConversation(c.otherId)}
                         >
                             <img
-                                src={c.avatarUrl ? resolveUrl(c.avatarUrl) : '/imgs/loginandwelcomepanel/1.png'}
+                                src={isValidAvatar(c.avatarUrl) ? resolveUrl(c.avatarUrl) : getDefaultAvatar(c.otherId)}
                                 alt="avatar"
                                 className="conversation-sidebar-avatar"
                                 onError={(ev) => {
                                     const target = ev.target;
                                     target.onerror = null;
-                                    target.src = '/imgs/loginandwelcomepanel/1.png';
+                                    target.src = getDefaultAvatar(c.otherId);
                                 }}
                                 onContextMenu={async (e) => {
                                     e.preventDefault();
@@ -1266,9 +1267,9 @@ export default function CommunicationPage() {
                         <div className="conversation-chat-header">
                             <div className="conversation-chat-header-info">
                                 <img 
-                                    src={otherInfo.avatarUrl ? resolveUrl(otherInfo.avatarUrl) : '/imgs/loginandwelcomepanel/1.png'} 
+                                    src={isValidAvatar(otherInfo.avatarUrl) ? resolveUrl(otherInfo.avatarUrl) : getDefaultAvatar(otherId)} 
                                     className="conversation-chat-header-avatar"
-                                    onError={(e) => {e.target.onerror=null; e.target.src='/imgs/loginandwelcomepanel/1.png'}}
+                                    onError={(e) => {e.target.onerror=null; e.target.src=getDefaultAvatar(otherId)}}
                                     alt="avatar"
                                 />
                                 <span className="conversation-chat-header-name">{otherInfo.nickname || '用户'}</span>
@@ -1337,11 +1338,11 @@ export default function CommunicationPage() {
                                         <div className="conversation-detail-msg-meta">
                                             <img
                                                 src={
-                                                    msg.senderAvatarUrl
+                                                    isValidAvatar(msg.senderAvatarUrl)
                                                         ? resolveUrl(msg.senderAvatarUrl)
-                                                        : otherInfo.avatarUrl
+                                                        : (!isSelf && isValidAvatar(otherInfo.avatarUrl))
                                                             ? resolveUrl(otherInfo.avatarUrl)
-                                                            : '/imgs/loginandwelcomepanel/1.png'
+                                                            : getDefaultAvatar(msg.senderId)
                                                 }
                                                 className={`conversation-detail-msg-avatar${!isSelf ? ' clickable' : ''}`}
                                                 title={!isSelf ? '查看主页' : undefined}
@@ -1349,7 +1350,7 @@ export default function CommunicationPage() {
                                                 onError={(ev) => {
                                                     const target = ev.target;
                                                     target.onerror = null;
-                                                    target.src = '/imgs/loginandwelcomepanel/1.png';
+                                                    target.src = getDefaultAvatar(msg.senderId);
                                                 }}
                                             />
                                             <span className="conversation-detail-msg-nickname">
@@ -1417,10 +1418,10 @@ export default function CommunicationPage() {
                                                         <div className="pm-blog-preview-meta">
                                                             <div className="pm-blog-preview-author-info">
                                                                 <img 
-                                                                    src={resolveUrl(msg.blogPreview.authorAvatarUrl) || '/imgs/loginandwelcomepanel/1.png'} 
+                                                                    src={isValidAvatar(msg.blogPreview.authorAvatarUrl) ? resolveUrl(msg.blogPreview.authorAvatarUrl) : getDefaultAvatar(msg.blogPreview.authorId)} 
                                                                     alt="" 
                                                                     className="pm-blog-preview-avatar-small"
-                                                                    onError={(e) => { e.target.onerror = null; e.target.src = '/imgs/loginandwelcomepanel/1.png'; }}
+                                                                    onError={(e) => { e.target.onerror = null; e.target.src = getDefaultAvatar(msg.blogPreview.authorId); }}
                                                                 />
                                                                 <span className="pm-blog-preview-author">
                                                                     {msg.blogPreview.authorNickname || '匿名'}

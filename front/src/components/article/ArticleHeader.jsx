@@ -1,34 +1,33 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import resolveUrl from '@utils/resolveUrl';
+import { getDefaultAvatar } from '@utils/avatarUtils';
 import '../../styles/article/ArticleDetail.css';
 
 export default function ArticleHeader({ post, isOwner, onDelete }) {
     if (!post) return null;
+    const avatarUrl = resolveUrl(post.authorAvatarUrl) || getDefaultAvatar(post.authorId || post.userId || post.authorUserId || post.uid);
+
     return (
         <div className="article-header">
             <div className="article-header-top">
                 <div className="article-meta-info">
-                    {post.authorAvatarUrl ? (
-                        <Link
-                            to={`/selfspace?userId=${
-                                post.authorId ||
-                                post.userId ||
-                                post.authorUserId ||
-                                post.uid ||
-                                ''
-                            }`}
-                            className="article-author-avatar-link"
-                        >
-                            <img
-                                src={resolveUrl(post.authorAvatarUrl)}
-                                alt="avatar"
-                                className="article-author-avatar"
-                            />
-                        </Link>
-                    ) : (
-                        <div className="article-author-avatar-placeholder" />
-                    )}
+                    <Link
+                        to={`/selfspace?userId=${
+                            post.authorId ||
+                            post.userId ||
+                            post.authorUserId ||
+                            post.uid ||
+                            ''
+                        }`}
+                        className="article-author-avatar-link"
+                    >
+                        <img
+                            src={avatarUrl}
+                            alt="avatar"
+                            className="article-author-avatar"
+                        />
+                    </Link>
                     <div className="article-meta-text">
                         <Link
                             to={`/selfspace?userId=${

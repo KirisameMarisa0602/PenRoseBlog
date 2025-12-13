@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import '../../styles/common/ArticleCard.css';
 import resolveUrl from '@utils/resolveUrl';
+import { getDefaultAvatar } from '@utils/avatarUtils';
 
 // Icons - use absolute paths directly since assets are served by Nginx
 const iconView = resolveUrl('/icons/blogpost/浏览.svg');
@@ -26,7 +27,7 @@ function truncateByUnits(text = '', limitUnits = 48) {
 
 export default function ArticleCard({ post, className, onDelete }) {
     const coverSrc = resolveUrl(post.coverImageUrl) || null;
-    const avatar = resolveUrl(post.authorAvatarUrl || post.avatarUrl);
+    const avatar = resolveUrl(post.authorAvatarUrl || post.avatarUrl) || getDefaultAvatar(post.userId || post.authorId);
     const author = post.authorNickname || post.authorName || post.author || post.username || '匿名';
     const created = post.createdAt || post.created || post.createTime;
     const likeCount = post.likeCount || post.likes || 0;
@@ -109,7 +110,7 @@ export default function ArticleCard({ post, className, onDelete }) {
 
                     <div className="article-card-meta-top">
                         <div className="article-card-author">
-                            <img src={avatar || '/default-avatar.png'} alt={author} className="article-card-avatar" />
+                            <img src={avatar} alt={author} className="article-card-avatar" />
                             <span className="article-card-nickname">{author}</span>
                         </div>
                         <span className="article-card-time">{formatDate(created)}</span>

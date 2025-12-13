@@ -6,6 +6,7 @@ import { fetchFollowing } from '@utils/api/friendService';
 import { unfollow } from '@utils/api/followService';
 import { useAuthState } from '@hooks/useAuthState';
 import resolveUrl from '@utils/resolveUrl';
+import { getDefaultAvatar } from '@utils/avatarUtils';
 
 export default function FollowingList() {
   const [list, setList] = useState([]);
@@ -70,9 +71,13 @@ export default function FollowingList() {
               <li key={u.id} className="message-list-item">
                 <Link to={`/selfspace?userId=${u.id}`} title="查看主页" className="avatar-link">
                   <img
-                    src={resolveUrl(u.avatarUrl || '') || '/imgs/loginandwelcomepanel/1.png'}
+                    src={resolveUrl(u.avatarUrl || '') || getDefaultAvatar(u.id)}
                     alt="avatar"
                     className="message-list-avatar clickable"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = getDefaultAvatar(u.id);
+                    }}
                   />
                 </Link>
                 <div className="user-info-container">

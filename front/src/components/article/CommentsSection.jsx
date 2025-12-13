@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import resolveUrl from '@utils/resolveUrl';
+import { getDefaultAvatar } from '@utils/avatarUtils';
 
 // Icons
 const iconLike = '/icons/blogpost/点赞.svg';
@@ -86,7 +87,7 @@ export default function CommentsSection({
                                 to={`/selfspace?userId=${c.userId || c.authorId || c.uid || ''}`}
                                 title={c.nickname || '用户主页'}
                             >
-                                <img src={resolveUrl(c.avatarUrl)} alt="avatar" className="comment-avatar-img" />
+                                <img src={resolveUrl(c.avatarUrl) || getDefaultAvatar(c.userId || c.authorId || c.uid)} alt="avatar" className="comment-avatar-img" />
                             </Link>
                         </div>
                         <div className="comment-main-content">
@@ -158,7 +159,7 @@ export default function CommentsSection({
                                             return (
                                                 <div key={r.id} id={`reply-${r.id}`} className="reply-item">
                                                     <Link to={`/selfspace?userId=${r.userId}`} className="reply-avatar-link">
-                                                        <img src={resolveUrl(r.avatarUrl)} alt="avatar" className="reply-avatar-img" />
+                                                        <img src={resolveUrl(r.avatarUrl) || getDefaultAvatar(r.userId)} alt="avatar" className="reply-avatar-img" />
                                                     </Link>
                                                     <div className="reply-content-wrapper">
                                                         <div className="reply-header-info">

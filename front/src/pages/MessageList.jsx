@@ -4,6 +4,7 @@ import '@styles/pages/NotificationCenter.css';
 import { fetchConversations } from '@utils/api/messageService';
 import { useAuthState } from '@hooks/useAuthState';
 import resolveUrl from '@utils/resolveUrl';
+import { getDefaultAvatar } from '@utils/avatarUtils';
 
 export default function MessageList({ isEmbedded }) {
   const [conversations, setConversations] = useState([]);
@@ -43,10 +44,10 @@ export default function MessageList({ isEmbedded }) {
         <li key={conv.otherId} className="message-list-item">
           <a href={`/conversation/${conv.otherId}`} className="message-list-link">
             <img
-              src={resolveUrl(conv.avatarUrl || '') || '/imgs/loginandwelcomepanel/1.png'}
+              src={resolveUrl(conv.avatarUrl || '') || getDefaultAvatar(conv.otherId)}
               alt="avatar"
               className="message-list-avatar"
-              onError={(e) => { e.target.onerror = null; e.target.src = '/imgs/loginandwelcomepanel/1.png'; }}
+              onError={(e) => { e.target.onerror = null; e.target.src = getDefaultAvatar(conv.otherId); }}
             />
             <span className="message-list-nickname">{conv.nickname}</span>
             <span className="message-list-lastmsg">{conv.lastMessage}</span>

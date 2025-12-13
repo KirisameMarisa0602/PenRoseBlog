@@ -6,6 +6,7 @@ import ArticleCard from '@components/common/ArticleCard';
 import { useAuthState } from '@hooks/useAuthState';
 import resolveUrl from '@utils/resolveUrl';
 import httpClient from '@utils/api/httpClient';
+import { getDefaultAvatar, isValidAvatar } from '@utils/avatarUtils';
 import { BLOG_CATEGORIES } from '@utils/constants';
 import { CATEGORY_CONFIG, DEFAULT_CATEGORY_CONFIG } from '@utils/categoryConfig';
 
@@ -183,9 +184,9 @@ export default function SelfSpace() {
               <div className="selfspace-user-brief">
                 <img
                   className="selfspace-user-brief-avatar"
-                  src={resolveUrl(viewProfile.avatarUrl || '') || '/imgs/loginandwelcomepanel/1.png'}
+                  src={isValidAvatar(viewProfile.avatarUrl) ? resolveUrl(viewProfile.avatarUrl) : getDefaultAvatar(effectiveUserId)}
                   alt="avatar"
-                  onError={e => { e.currentTarget.src = '/imgs/loginandwelcomepanel/1.png'; }}
+                  onError={e => { e.currentTarget.src = getDefaultAvatar(effectiveUserId); }}
                 />
                 <div className="selfspace-user-brief-info">
                   <div className="nick">{viewProfile.nickname || viewProfile.username || `用户${effectiveUserId}`}</div>

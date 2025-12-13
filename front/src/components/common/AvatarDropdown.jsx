@@ -3,6 +3,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/common/AvatarDropdown.css";
 import resolveUrl from '@utils/resolveUrl';
+import { getDefaultAvatar } from '@utils/avatarUtils';
 
 
 const sexIconMap = {
@@ -41,9 +42,9 @@ export default function AvatarDropdown({ user, onLogout }) {
       <div className="dropdown-header">
         <img
           className="dropdown-avatar-img"
-          src={resolveUrl(user.avatar)}
+          src={resolveUrl(user.avatar) || getDefaultAvatar(user.id)}
           alt={displayName}
-          onError={(e) => { e.target.style.display = 'none' }}
+          onError={(e) => { e.target.src = getDefaultAvatar(user.id); }}
         />
         <div className="dropdown-user-info">
           <span className="dropdown-name">{displayName}</span>

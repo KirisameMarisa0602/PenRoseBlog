@@ -3,6 +3,7 @@ import '@styles/message/MessageList.css';
 import '@styles/Notification/PendingFriendRequests.css';
 import resolveUrl from '@utils/resolveUrl';
 import { fetchPendingFriendRequests, respondToFriendRequest } from '@utils/api/friendService';
+import { getDefaultAvatar } from '@utils/avatarUtils';
 
 export default function PendingFriendRequests() {
     const [requests, setRequests] = useState([]);
@@ -75,8 +76,9 @@ export default function PendingFriendRequests() {
                                 {requests.map((req) => {
                                     const id = req.id || req.requestId;
                                     const sender = req.sender || {};
+                                    const senderId = req.senderId || sender.id;
                                     const nickname = req.senderNickname || sender.nickname || sender.username || 'Unknown';
-                                    const avatar = req.senderAvatarUrl || sender.avatarUrl || '/icons/message/admin.svg';
+                                    const avatar = req.senderAvatarUrl || sender.avatarUrl || getDefaultAvatar(senderId);
                                     const message = req.message || '请求添加好友';
                                     const time = req.createdAt ? new Date(req.createdAt).toLocaleString() : '';
 
@@ -88,7 +90,7 @@ export default function PendingFriendRequests() {
                                                 className="message-list-avatar pf-avatar"
                                                 onError={(e) => {
                                                     e.target.onerror = null;
-                                                    e.target.src = '/icons/message/admin.svg';
+                                                    e.target.src = getDefaultAvatar(senderId);
                                                 }}
                                             />
                                             <div className="pf-body">
