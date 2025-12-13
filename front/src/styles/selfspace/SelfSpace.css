@@ -13,6 +13,7 @@
   /* 固定在视口左侧，始终悬浮在页面左边 */
   position: fixed;
   left: 0;
+  top: var(--navH); /* Explicitly set top to start below navbar */
   width: 25vw;
   min-width: 260px;
   max-width: 420px;
@@ -60,6 +61,7 @@
   display: flex;
   flex-direction: column;
   padding: 24px;
+  padding-top: calc(var(--navH) + 24px); /* Add padding-top to clear navbar + spacing */
   box-sizing: border-box;
 }
 
@@ -103,10 +105,13 @@
   border-radius: 12px;
   box-shadow: 0 6px 18px rgba(0,0,0,0.04);
   width: 880px;
-  min-height: calc(100vh - var(--navH, 15vh) - 100px); /* 保证下边界刚好贴底 */
+  /* min-height: calc(100vh - var(--navH, 15vh) - 100px); Removed to allow auto-sizing */
+  height: fit-content; /* Adapt to content height */
+  min-height: 100px; /* Minimum height just to look like a container */
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  transition: height 0.3s ease; /* Smooth transition if height changes */
 }
 
 /* 顶部：标题 + 排序按钮（按钮在右侧） */

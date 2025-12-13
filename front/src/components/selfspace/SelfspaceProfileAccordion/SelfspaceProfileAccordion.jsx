@@ -4,6 +4,7 @@ import '@styles/selfspace/SelfspaceProfileAccordion/selfspaceProfileAccordion.cs
 import httpClient from '@utils/api/httpClient';
 import { useAuthState } from '@hooks/useAuthState';
 import { getDefaultAvatar } from '@utils/avatarUtils';
+import MatchboxTagEditor from '../MatchboxTagEditor';
 
 // 个人空间左侧手风琴面板
 export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHeight = '100%', viewUserId = null, hideEditPanel = false }) {
@@ -964,21 +965,9 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                         <span style={{ width: '4px', height: '16px', background: '#1890ff', marginRight: '8px', borderRadius: '2px' }}></span>
                         个人标签
                       </h4>
-                      <div className="profile-tags-display" style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+                      <div className="profile-tags-display" style={{ display: 'flex', justifyContent: 'center', padding: '10px 0' }}>
                         {tagsList && tagsList.length > 0 ? (
-                          tagsList.map((tag, i) => (
-                            <span key={i} style={{ 
-                              background: 'linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%)', 
-                              color: '#096dd9', 
-                              padding: '8px 16px', 
-                              borderRadius: '20px', 
-                              fontSize: '0.95rem',
-                              fontWeight: '500',
-                              boxShadow: '0 2px 4px rgba(24, 144, 255, 0.1)'
-                            }}>
-                              {tag}
-                            </span>
-                          ))
+                          <MatchboxTagEditor tags={tagsList} readOnly={true} />
                         ) : (
                           <span style={{ color: '#999', fontStyle: 'italic', padding: '5px 0' }}>暂无标签</span>
                         )}

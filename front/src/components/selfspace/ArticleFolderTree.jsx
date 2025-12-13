@@ -160,21 +160,15 @@ export default function ArticleFolderTree({ posts, onDelete }) {
     setSelectedPath(node.path);
   };
 
-  // Render children of root directly to have multiple top-level accordion items
-  const rootChildren = tree.children ? Object.values(tree.children) : [];
-
   return (
     <div className="folder-tree-container">
-      {rootChildren.map(child => (
-        <FolderNode 
-          key={child.path} 
-          node={child} 
-          onSelect={handleSelect} 
-          selectedPath={selectedPath}
-          level={0}
-          onDelete={onDelete}
-        />
-      ))}
+      <FolderNode 
+        node={tree} 
+        onSelect={handleSelect} 
+        selectedPath={selectedPath}
+        level={0}
+        onDelete={onDelete}
+      />
     </div>
   );
 }
