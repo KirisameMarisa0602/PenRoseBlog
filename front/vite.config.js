@@ -48,7 +48,12 @@ export default ({ mode }) => {
         '/background': {
           target: backendTarget,
           changeOrigin: true,
-          rewrite: path => path
+          rewrite: path => path,
+          bypass: (req) => {
+            if (req.url.includes('.mp4')) {
+              return req.url;
+            }
+          }
         },
         '/profile': {
           target: backendTarget,
