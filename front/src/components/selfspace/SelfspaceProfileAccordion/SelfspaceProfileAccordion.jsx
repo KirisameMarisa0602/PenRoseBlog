@@ -1401,7 +1401,7 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                                  display: 'none',
                                  border: '1px solid #eee'
                                }}>
-                                 <img src={resolveUrl(profile.qqQrCode)} alt="QQ QR" style={{ width: '150px', height: '150px', objectFit: 'contain', display: 'block' }} />
+                                 <img src={resolveUrl(profile.qqQrCode)} alt="QQ QR" style={{ width: '280px', height: '280px', objectFit: 'contain', display: 'block' }} />
                                </div>
                                <style>{`
                                  .qr-preview-hover:hover .qr-popup { display: block !important; }
@@ -1444,7 +1444,7 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                                  display: 'none',
                                  border: '1px solid #eee'
                                }}>
-                                 <img src={resolveUrl(profile.wechatQrCode)} alt="WeChat QR" style={{ width: '150px', height: '150px', objectFit: 'contain', display: 'block' }} />
+                                 <img src={resolveUrl(profile.wechatQrCode)} alt="WeChat QR" style={{ width: '280px', height: '280px', objectFit: 'contain', display: 'block' }} />
                                </div>
                                <style>{`
                                  .qr-preview-hover:hover .qr-popup { display: block !important; }

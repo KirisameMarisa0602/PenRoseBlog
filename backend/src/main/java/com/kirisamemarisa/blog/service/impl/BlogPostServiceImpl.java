@@ -498,8 +498,31 @@ public class BlogPostServiceImpl implements BlogPostService {
         if (opt.isEmpty())
             return new ApiResponse<>(404, "博客不存在", false);
         BlogPost post = opt.get();
-        if (content != null && !content.trim().isEmpty())
-            post.setContent(content.trim());
+        if (content != null && !content.trim().isEmpty()) {
+            // 1. Extract images from old content
+            List<String> oldImages = extractImageUrls(post.getContent());
+
+            // 2. Extract images from new content
+            String newContent = content.trim();
+            List<String> newImages = extractImageUrls(newContent);
+
+            // 3. Find images to delete (in old but not in new)
+            List<String> imagesToDelete = oldImages.stream()
+                    .filter(img -> !newImages.contains(img))
+                    .collect(Collectors.toList());
+
+            // 4. Delete from COS
+            for (String imgUrl : imagesToDelete) {
+                try {
+                    fileStorageService.deleteFile(imgUrl);
+                    logger.info("Deleted unused content image: {}", imgUrl);
+                } catch (Exception e) {
+                    logger.warn("Failed to delete unused content image: {}", imgUrl, e);
+                }
+            }
+
+            post.setContent(newContent);
+        }
         if (directory != null)
             post.setDirectory(directory);
         if (status != null) {

@@ -748,7 +748,7 @@ const BlogEditor = () => {
               <h3>封面</h3>
               <div className="cover-upload-area">
                  {coverPreview ? (
-                   <div className="cover-preview">
+                   <div className="cover-preview-large">
                      <img src={coverPreview} alt="Cover" />
                      <div className="cover-actions">
                         <label className="change-cover-btn">
