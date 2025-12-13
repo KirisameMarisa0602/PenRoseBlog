@@ -9,6 +9,8 @@ import com.kirisamemarisa.blog.model.NotificationType;
 import com.kirisamemarisa.blog.model.UserProfile;
 import com.kirisamemarisa.blog.repository.NotificationRepository;
 import com.kirisamemarisa.blog.repository.UserProfileRepository;
+import com.kirisamemarisa.blog.repository.FriendRequestRepository;
+import com.kirisamemarisa.blog.model.FriendRequest;
 import com.kirisamemarisa.blog.service.NotificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,16 +31,19 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationEventPublisher publisher;
     private final NotificationRepository notificationRepository;
     private final UserProfileRepository userProfileRepository;
+    private final FriendRequestRepository friendRequestRepository;
 
     @Autowired(required = false)
     private RabbitNotificationBridge rabbitBridge;
 
     public NotificationServiceImpl(NotificationEventPublisher publisher,
             NotificationRepository notificationRepository,
-            UserProfileRepository userProfileRepository) {
+            UserProfileRepository userProfileRepository,
+            FriendRequestRepository friendRequestRepository) {
         this.publisher = publisher;
         this.notificationRepository = notificationRepository;
         this.userProfileRepository = userProfileRepository;
+        this.friendRequestRepository = friendRequestRepository;
     }
 
     @Override
@@ -208,12 +213,16 @@ public class NotificationServiceImpl implements NotificationService {
                         NotificationType.FOLLOW,
                         NotificationType.UNFOLLOW)));
 
-        // REQUESTS: FRIEND_REQUEST, FRIEND_REQUEST_ACCEPTED, FRIEND_REQUEST_REJECTED
-        stats.put("REQUESTS", notificationRepository.countByReceiverIdAndIsReadFalseAndTypeIn(userId,
+        // REQUESTS: FRIEND_REQUEST, FRIEND_REQUEST_ACCEPTED, FRIEND_REQUEST_REJECTED +
+        // Pending Friend Requests
+        long unreadRequestNotes = notificationRepository.countByReceiverIdAndIsReadFalseAndTypeIn(userId,
                 java.util.Arrays.asList(
                         NotificationType.FRIEND_REQUEST,
                         NotificationType.FRIEND_REQUEST_ACCEPTED,
-                        NotificationType.FRIEND_REQUEST_REJECTED)));
+                        NotificationType.FRIEND_REQUEST_REJECTED));
+        long pendingRequests = friendRequestRepository.countByReceiver_IdAndStatus(userId,
+                FriendRequest.Status.PENDING);
+        stats.put("REQUESTS", unreadRequestNotes + pendingRequests);
 
         // ALL: Sum of above (or just query all)
         // Note: This excludes SYSTEM or other types if they exist but aren't in

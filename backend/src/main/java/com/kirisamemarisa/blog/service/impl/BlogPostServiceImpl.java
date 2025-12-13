@@ -544,13 +544,20 @@ public class BlogPostServiceImpl implements BlogPostService {
 
         // 处理封面逻辑：优先处理删除，再处理上传
         if (Boolean.TRUE.equals(removeCover)) {
-            // 如果原先有封面，尝试删除文件（可选，取决于是否想保留历史文件）
-            // 这里选择保留文件或由定时任务清理，只清除引用
-            post.setCoverImageUrl(null);
+            // 如果原先有封面，删除文件
+            if (post.getCoverImageUrl() != null && !post.getCoverImageUrl().isEmpty()) {
+                fileStorageService.deleteFile(post.getCoverImageUrl());
+                post.setCoverImageUrl(null);
+            }
         }
 
         // 保存新封面文件
         if (cover != null && !cover.isEmpty()) {
+            // 如果有旧封面且未被删除（removeCover为false），则先删除旧封面
+            if (post.getCoverImageUrl() != null && !post.getCoverImageUrl().isEmpty()) {
+                fileStorageService.deleteFile(post.getCoverImageUrl());
+            }
+
             try {
                 String url = fileStorageService.storeCoverImage(cover, post.getUser().getId(), post.getId());
                 post.setCoverImageUrl(url);

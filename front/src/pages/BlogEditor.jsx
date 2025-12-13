@@ -570,8 +570,8 @@ const BlogEditor = () => {
                         <label className="change-cover-btn">
                            更换
                            <input type="file" accept="image/*" onChange={handleCoverChange} hidden />
-                        </label> setRemoveCover(true);
-                        <button className="remove-cover-btn" onClick={() => {setCover(null); setCoverPreview(null);}}>移除</button>
+                        </label>
+                        <button className="remove-cover-btn" onClick={() => {setCover(null); setCoverPreview(null); setRemoveCover(true);}}>移除</button>
                      </div>
                    </div>
                  ) : (

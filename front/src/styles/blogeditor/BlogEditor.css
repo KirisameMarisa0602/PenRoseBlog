@@ -571,14 +571,16 @@
 
 .change-cover-btn,
 .remove-cover-btn {
-  padding: 4px 12px;
-  border-radius: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   border: none;
   -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .change-cover-btn {
@@ -593,10 +595,19 @@
 
 .change-cover-btn:hover {
   background: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.15);
 }
 
 .remove-cover-btn:hover {
   background: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(220, 38, 38, 0.3);
+}
+
+.change-cover-btn:active,
+.remove-cover-btn:active {
+  transform: translateY(0);
 }
 
 /* Ensure preview images are responsive */
