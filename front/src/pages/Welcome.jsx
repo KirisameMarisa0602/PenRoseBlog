@@ -194,7 +194,7 @@ export default function Welcome() {
           transition: 'top 0.1s ease-out, left 0.1s ease-out', // Smooth movement
         }}
       >
-        <source src={resolveUrl('/background/34.mp4')} type="video/mp4" />
+        <source src="/background/34.mp4" type="video/mp4" />
       </video>
       <div className="welcome-card">
         <div
