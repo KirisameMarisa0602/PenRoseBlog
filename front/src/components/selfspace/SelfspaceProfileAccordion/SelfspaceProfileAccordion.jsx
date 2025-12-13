@@ -316,6 +316,20 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
     setWechatQrPreview(URL.createObjectURL(file));
   };
 
+  const handleRemoveQqQr = (e) => {
+    e.stopPropagation();
+    setQqQrFile(null);
+    setQqQrPreview('');
+    setProfile(prev => ({ ...prev, qqQrCode: '' }));
+  };
+
+  const handleRemoveWechatQr = (e) => {
+    e.stopPropagation();
+    setWechatQrFile(null);
+    setWechatQrPreview('');
+    setProfile(prev => ({ ...prev, wechatQrCode: '' }));
+  };
+
   // 保存用户信息（统一上传头像/背景并保存）
   const handleProfileSave = async () => {
     console.log('[ProfileAccordion] 保存资料 userId:', userId, 'profile:', profile);
@@ -626,21 +640,21 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                 {isActive ? (
                   <div className="profilepanel-useredit-panel" style={{ display: 'flex', flexDirection: 'row', height: '100%', padding: 0, background: 'rgba(255,255,255,0.9)' }}>
                     {/* Sidebar */}
-                    <div className="profilepanel-edit-sidebar" style={{ width: '120px', borderRight: '1px solid rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', background: 'rgba(249,249,249,0.8)', padding: '10px 0' }}>
+                    <div className="profilepanel-edit-sidebar" style={{ width: '90px', borderRight: '1px solid rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', background: 'rgba(249,249,249,0.8)', padding: '10px 0' }}>
                       {['profile', 'tags', 'media', 'contact'].map(tab => (
                         <div 
                           key={tab}
                           className={`edit-tab-item ${activeTab === tab ? 'active' : ''}`} 
                           onClick={() => setActiveTab(tab)} 
                           style={{ 
-                            padding: '12px 10px', 
+                            padding: '12px 2px', 
                             cursor: 'pointer', 
                             textAlign: 'center', 
                             background: activeTab === tab ? '#e6f7ff' : 'transparent', 
                             color: activeTab === tab ? '#1890ff' : '#555', 
                             fontSize: '0.95rem', 
                             fontWeight: activeTab === tab ? '600' : 'normal',
-                            margin: '4px 8px',
+                            margin: '4px 5px',
                             borderRadius: '8px',
                             transition: 'all 0.2s ease'
                           }}
@@ -654,8 +668,8 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                     </div>
 
                     {/* Content Area */}
-                    <div className="profilepanel-edit-content" style={{ flex: 1, padding: '25px', overflowY: 'auto' }}>
-                      <h4 style={{ marginTop: 0, marginBottom: 25, borderBottom: '1px solid rgba(0,0,0,0.06)', paddingBottom: 15, color: '#333', fontSize: '1.2rem' }}>
+                    <div className="profilepanel-edit-content" style={{ flex: 1, padding: '25px', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                      <h4 style={{ marginTop: 0, marginBottom: 25, borderBottom: '1px solid rgba(0,0,0,0.06)', paddingBottom: 15, color: '#333', fontSize: '1.2rem', flexShrink: 0 }}>
                         {activeTab === 'profile' && '编辑个人资料'}
                         {activeTab === 'tags' && '管理个性标签'}
                         {activeTab === 'media' && '设置头像与背景'}
@@ -670,7 +684,7 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                         <form
                           className="profilepanel-useredit-form"
                           onSubmit={e => { e.preventDefault(); handleProfileSave(); }}
-                          style={{ maxWidth: '600px' }}
+                          style={{ maxWidth: '100%', width: '100%', display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}
                         >
                           {activeTab === 'profile' && (
                             <>
@@ -715,195 +729,503 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                                 <label className="profile-form-label">自我介绍</label>
                                 <textarea name="bio" maxLength={300} value={profile.bio || ''} onChange={handleProfileChange} placeholder="详细介绍一下自己吧（最多300字）" className="profile-form-textarea" style={{ minHeight: '120px', resize: 'vertical' }} />
                               </div>
+                              <div style={{ marginTop: 30, paddingTop: 20, borderTop: '1px solid #eee' }}>
+                                <button type="submit" disabled={editLoading} style={{ 
+                                  width: '100%', 
+                                  padding: '12px', 
+                                  background: 'linear-gradient(135deg, #1890ff 0%, #096dd9 100%)', 
+                                  color: '#fff', 
+                                  border: 'none', 
+                                  borderRadius: '8px', 
+                                  cursor: editLoading ? 'not-allowed' : 'pointer', 
+                                  fontWeight: 'bold',
+                                  fontSize: '1rem',
+                                  boxShadow: '0 4px 12px rgba(24, 144, 255, 0.3)',
+                                  transition: 'all 0.2s'
+                                }}>
+                                  {editLoading ? '保存中...' : '保存资料'}
+                                </button>
+                              </div>
+                              {editMsg && <div className="form-msg" style={{ marginTop: 15, color: editMsg.includes('成功') ? '#52c41a' : '#ff4d4f', textAlign: 'center', fontWeight: '500' }}>{editMsg}</div>}
                             </>
                           )}
 
                           {activeTab === 'tags' && (
-                            <div className="form-group">
-                                <label className="profile-form-label">个人标签（最多10个）</label>
-                              <div className="profile-tags-wrapper" style={{ background: '#fff', padding: '15px', borderRadius: '8px', border: '1px solid #eee' }}>
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '15px' }}>
-                                  {tagsList.map(tag => (
-                                    <span key={tag} className="profile-tag-chip" style={{ 
-                                      background: '#e6f7ff', 
-                                      color: '#1890ff', 
-                                      padding: '5px 10px', 
-                                      borderRadius: '15px', 
-                                      fontSize: '0.9rem', 
-                                      display: 'flex', 
-                                      alignItems: 'center' 
-                                    }}>
-                                      {tag}
-                                      <button type="button" onClick={() => handleRemoveTag(tag)} style={{ marginLeft: '5px', background: 'none', border: 'none', color: '#1890ff', cursor: 'pointer', fontSize: '1.1rem', lineHeight: 1 }}>&times;</button>
-                                    </span>
-                                  ))}
-                                </div>
+                            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden', marginBottom: 0 }}>
+                              <label className="profile-form-label" style={{ marginBottom: '10px', display: 'block', flexShrink: 0 }}>个人标签（最多10个）</label>
+                              <div className="profile-tags-container" style={{ 
+                                flex: 1, 
+                                background: '#f9f9f9', 
+                                borderRadius: '12px', 
+                                padding: '15px',
+                                border: '2px dashed #e0e0e0',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '8px',
+                                transition: 'all 0.3s ease',
+                                overflowY: 'auto',
+                                scrollbarWidth: 'none', /* Firefox */
+                                msOverflowStyle: 'none'  /* IE 10+ */
+                              }}>
+                                <style>{`
+                                  .profile-tags-container::-webkit-scrollbar { 
+                                    display: none; 
+                                  }
+                                `}</style>
+                                {tagsList.map((tag, index) => (
+                                  <div key={tag + index} className="profile-tag-item" style={{
+                                    background: 'linear-gradient(to right, #e6f7ff, #ffffff)',
+                                    color: '#096dd9',
+                                    padding: '12px 20px',
+                                    borderRadius: '8px',
+                                    fontSize: '1rem',
+                                    fontWeight: '600',
+                                    boxShadow: '0 2px 6px rgba(24, 144, 255, 0.1)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    cursor: 'default',
+                                    animation: 'fadeIn 0.3s ease-out',
+                                    border: '1px solid #bae7ff',
+                                    width: '100%',
+                                    flexShrink: 0
+                                  }}>
+                                    <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tag}</span>
+                                    <button 
+                                      type="button" 
+                                      onClick={() => handleRemoveTag(tag)}
+                                      style={{ 
+                                        marginLeft: '10px', 
+                                        width: '24px', 
+                                        height: '24px', 
+                                        borderRadius: '50%', 
+                                        background: 'rgba(24, 144, 255, 0.1)', 
+                                        border: 'none', 
+                                        color: '#1890ff', 
+                                        cursor: 'pointer', 
+                                        display: 'flex', 
+                                        alignItems: 'center', 
+                                        justifyContent: 'center',
+                                        fontSize: '16px',
+                                        transition: 'all 0.2s'
+                                      }}
+                                      onMouseEnter={e => { e.currentTarget.style.background = '#ff4d4f'; e.currentTarget.style.color = '#fff'; }}
+                                      onMouseLeave={e => { e.currentTarget.style.background = 'rgba(24, 144, 255, 0.1)'; e.currentTarget.style.color = '#1890ff'; }}
+                                    >
+                                      &times;
+                                    </button>
+                                  </div>
+                                ))}
+                                
                                 {tagsList.length < 10 && (
-                                  <div className="profile-tag-input-group" style={{ display: 'flex', gap: '10px' }}>
+                                  <div className="profile-tag-add-wrapper" style={{ position: 'relative', width: '100%', flexShrink: 0 }}>
                                     <input
+                                      id="tag-input-field"
                                       type="text"
-                                      placeholder={tagsList.length === 0 ? "输入标签按回车添加" : "添加新标签"}
                                       value={tagInput}
                                       onChange={e => setTagInput(e.target.value)}
                                       onKeyDown={handleTagKeyDown}
-                                      className="profile-tag-input"
+                                      placeholder="+ 添加新标签 (输入后回车)"
                                       maxLength={10}
-                                      style={{ flex: 1 }}
+                                      style={{
+                                        width: '100%',
+                                        padding: '12px 20px',
+                                        borderRadius: '8px',
+                                        border: '2px dashed #bbb',
+                                        outline: 'none',
+                                        fontSize: '1rem',
+                                        background: '#fff',
+                                        color: '#555',
+                                        transition: 'all 0.2s',
+                                        boxShadow: 'none'
+                                      }}
+                                      onFocus={e => {
+                                        e.target.style.borderColor = '#1890ff';
+                                        e.target.style.borderStyle = 'solid';
+                                        e.target.style.boxShadow = '0 4px 12px rgba(24, 144, 255, 0.2)';
+                                      }}
+                                      onBlur={e => {
+                                        if (!tagInput) {
+                                          e.target.style.borderColor = '#bbb';
+                                          e.target.style.borderStyle = 'dashed';
+                                          e.target.style.boxShadow = 'none';
+                                        }
+                                      }}
                                     />
-                                    <button type="button" onClick={handleAddTag} className="profile-add-tag-btn" disabled={!tagInput.trim()} style={{ padding: '0 15px', background: '#1890ff', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                                      添加
-                                    </button>
                                   </div>
                                 )}
                               </div>
+                              <div style={{ marginTop: '10px', textAlign: 'right', fontSize: '0.85rem', color: '#999', flexShrink: 0 }}>
+                                {tagsList.length}/10
+                              </div>
+                              <div style={{ marginTop: 30, paddingTop: 20, borderTop: '1px solid #eee' }}>
+                                <button type="submit" disabled={editLoading} style={{ 
+                                  width: '100%', 
+                                  padding: '12px', 
+                                  background: 'linear-gradient(135deg, #1890ff 0%, #096dd9 100%)', 
+                                  color: '#fff', 
+                                  border: 'none', 
+                                  borderRadius: '8px', 
+                                  cursor: editLoading ? 'not-allowed' : 'pointer', 
+                                  fontWeight: 'bold',
+                                  fontSize: '1rem',
+                                  boxShadow: '0 4px 12px rgba(24, 144, 255, 0.3)',
+                                  transition: 'all 0.2s'
+                                }}>
+                                  {editLoading ? '保存中...' : '保存资料'}
+                                </button>
+                              </div>
+                              {editMsg && <div className="form-msg" style={{ marginTop: 15, color: editMsg.includes('成功') ? '#52c41a' : '#ff4d4f', textAlign: 'center', fontWeight: '500' }}>{editMsg}</div>}
                             </div>
                           )}
 
                           {activeTab === 'media' && (
                             <>
                               <div className="form-group">
-                                <label className="profile-form-label">头像</label>
-                                <div className="profile-file-input-wrapper" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                                  {(avatarPreview || profile.avatarUrl) && (
-                                    <div className="profilepanel-avatar-preview">
-                                      <img
-                                        src={avatarPreview || resolveUrl(profile.avatarUrl)}
-                                        alt="头像预览"
-                                        className="profilepanel-avatar-img"
-                                        style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover', border: '4px solid #fff', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                                      />
+                                <label className="profile-form-label" style={{ marginBottom: '15px', display: 'block' }}>头像设置</label>
+                                <div style={{ display: 'flex', justifyContent: 'center', padding: '20px 0' }}>
+                                  <div 
+                                    className="avatar-upload-preview"
+                                    style={{ 
+                                      position: 'relative', 
+                                      width: '140px', 
+                                      height: '140px', 
+                                      borderRadius: '50%', 
+                                      cursor: 'pointer',
+                                      boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                                      border: '4px solid #fff',
+                                      overflow: 'hidden',
+                                      transition: 'transform 0.3s',
+                                      background: '#fff'
+                                    }}
+                                    onClick={() => document.getElementById('avatar-upload-hidden').click()}
+                                    onMouseEnter={e => {
+                                      e.currentTarget.style.transform = 'scale(1.05)';
+                                      e.currentTarget.querySelector('.avatar-overlay').style.opacity = 1;
+                                    }}
+                                    onMouseLeave={e => {
+                                      e.currentTarget.style.transform = 'scale(1)';
+                                      e.currentTarget.querySelector('.avatar-overlay').style.opacity = 0;
+                                    }}
+                                  >
+                                    <img
+                                      src={avatarPreview || (profile.avatarUrl ? resolveUrl(profile.avatarUrl) : resolveUrl(getDefaultAvatar(profile.id || userId)))}
+                                      alt="Avatar"
+                                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                    />
+                                    <div className="avatar-overlay" style={{
+                                      position: 'absolute',
+                                      top: 0, left: 0, width: '100%', height: '100%',
+                                      background: 'rgba(0,0,0,0.5)',
+                                      display: 'flex',
+                                      flexDirection: 'column',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      color: '#fff',
+                                      opacity: 0,
+                                      transition: 'opacity 0.3s'
+                                    }}>
+                                      <span style={{ fontSize: '24px', marginBottom: '5px' }}>📷</span>
+                                      <span style={{ fontSize: '12px', fontWeight: 'bold' }}>更换头像</span>
                                     </div>
-                                  )}
-                                  <div style={{ flex: 1 }}>
-                                    <div className="upload-zone" style={{ minHeight: '100px', padding: '15px', flexDirection: 'row', gap: '15px', justifyContent: 'flex-start' }}>
-                                      <input type="file" accept="image/*,image/gif" onChange={handleAvatarSelect} id="avatar-upload" />
-                                      <div className="upload-zone-icon" style={{ fontSize: '24px', marginBottom: 0 }}>📷</div>
-                                      <div style={{ textAlign: 'left' }}>
-                                        <div className="upload-zone-text">点击更换头像</div>
-                                        <div className="upload-zone-subtext">支持 JPG, PNG, GIF</div>
-                                      </div>
-                                    </div>
+                                    <input 
+                                      type="file" 
+                                      id="avatar-upload-hidden" 
+                                      accept="image/*,image/gif" 
+                                      onChange={handleAvatarSelect} 
+                                      style={{ display: 'none' }} 
+                                    />
                                   </div>
                                 </div>
                               </div>
-                              <div className="form-group" style={{ marginTop: '25px' }}>
-                                <label className="profile-form-label">背景图/视频</label>
-                                {(backgroundPreview || profile.backgroundUrl) && (
-                                  <div className="profilepanel-bg-preview" style={{ marginBottom: '15px', borderRadius: '12px', overflow: 'hidden', border: '1px solid #eee', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-                                    {(() => {
-                                      const url = backgroundPreview || profile.backgroundUrl;
-                                      if (/\.(mp4|webm)$/i.test(url)) {
-                                        return <video src={resolveUrl(url)} controls className="profilepanel-bg-video" style={{ width: '100%', maxHeight: '240px', objectFit: 'cover', display: 'block' }} />;
-                                      } else {
-                                        return <img src={resolveUrl(url)} alt="背景预览" className="profilepanel-bg-img" style={{ width: '100%', maxHeight: '240px', objectFit: 'cover', display: 'block' }} />;
-                                      }
-                                    })()}
+
+                              <div className="form-group" style={{ marginTop: '30px' }}>
+                                <label className="profile-form-label" style={{ marginBottom: '15px', display: 'block' }}>背景图/视频设置</label>
+                                <div 
+                                  className="bg-upload-preview"
+                                  style={{ 
+                                    position: 'relative', 
+                                    width: '100%', 
+                                    height: '200px', 
+                                    borderRadius: '16px', 
+                                    overflow: 'hidden',
+                                    cursor: 'pointer',
+                                    boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
+                                    border: '1px solid #eee',
+                                    transition: 'all 0.3s',
+                                    background: '#f0f0f0'
+                                  }}
+                                  onClick={() => document.getElementById('bg-upload-hidden').click()}
+                                  onMouseEnter={e => {
+                                    e.currentTarget.style.boxShadow = '0 12px 32px rgba(0,0,0,0.15)';
+                                    e.currentTarget.querySelector('.bg-overlay').style.opacity = 1;
+                                  }}
+                                  onMouseLeave={e => {
+                                    e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.1)';
+                                    e.currentTarget.querySelector('.bg-overlay').style.opacity = 0;
+                                  }}
+                                >
+                                  {(() => {
+                                    const url = backgroundPreview || profile.backgroundUrl;
+                                    if (url) {
+                                        if (/\.(mp4|webm)$/i.test(url)) {
+                                            return <video src={resolveUrl(url)} className="profilepanel-bg-video" style={{ width: '100%', height: '100%', objectFit: 'cover' }} muted loop autoPlay />;
+                                        } else {
+                                            return <img src={resolveUrl(url)} alt="Background" className="profilepanel-bg-img" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />;
+                                        }
+                                    } else {
+                                        return (
+                                            <div style={{ 
+                                                width: '100%', 
+                                                height: '100%', 
+                                                background: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)' 
+                                            }} />
+                                        );
+                                    }
+                                  })()}
+                                  
+                                  <div className="bg-overlay" style={{
+                                    position: 'absolute',
+                                    top: 0, left: 0, width: '100%', height: '100%',
+                                    background: 'rgba(0,0,0,0.4)',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: '#fff',
+                                    opacity: 0,
+                                    transition: 'opacity 0.3s',
+                                    backdropFilter: 'blur(2px)'
+                                  }}>
+                                    <span style={{ fontSize: '32px', marginBottom: '10px' }}>🖼️</span>
+                                    <span style={{ fontSize: '14px', fontWeight: 'bold', letterSpacing: '1px' }}>点击更换背景</span>
+                                    <span style={{ fontSize: '12px', opacity: 0.8, marginTop: '5px' }}>支持图片与视频</span>
                                   </div>
-                                )}
-                                <div className="upload-zone" style={{ minHeight: '60px', padding: '10px', flexDirection: 'row', gap: '10px' }}>
-                                  <input type="file" accept="image/*,image/gif,video/mp4,video/webm" onChange={handleBackgroundSelect} id="bg-upload" />
-                                  <div className="upload-zone-icon" style={{ fontSize: '20px', marginBottom: 0 }}>🖼️</div>
-                                  <div className="upload-zone-text">点击更换背景</div>
+                                  <input 
+                                    type="file" 
+                                    id="bg-upload-hidden" 
+                                    accept="image/*,image/gif,video/mp4,video/webm" 
+                                    onChange={handleBackgroundSelect} 
+                                    style={{ display: 'none' }} 
+                                  />
                                 </div>
                               </div>
+                              <div style={{ marginTop: 30, paddingTop: 20, borderTop: '1px solid #eee' }}>
+                                <button type="submit" disabled={editLoading} style={{ 
+                                  width: '100%', 
+                                  padding: '12px', 
+                                  background: 'linear-gradient(135deg, #1890ff 0%, #096dd9 100%)', 
+                                  color: '#fff', 
+                                  border: 'none', 
+                                  borderRadius: '8px', 
+                                  cursor: editLoading ? 'not-allowed' : 'pointer', 
+                                  fontWeight: 'bold',
+                                  fontSize: '1rem',
+                                  boxShadow: '0 4px 12px rgba(24, 144, 255, 0.3)',
+                                  transition: 'all 0.2s'
+                                }}>
+                                  {editLoading ? '保存中...' : '保存资料'}
+                                </button>
+                              </div>
+                              {editMsg && <div className="form-msg" style={{ marginTop: 15, color: editMsg.includes('成功') ? '#52c41a' : '#ff4d4f', textAlign: 'center', fontWeight: '500' }}>{editMsg}</div>}
                             </>
                           )}
 
                           {activeTab === 'contact' && (
                             <>
-                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                                <div className="form-group">
-                                  <label className="profile-form-label">QQ号</label>
-                                  <div style={{ position: 'relative', width: '100%' }}>
-                                    <img src={resolveUrl('/icons/contect/qq.svg')} alt="QQ" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '20px', height: '20px', opacity: 0.6 }} />
-                                    <input type="text" name="qq" value={profile.qq || ''} onChange={handleProfileChange} className="profile-form-input" placeholder="QQ号码" style={{ paddingLeft: '38px' }} />
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '25px', flex: 1, overflowY: 'auto', paddingRight: '5px' }}>
+                                {/* Inputs Grid */}
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                                  <div className="form-group" style={{ marginBottom: 0 }}>
+                                    <label className="profile-form-label" style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>QQ号</label>
+                                    <div style={{ position: 'relative', width: '100%' }}>
+                                      <img src={resolveUrl('/icons/contect/qq.svg')} alt="QQ" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', width: '20px', height: '20px', opacity: 0.7 }} />
+                                      <input type="text" name="qq" value={profile.qq || ''} onChange={handleProfileChange} className="profile-form-input" placeholder="QQ号码" style={{ paddingLeft: '44px', height: '42px', fontSize: '14px', color: '#333', fontWeight: '500', width: '100%' }} />
+                                    </div>
+                                  </div>
+                                  <div className="form-group" style={{ marginBottom: 0 }}>
+                                    <label className="profile-form-label" style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>微信号</label>
+                                    <div style={{ position: 'relative', width: '100%' }}>
+                                      <img src={resolveUrl('/icons/contect/微信.svg')} alt="WeChat" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', width: '20px', height: '20px', opacity: 0.7 }} />
+                                      <input type="text" name="wechat" value={profile.wechat || ''} onChange={handleProfileChange} className="profile-form-input" placeholder="微信号码" style={{ paddingLeft: '44px', height: '42px', fontSize: '14px', color: '#333', fontWeight: '500', width: '100%' }} />
+                                    </div>
+                                  </div>
+                                  <div className="form-group" style={{ marginBottom: 0 }}>
+                                    <label className="profile-form-label" style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>GitHub</label>
+                                    <div style={{ position: 'relative', width: '100%' }}>
+                                      <img src={resolveUrl('/icons/contect/github.svg')} alt="GitHub" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', width: '20px', height: '20px', opacity: 0.7 }} />
+                                      <input type="text" name="githubLink" value={profile.githubLink || ''} onChange={handleProfileChange} className="profile-form-input" placeholder="GitHub链接" style={{ paddingLeft: '44px', height: '42px', fontSize: '14px', color: '#333', fontWeight: '500', width: '100%' }} />
+                                    </div>
+                                  </div>
+                                  <div className="form-group" style={{ marginBottom: 0 }}>
+                                    <label className="profile-form-label" style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Bilibili</label>
+                                    <div style={{ position: 'relative', width: '100%' }}>
+                                      <img src={resolveUrl('/icons/contect/bilibili.svg')} alt="Bilibili" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', width: '20px', height: '20px', opacity: 0.7 }} />
+                                      <input type="text" name="bilibiliLink" value={profile.bilibiliLink || ''} onChange={handleProfileChange} className="profile-form-input" placeholder="B站主页链接" style={{ paddingLeft: '44px', height: '42px', fontSize: '14px', color: '#333', fontWeight: '500', width: '100%' }} />
+                                    </div>
                                   </div>
                                 </div>
-                                <div className="form-group">
-                                  <label className="profile-form-label">微信号</label>
-                                  <div style={{ position: 'relative', width: '100%' }}>
-                                    <img src={resolveUrl('/icons/contect/微信.svg')} alt="WeChat" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '20px', height: '20px', opacity: 0.6 }} />
-                                    <input type="text" name="wechat" value={profile.wechat || ''} onChange={handleProfileChange} className="profile-form-input" placeholder="微信号码" style={{ paddingLeft: '38px' }} />
+
+                                {/* QR Codes */}
+                                <div style={{ display: 'flex', gap: '20px' }}>
+                                  <div className="form-group" style={{ marginBottom: 0, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                                    <label className="profile-form-label" style={{ marginBottom: '8px', textAlign: 'center', fontSize: '14px', fontWeight: 'bold' }}>QQ二维码</label>
+                                    <div 
+                                      className="qr-upload-box"
+                                      onClick={() => document.getElementById('qq-qr-upload').click()}
+                                      style={{ 
+                                        width: '100%',
+                                        maxWidth: '220px',
+                                        aspectRatio: '1/1',
+                                        margin: '0 auto',
+                                        border: '2px dashed #d9d9d9', 
+                                        borderRadius: '12px', 
+                                        display: 'flex', 
+                                        flexDirection: 'column', 
+                                        alignItems: 'center', 
+                                        justifyContent: 'center', 
+                                        cursor: 'pointer',
+                                        background: '#fafafa',
+                                        transition: 'all 0.3s',
+                                        position: 'relative',
+                                        overflow: 'hidden'
+                                      }}
+                                      onMouseEnter={e => { e.currentTarget.style.borderColor = '#1890ff'; e.currentTarget.style.background = '#f0f5ff'; }}
+                                      onMouseLeave={e => { e.currentTarget.style.borderColor = '#d9d9d9'; e.currentTarget.style.background = '#fafafa'; }}
+                                    >
+                                      {(qqQrPreview || profile.qqQrCode) ? (
+                                         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                                           <img 
+                                            src={qqQrPreview || resolveUrl(profile.qqQrCode)} 
+                                            alt="QQ QR" 
+                                            style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '10px' }}
+                                           />
+                                           <button
+                                              type="button"
+                                              onClick={handleRemoveQqQr}
+                                              style={{
+                                                position: 'absolute',
+                                                top: '8px',
+                                                right: '8px',
+                                                width: '24px',
+                                                height: '24px',
+                                                borderRadius: '50%',
+                                                background: 'rgba(0,0,0,0.5)',
+                                                color: '#fff',
+                                                border: 'none',
+                                                cursor: 'pointer',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                fontSize: '16px',
+                                                zIndex: 10
+                                              }}
+                                              onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,0,0,0.7)'}
+                                              onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,0,0,0.5)'}
+                                            >
+                                              &times;
+                                            </button>
+                                         </div>
+                                      ) : (
+                                        <>
+                                          <img src={resolveUrl('/icons/profile/qqqr.svg')} alt="Upload" style={{ width: '40px', height: '40px', opacity: 0.5, marginBottom: '8px' }} />
+                                          <span style={{ fontSize: '13px', color: '#888', fontWeight: '500' }}>点击上传</span>
+                                        </>
+                                      )}
+                                      <input type="file" accept="image/*" onChange={handleQqQrSelect} id="qq-qr-upload" style={{ display: 'none' }} />
+                                    </div>
+                                  </div>
+
+                                  <div className="form-group" style={{ marginBottom: 0, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                                    <label className="profile-form-label" style={{ marginBottom: '8px', textAlign: 'center', fontSize: '14px', fontWeight: 'bold' }}>微信二维码</label>
+                                    <div 
+                                      className="qr-upload-box"
+                                      onClick={() => document.getElementById('wechat-qr-upload').click()}
+                                      style={{ 
+                                        width: '100%',
+                                        maxWidth: '220px',
+                                        aspectRatio: '1/1',
+                                        margin: '0 auto',
+                                        border: '2px dashed #d9d9d9', 
+                                        borderRadius: '12px', 
+                                        display: 'flex', 
+                                        flexDirection: 'column', 
+                                        alignItems: 'center', 
+                                        justifyContent: 'center', 
+                                        cursor: 'pointer',
+                                        background: '#fafafa',
+                                        transition: 'all 0.3s',
+                                        position: 'relative',
+                                        overflow: 'hidden'
+                                      }}
+                                      onMouseEnter={e => { e.currentTarget.style.borderColor = '#1890ff'; e.currentTarget.style.background = '#f0f5ff'; }}
+                                      onMouseLeave={e => { e.currentTarget.style.borderColor = '#d9d9d9'; e.currentTarget.style.background = '#fafafa'; }}
+                                    >
+                                      {(wechatQrPreview || profile.wechatQrCode) ? (
+                                         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                                           <img 
+                                            src={wechatQrPreview || resolveUrl(profile.wechatQrCode)} 
+                                            alt="WeChat QR" 
+                                            style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '10px' }}
+                                           />
+                                           <button
+                                              type="button"
+                                              onClick={handleRemoveWechatQr}
+                                              style={{
+                                                position: 'absolute',
+                                                top: '8px',
+                                                right: '8px',
+                                                width: '24px',
+                                                height: '24px',
+                                                borderRadius: '50%',
+                                                background: 'rgba(0,0,0,0.5)',
+                                                color: '#fff',
+                                                border: 'none',
+                                                cursor: 'pointer',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                fontSize: '16px',
+                                                zIndex: 10
+                                              }}
+                                              onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,0,0,0.7)'}
+                                              onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,0,0,0.5)'}
+                                            >
+                                              &times;
+                                            </button>
+                                         </div>
+                                      ) : (
+                                        <>
+                                          <img src={resolveUrl('/icons/profile/wechatqr.svg')} alt="Upload" style={{ width: '40px', height: '40px', opacity: 0.5, marginBottom: '8px' }} />
+                                          <span style={{ fontSize: '13px', color: '#888', fontWeight: '500' }}>点击上传</span>
+                                        </>
+                                      )}
+                                      <input type="file" accept="image/*" onChange={handleWechatQrSelect} id="wechat-qr-upload" style={{ display: 'none' }} />
+                                    </div>
                                   </div>
                                 </div>
                               </div>
 
-                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginTop: '15px' }}>
-                                <div className="form-group">
-                                  <label className="profile-form-label">QQ二维码</label>
-                                  <div className="upload-zone" style={{ minHeight: '160px' }}>
-                                    <input type="file" accept="image/*" onChange={handleQqQrSelect} id="qq-qr-upload" />
-                                    {(qqQrPreview || profile.qqQrCode) ? (
-                                       <img 
-                                        src={qqQrPreview || resolveUrl(profile.qqQrCode)} 
-                                        alt="QQ QR" 
-                                        style={{ width: '100px', height: '100px', objectFit: 'contain', marginBottom: '10px' }}
-                                        onError={e => { e.target.onerror = null; e.target.src = '/imgs/loginandwelcomepanel/1.png'; }}
-                                      />
-                                    ) : (
-                                      <div className="upload-zone-icon">
-                                        <img src={resolveUrl('/icons/profile/qqqr.svg')} alt="QQ QR Placeholder" style={{ width: '40px', height: '40px', opacity: 0.5 }} />
-                                      </div>
-                                    )}
-                                    <div className="upload-zone-text">{ (qqQrPreview || profile.qqQrCode) ? '点击更换二维码' : '上传QQ二维码' }</div>
-                                  </div>
-                                </div>
-                                <div className="form-group">
-                                  <label className="profile-form-label">微信二维码</label>
-                                  <div className="upload-zone" style={{ minHeight: '160px' }}>
-                                    <input type="file" accept="image/*" onChange={handleWechatQrSelect} id="wechat-qr-upload" />
-                                    {(wechatQrPreview || profile.wechatQrCode) ? (
-                                       <img 
-                                        src={wechatQrPreview || resolveUrl(profile.wechatQrCode)} 
-                                        alt="WeChat QR" 
-                                        style={{ width: '100px', height: '100px', objectFit: 'contain', marginBottom: '10px' }}
-                                        onError={e => { e.target.onerror = null; e.target.src = '/imgs/loginandwelcomepanel/1.png'; }}
-                                      />
-                                    ) : (
-                                      <div className="upload-zone-icon">
-                                        <img src={resolveUrl('/icons/profile/wechatqr.svg')} alt="WeChat QR Placeholder" style={{ width: '40px', height: '40px', opacity: 0.5 }} />
-                                      </div>
-                                    )}
-                                    <div className="upload-zone-text">{ (wechatQrPreview || profile.wechatQrCode) ? '点击更换二维码' : '上传微信二维码' }</div>
-                                  </div>
-                                </div>
+                              <div style={{ marginTop: 30, paddingTop: 20, borderTop: '1px solid #eee' }}>
+                                <button type="submit" disabled={editLoading} style={{ 
+                                  width: '100%', 
+                                  padding: '12px', 
+                                  background: 'linear-gradient(135deg, #1890ff 0%, #096dd9 100%)', 
+                                  color: '#fff', 
+                                  border: 'none', 
+                                  borderRadius: '8px', 
+                                  cursor: editLoading ? 'not-allowed' : 'pointer', 
+                                  fontWeight: 'bold',
+                                  fontSize: '1rem',
+                                  boxShadow: '0 4px 12px rgba(24, 144, 255, 0.3)',
+                                  transition: 'all 0.2s'
+                                }}>
+                                  {editLoading ? '保存中...' : '保存资料'}
+                                </button>
                               </div>
-
-                              <div className="form-group" style={{ marginTop: '15px' }}>
-                                <label className="profile-form-label">GitHub主页</label>
-                                <div style={{ position: 'relative', width: '100%' }}>
-                                  <img src={resolveUrl('/icons/contect/github.svg')} alt="GitHub" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '20px', height: '20px', opacity: 0.6 }} />
-                                  <input type="text" name="githubLink" value={profile.githubLink || ''} onChange={handleProfileChange} className="profile-form-input" placeholder="https://github.com/..." style={{ paddingLeft: '38px' }} />
-                                </div>
-                              </div>
-                              <div className="form-group">
-                                <label className="profile-form-label">B站主页</label>
-                                <div style={{ position: 'relative', width: '100%' }}>
-                                  <img src={resolveUrl('/icons/contect/bilibili.svg')} alt="Bilibili" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '20px', height: '20px', opacity: 0.6 }} />
-                                  <input type="text" name="bilibiliLink" value={profile.bilibiliLink || ''} onChange={handleProfileChange} className="profile-form-input" placeholder="https://space.bilibili.com/..." style={{ paddingLeft: '38px' }} />
-                                </div>
-                              </div>
+                              {editMsg && <div className="form-msg" style={{ marginTop: 15, color: editMsg.includes('成功') ? '#52c41a' : '#ff4d4f', textAlign: 'center', fontWeight: '500' }}>{editMsg}</div>}
                             </>
                           )}
-
-                          <div style={{ marginTop: 30, paddingTop: 20, borderTop: '1px solid #eee' }}>
-                            <button type="submit" disabled={editLoading} style={{ 
-                              width: '100%', 
-                              padding: '12px', 
-                              background: 'linear-gradient(135deg, #1890ff 0%, #096dd9 100%)', 
-                              color: '#fff', 
-                              border: 'none', 
-                              borderRadius: '8px', 
-                              cursor: editLoading ? 'not-allowed' : 'pointer', 
-                              fontWeight: 'bold',
-                              fontSize: '1rem',
-                              boxShadow: '0 4px 12px rgba(24, 144, 255, 0.3)',
-                              transition: 'all 0.2s'
-                            }}>
-                              {editLoading ? '保存中...' : '保存资料'}
-                            </button>
-                          </div>
-                          {editMsg && <div className="form-msg" style={{ marginTop: 15, color: editMsg.includes('成功') ? '#52c41a' : '#ff4d4f', textAlign: 'center', fontWeight: '500' }}>{editMsg}</div>}
                         </form>
                       )}
                     </div>
@@ -961,10 +1283,6 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                     <h3 style={{ marginTop: 0, marginBottom: '25px', color: '#333', borderBottom: '2px solid #f0f0f0', paddingBottom: '15px', fontSize: '1.4rem' }}>关于我</h3>
                     
                     <div className="profile-tags-section" style={{ marginBottom: '35px' }}>
-                      <h4 style={{ color: '#555', marginBottom: '15px', fontSize: '1.1rem', display: 'flex', alignItems: 'center' }}>
-                        <span style={{ width: '4px', height: '16px', background: '#1890ff', marginRight: '8px', borderRadius: '2px' }}></span>
-                        个人标签
-                      </h4>
                       <div className="profile-tags-display" style={{ display: 'flex', justifyContent: 'center', padding: '10px 0' }}>
                         {tagsList && tagsList.length > 0 ? (
                           <MatchboxTagEditor tags={tagsList} readOnly={true} />

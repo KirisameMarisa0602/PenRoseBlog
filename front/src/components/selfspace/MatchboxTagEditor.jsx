@@ -85,7 +85,7 @@ const MatchboxTagEditor = ({ tags, onTagsChange, readOnly = false }) => {
     };
 
     return (
-        <div className={`matchbox-wrapper ${readOnly ? 'readonly' : ''}`} title={readOnly ? "Hover to open" : "Hover to open, Click tags to edit"}>
+        <div className={`matchbox-wrapper ${readOnly ? 'readonly' : ''}`}>
             <div className="matchbox-container">
                 
                 {/* The Inner Drawer (Tags) */}
@@ -148,7 +148,7 @@ const MatchboxTagEditor = ({ tags, onTagsChange, readOnly = false }) => {
                     <div className="mb-face front">
                         <div className="mb-label-circle">
                             <div className="mb-label-text">
-                                MY<br/>TAGS
+                                个人<br/>标签
                             </div>
                         </div>
                         <div className="mb-subtext">PERSONALITY</div>
