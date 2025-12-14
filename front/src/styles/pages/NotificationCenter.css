@@ -173,6 +173,7 @@
     border: 1px solid rgba(255, 255, 255, 0.5);
     transition: all 0.2s ease;
     cursor: pointer;
+    position: relative; /* Added for positioning the unread dot */
 }
 
 .notification-item:hover {
@@ -184,6 +185,19 @@
 .notification-item.unread {
     background: rgba(240, 249, 255, 0.8);
     border-left: 4px solid #3498db;
+}
+
+/* Add blue dot for unread notifications */
+.notification-item.unread::after {
+    content: '';
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 10px;
+    height: 10px;
+    background-color: #3498db;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8);
 }
 
 .notification-avatar img {

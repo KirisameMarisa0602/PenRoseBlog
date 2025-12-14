@@ -210,7 +210,7 @@
 
 /* Slide out on hover */
 .matchbox-wrapper:hover .mb-inner {
-    transform: translateX(calc(var(--mb-w) * 0.55));
+    transform: translateX(calc(var(--mb-w) * 0.95)); /* Slide out almost completely */
 }
 
 /* Hide the right face of the outer box so the drawer can slide out */
@@ -320,6 +320,8 @@
     max-width: 100%;
     margin-left: 50px; /* Head + Stick + Gap */
     text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+    position: relative;
+    z-index: 10; /* Ensure text is on top of stick/head */
 }
 
 /* Input for editing */
