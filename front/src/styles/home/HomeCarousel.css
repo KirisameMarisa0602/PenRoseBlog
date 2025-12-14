@@ -1,7 +1,7 @@
 .home-carousel-container {
     position: relative;
     width: 100%;
-    /* height is now controlled by parent or inline style */
+    height: 400px; /* Default fixed height */
     overflow: hidden;
     border-radius: 12px;
     /* margin-bottom removed/handled by parent */

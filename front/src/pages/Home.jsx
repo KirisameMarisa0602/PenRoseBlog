@@ -16,7 +16,7 @@ const Home = () => {
   const [page, setPage] = useState(0);
   const [sortMode, setSortMode] = useState('latest'); // 'latest' | 'hot'
   const [selectedCategory, setSelectedCategory] = useState('首页');
-  const size = 12; // 每页 12 篇，适应网格布局
+  const size = 15; // 每页 15 篇，适应 5 列网格布局 (3行)
   const { user } = useAuthState();
   const userId = user?.id || null;
 
@@ -133,7 +133,20 @@ const Home = () => {
 
   const handlePrevPage = () => { if (canPrev) setPage(Math.max(0, page - 1)); };
   const handleNextPage = () => { if (canNext) setPage(page + 1); };
-{/* Hero Section: Carousel + Top Grid */}
+
+  // 隐藏 Home 页滚动条（不影响滚动），离开时恢复
+  useEffect(() => {
+    try { document.body.classList.add('hide-scrollbar'); } catch (err) { void err; }
+    return () => { try { document.body.classList.remove('hide-scrollbar'); } catch (err) { void err; } };
+  }, []);
+
+  return (
+    <>
+      <div className="home-page-wrapper">
+        <HomeCategoryTabs selectedCategory={selectedCategory} onSelectCategory={handleCategoryChange} />
+        
+        <div className="home-articles-container">
+          {/* Hero Section: Carousel + Top Grid */}
           <div className="home-hero-section">
             <div className="home-hero-carousel">
                 <HomeCarousel />
@@ -150,19 +163,6 @@ const Home = () => {
             </div>
           </div>
 
-  // 隐藏 Home 页滚动条（不影响滚动），离开时恢复
-  useEffect(() => {
-    try { document.body.classList.add('hide-scrollbar'); } catch (err) { void err; }
-    return () => { try { document.body.classList.remove('hide-scrollbar'); } catch (err) { void err; } };
-  }, []);
-
-  return (
-    <>
-      <div className="home-page-wrapper">
-        <HomeCategoryTabs selectedCategory={selectedCategory} onSelectCategory={handleCategoryChange} />
-        
-        <div className="home-articles-container">
-          <HomeCarousel />
           <HomeSortTabs sortMode={sortMode} onChange={handleSortChange} />
           
           <div className="home-articles-list">

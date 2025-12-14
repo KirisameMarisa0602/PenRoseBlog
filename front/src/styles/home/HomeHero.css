@@ -3,14 +3,32 @@
     display: grid;
     grid-template-columns: 45% 1fr; /* Carousel takes 45%, Grid takes rest */
     gap: 20px;
-    margin-bottom: 30px;
-    height: 380px; /* Fixed height for alignment */
+    margin-bottom: 60px;
+    height: 460px; /* Increased height to fit 2 rows of cards */
+    opacity: 0;
+    animation: fadeIn 0.8s ease-out forwards;
+}
+
+/* Fallback for empty hero section to avoid layout collapse */
+.home-hero-section:empty {
+    display: none;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .home-hero-carousel {
     height: 100%;
     border-radius: 12px;
     overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.home-hero-carousel:hover {
+    transform: scale(1.01);
 }
 
 /* Override carousel container margin inside hero */
@@ -34,20 +52,31 @@
     display: flex;
     flex-direction: column;
     background: #fff;
-    border-radius: 8px;
+    border-radius: 12px; /* More rounded */
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    transition: transform 0.2s;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    border: 1px solid rgba(0,0,0,0.02);
 }
 
 .home-hero-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+    z-index: 2;
 }
 
 .home-hero-card .article-card-cover-wrapper {
-    height: 100px; /* Smaller cover for hero grid */
+    height: 110px; /* Slightly larger */
     flex-shrink: 0;
+    overflow: hidden;
+}
+
+.home-hero-card .article-card-cover {
+    transition: transform 0.5s ease;
+}
+
+.home-hero-card:hover .article-card-cover {
+    transform: scale(1.1);
 }
 
 .home-hero-card .article-card-info {

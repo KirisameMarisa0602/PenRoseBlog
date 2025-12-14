@@ -38,14 +38,17 @@
 
 /* 容器略窄以便更多内容进入同屏，同时保留美观 */
 .home-articles-container {
-  max-width: 1200px; /* Increased width for grid layout */
+  max-width: 1600px; /* Significantly increased width */
+  width: 95%; /* Responsive width */
   margin: 0 auto;
   padding: 24px 24px;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.95); /* Slightly transparent white */
   border-radius: 16px;
-  box-shadow: 0 4px 24px rgba(80,120,200,0.10);
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15); /* Glassmorphism-ish shadow */
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
   position: relative;
-  min-height: 500px; /* Ensure some height */
+  min-height: 800px; /* Ensure substantial height */
 }
 
 /* Removed .home-articles-title-out and .home-sort-group styles as they are no longer used in this way */
@@ -63,7 +66,7 @@
 .home-articles-list {
   display: flex;
   flex-direction: column;
-  gap: 12px; 
+  gap: 36px; 
   padding: 0;
   margin: 0;
 }

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchTopPostsPerCategory } from '@utils/api/postService';
+import { fetchTopPostsPerCategory, fetchPosts } from '@utils/api/postService';
 import resolveUrl from '@utils/resolveUrl';
 import { getDefaultAvatar } from '@utils/avatarUtils';
 import '@styles/home/HomeCarousel.css';
@@ -11,11 +11,36 @@ const HomeCarousel = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        fetchTopPostsPerCategory().then(res => {
-            if (res && res.code === 200) {
-                setSlides(res.data || []);
+        const loadData = async () => {
+            let slidesData = [];
+            try {
+                // Try to get top posts per category first
+                const topRes = await fetchTopPostsPerCategory();
+                if (topRes && topRes.code === 200 && topRes.data && topRes.data.length > 0) {
+                    slidesData = topRes.data;
+                }
+            } catch (err) {
+                console.warn("Failed to fetch top posts per category, falling back...", err);
             }
-        });
+
+            // Fallback if no data found
+            if (slidesData.length === 0) {
+                try {
+                    const hotRes = await fetchPosts({ page: 0, size: 5, sortMode: 'hot' });
+                    if (hotRes && (hotRes.code === 200 || hotRes.status === 200)) {
+                        let list = hotRes.data && hotRes.data.list ? hotRes.data.list : (hotRes.data || []);
+                        if (Array.isArray(list) && list.length > 0) {
+                            slidesData = list.slice(0, 5);
+                        }
+                    }
+                } catch (err) {
+                    console.error("Failed to fetch fallback hot posts", err);
+                }
+            }
+            
+            setSlides(slidesData);
+        };
+        loadData();
     }, []);
 
     useEffect(() => {
@@ -43,7 +68,7 @@ const HomeCarousel = () => {
     if (slides.length === 0) return null;
 
     return (
-        <div className="home-carousel-container" style={{ height: '100%' }}>
+        <div className="home-carousel-container">
             {slides.map((slide, index) => {
                 const coverUrl = resolveUrl(slide.coverImageUrl);
                 const avatarUrl = resolveUrl(slide.authorAvatarUrl) || getDefaultAvatar(slide.userId);
