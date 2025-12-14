@@ -510,7 +510,7 @@ export default function BannerNavbar({ bannerId }) {
         <SplitNavItem to="/notifications" text="系统通知" badge={sysUnread} />
 
         {/* 6. Publish */}
-        <SplitNavItem to="/blog-edit" text="发布文章" />
+        <SplitNavItem to="/blog-edit?new=true" text="发布文章" />
 
         {/* 7. Placeholder */}
         <SplitNavItem text="更多功能" />

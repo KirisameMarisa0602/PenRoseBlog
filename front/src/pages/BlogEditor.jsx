@@ -303,15 +303,31 @@ const BlogEditor = () => {
   };
 
   useEffect(() => {
-    try {
-      const t = localStorage.getItem('blog.editor.title');
-      const c = localStorage.getItem('blog.editor.content');
-      const tg = localStorage.getItem('blog.editor.tags');
-      if (t != null) setTitle(t);
-      if (c != null) setContent(c);
-      if (tg != null) setTags(JSON.parse(tg));
-    } catch { /* ignore */ }
-  }, []);
+    const isNew = searchParams.get('new') === 'true';
+    if (isNew) {
+      try {
+        localStorage.removeItem('blog.editor.title');
+        localStorage.removeItem('blog.editor.content');
+        localStorage.removeItem('blog.editor.tags');
+      } catch { /* ignore */ }
+      setTitle('');
+      setContent('');
+      setTags([]);
+      setCover(null);
+      setCoverPreview(null);
+      // Remove param to avoid clearing on refresh if user wants to keep it
+      navigate('/blog-edit', { replace: true });
+    } else {
+      try {
+        const t = localStorage.getItem('blog.editor.title');
+        const c = localStorage.getItem('blog.editor.content');
+        const tg = localStorage.getItem('blog.editor.tags');
+        if (t != null) setTitle(t);
+        if (c != null) setContent(c);
+        if (tg != null) setTags(JSON.parse(tg));
+      } catch { /* ignore */ }
+    }
+  }, [searchParams, navigate]);
 
   useEffect(() => {
     const beforeUnload = (ev) => {
