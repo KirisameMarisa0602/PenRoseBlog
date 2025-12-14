@@ -1203,56 +1203,93 @@ export default function CommunicationPage() {
                     ref={leftScrollRef}
                     aria-label="会话列表"
                 >
-                    {conversations.map(c => (
-                        <button
-                            key={c.otherId}
-                            className={`conversation-sidebar-item${String(c.otherId) ===
-                                String(otherId)
-                                ? ' active'
-                                : ''}`}
-                            title={c.nickname || ''}
-                            onClick={() => gotoConversation(c.otherId)}
-                        >
-                            <img
-                                src={isValidAvatar(c.avatarUrl) ? resolveUrl(c.avatarUrl) : getDefaultAvatar(c.otherId)}
-                                alt="avatar"
-                                className="conversation-sidebar-avatar"
-                                onError={(ev) => {
-                                    const target = ev.target;
-                                    target.onerror = null;
-                                    target.src = getDefaultAvatar(c.otherId);
-                                }}
-                                onContextMenu={async (e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    const blocked = await checkBlockStatus(c.otherId);
-                                    setSidebarMenu({
-                                        visible: true,
-                                        x: e.clientX,
-                                        y: e.clientY,
-                                        user: c,
-                                        blocked
-                                    });
-                                }}
-                            />
-                            <span className="conversation-sidebar-name">
-                                {c.nickname || `用户${c.otherId}`}
-                            </span>
-                            {c.unreadCount > 0 && (
-                                <span
-                                    className="conversation-sidebar-badge"
-                                    title={`未读 ${c.unreadCount}`}
-                                >
-                                    {c.unreadCount > 99 ? '99+' : c.unreadCount}
-                                </span>
-                            )}
-                            {c.blocked && (
-                                <span className="conversation-sidebar-blocked" title="你已拉黑此用户">
-                                    已拉黑
-                                </span>
-                            )}
-                        </button>
-                    ))}
+                    <div className="conversation-sidebar-header">
+                        <div className="sidebar-search-wrapper">
+                            <input type="text" placeholder="Search here..." className="sidebar-search-input" />
+                            <svg className="sidebar-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        </div>
+                    </div>
+
+                    <div className="conversation-sidebar-content">
+                        {/* Groups Section - Placeholder for now as backend might not support it yet */}
+                        {/* <div className="sidebar-section">
+                            <div className="sidebar-section-header">
+                                <span>Groups</span>
+                                <button className="sidebar-section-add">+</button>
+                            </div>
+                            ... groups list ...
+                        </div> */}
+
+                        <div className="sidebar-section">
+                            <div className="sidebar-section-header">
+                                <span>Persons</span>
+                            </div>
+                            <div className="sidebar-list">
+                                {conversations.map(c => (
+                                    <button
+                                        key={c.otherId}
+                                        className={`conversation-sidebar-item${String(c.otherId) ===
+                                            String(otherId)
+                                            ? ' active'
+                                            : ''}`}
+                                        onClick={() => gotoConversation(c.otherId)}
+                                    >
+                                        <div className="sidebar-avatar-container">
+                                            <img
+                                                src={isValidAvatar(c.avatarUrl) ? resolveUrl(c.avatarUrl) : getDefaultAvatar(c.otherId)}
+                                                alt="avatar"
+                                                className="conversation-sidebar-avatar"
+                                                onError={(ev) => {
+                                                    const target = ev.target;
+                                                    target.onerror = null;
+                                                    target.src = getDefaultAvatar(c.otherId);
+                                                }}
+                                                onContextMenu={async (e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    const blocked = await checkBlockStatus(c.otherId);
+                                                    setSidebarMenu({
+                                                        visible: true,
+                                                        x: e.clientX,
+                                                        y: e.clientY,
+                                                        user: c,
+                                                        blocked
+                                                    });
+                                                }}
+                                            />
+                                            {/* Online status indicator could go here */}
+                                        </div>
+                                        
+                                        <div className="sidebar-item-info">
+                                            <div className="sidebar-item-row-top">
+                                                <span className="conversation-sidebar-name">
+                                                    {c.nickname || `用户${c.otherId}`}
+                                                </span>
+                                                {c.unreadCount > 0 && (
+                                                    <span className="conversation-sidebar-badge">
+                                                        {c.unreadCount > 99 ? '99+' : c.unreadCount}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <div className="sidebar-item-row-bottom">
+                                                <span className="conversation-sidebar-lastmsg">
+                                                    {c.lastMessage || '暂无消息'}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        {c.blocked && (
+                                            <div className="sidebar-item-blocked-overlay" title="已拉黑">
+                                                🚫
+                                            </div>
+                                        )}
+                                        
+                                        {String(c.otherId) === String(otherId) && <div className="active-indicator"></div>}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
                 </aside>
 
                 {/* 右侧消息区 */}

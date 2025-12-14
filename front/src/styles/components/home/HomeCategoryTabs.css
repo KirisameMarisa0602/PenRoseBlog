@@ -11,6 +11,11 @@
   position: sticky;
   top: var(--navH, 60px); /* Assuming nav height is around 60px */
   z-index: 90;
+  transition: top 0.3s ease;
+}
+
+body.navbar-hidden-mode .home-category-bar {
+  top: 0;
 }
 
 .home-category-list {
