@@ -16,7 +16,7 @@ public class ResourceProperties {
     private String blogpostcontentLocation;
 
     // 私信媒体资源
-    private String messageMediaLocation = "D:/Projects/selfprojects/blog/sources/messages/";
+    private String messageMediaLocation;
     private String messageMediaAccessPrefix = "/files/messages";
 
     public String getSourcesLocation() {
