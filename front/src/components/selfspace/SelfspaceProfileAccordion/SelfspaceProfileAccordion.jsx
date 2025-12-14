@@ -330,15 +330,16 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
     setProfile(prev => ({ ...prev, wechatQrCode: '' }));
   };
 
+
+
   // 保存用户信息（统一上传头像/背景并保存）
-  const handleProfileSave = async (section = null) => {
-    console.log('[ProfileAccordion] 保存资料 userId:', userId, 'profile:', profile, 'section:', section);
+  const handleProfileSave = async () => {
     if (!userId) {
       setEditMsg('用户ID无效，请重新登录');
       return;
     }
     setEditLoading(true);
-    setEditMsg('');
+    setEditMsg('正在保存...');
 
     // 初始使用当前 profile 中可能已有的 url
     let avatarUrl = profile.avatarUrl || '';
@@ -347,61 +348,42 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
     let wechatQrCode = profile.wechatQrCode || '';
 
     try {
-      // 1) 上传头像（如有） - 仅当 section 为 media 或 null 时
-      if ((!section || section === 'media') && avatarFile) {
-        setEditMsg('正在上传头像...');
+      // 1) 上传头像（如有）
+      if (avatarFile) {
         const formData = new FormData();
         formData.append('file', avatarFile);
-        console.log('[ProfileAccordion] 上传头像 userId:', userId, 'file:', avatarFile);
         const res = await httpClient.post(`/user/profile/${userId}/avatar`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
-        console.log('[ProfileAccordion] 上传头像返回:', res.data);
         const uploadData = res.data && res.data.data;
         if (res.data && res.data.code === 200 && uploadData) {
-          // 兼容后端返回两种常见格式：字符串路径 或 包含 avatarUrl 字段的对象
-          if (typeof uploadData === 'string') {
-            avatarUrl = uploadData;
-          } else if (typeof uploadData === 'object') {
-            avatarUrl = uploadData.avatarUrl || uploadData.path || avatarUrl;
-          }
-          // 持久化展示用
+          if (typeof uploadData === 'string') avatarUrl = uploadData;
+          else if (typeof uploadData === 'object') avatarUrl = uploadData.avatarUrl || uploadData.path || avatarUrl;
           localStorage.setItem('avatarUrl', avatarUrl || '');
         } else {
-          setEditMsg(res.data?.msg || res.data?.message || '头像上传失败');
-          setEditLoading(false);
-          return;
+          throw new Error(res.data?.msg || '头像上传失败');
         }
       }
 
-      // 2) 上传背景（如有） - 仅当 section 为 media 或 null 时
-      if ((!section || section === 'media') && backgroundFile) {
-        setEditMsg('正在上传背景...');
+      // 2) 上传背景（如有）
+      if (backgroundFile) {
         const formData = new FormData();
         formData.append('file', backgroundFile);
-        console.log('[ProfileAccordion] 上传背景 userId:', userId, 'file:', backgroundFile);
         const res = await httpClient.post(`/user/profile/${userId}/background`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
-        console.log('[ProfileAccordion] 上传背景返回:', res.data);
         const uploadData = res.data && res.data.data;
         if (res.data && res.data.code === 200 && uploadData) {
-          if (typeof uploadData === 'string') {
-            backgroundUrl = uploadData;
-          } else if (typeof uploadData === 'object') {
-            backgroundUrl = uploadData.backgroundUrl || uploadData.path || backgroundUrl;
-          }
+          if (typeof uploadData === 'string') backgroundUrl = uploadData;
+          else if (typeof uploadData === 'object') backgroundUrl = uploadData.backgroundUrl || uploadData.path || backgroundUrl;
           localStorage.setItem('backgroundUrl', backgroundUrl || '');
         } else {
-          setEditMsg(res.data?.msg || res.data?.message || '背景上传失败');
-          setEditLoading(false);
-          return;
+          throw new Error(res.data?.msg || '背景上传失败');
         }
       }
 
-      // 3) 上传QQ二维码（如有） - 仅当 section 为 contact 或 null 时
-      if ((!section || section === 'contact') && qqQrFile) {
-        setEditMsg('正在上传QQ二维码...');
+      // 3) 上传QQ二维码（如有）
+      if (qqQrFile) {
         const formData = new FormData();
         formData.append('file', qqQrFile);
         const res = await httpClient.post(`/user/profile/${userId}/qq-qrcode`, formData, {
@@ -410,15 +392,12 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
         if (res.data && res.data.code === 200) {
           qqQrCode = res.data.data;
         } else {
-          setEditMsg(res.data?.msg || 'QQ二维码上传失败');
-          setEditLoading(false);
-          return;
+          throw new Error(res.data?.msg || 'QQ二维码上传失败');
         }
       }
 
-      // 4) 上传微信二维码（如有） - 仅当 section 为 contact 或 null 时
-      if ((!section || section === 'contact') && wechatQrFile) {
-        setEditMsg('正在上传微信二维码...');
+      // 4) 上传微信二维码（如有）
+      if (wechatQrFile) {
         const formData = new FormData();
         formData.append('file', wechatQrFile);
         const res = await httpClient.post(`/user/profile/${userId}/wechat-qrcode`, formData, {
@@ -427,66 +406,37 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
         if (res.data && res.data.code === 200) {
           wechatQrCode = res.data.data;
         } else {
-          setEditMsg(res.data?.msg || '微信二维码上传失败');
-          setEditLoading(false);
-          return;
+          throw new Error(res.data?.msg || '微信二维码上传失败');
         }
       }
 
-      // 5) 最后保存 profile（根据 section 构建部分更新对象）
-      setEditMsg('正在保存信息...');
-
-      let newProfile = {};
-      if (section === 'profile') {
-        newProfile = {
-          nickname: profile.nickname,
-          signature: profile.signature,
-          gender: profile.gender,
-          bio: profile.bio
-        };
-      } else if (section === 'tags') {
-        newProfile = { tags: profile.tags };
-      } else if (section === 'media') {
-        newProfile = {
-          avatarUrl: avatarUrl || profile.avatarUrl,
-          backgroundUrl: backgroundUrl || profile.backgroundUrl
-        };
-      } else if (section === 'contact') {
-        newProfile = {
-          qq: profile.qq,
-          wechat: profile.wechat,
-          githubLink: profile.githubLink,
-          bilibiliLink: profile.bilibiliLink,
-          qqQrCode: qqQrCode || profile.qqQrCode,
-          wechatQrCode: wechatQrCode || profile.wechatQrCode
-        };
-      } else {
-        // Fallback: save everything if no section specified
-        newProfile = { ...profile, avatarUrl, backgroundUrl, qqQrCode, wechatQrCode };
-      }
+      // 5) 最后保存 profile
+      const newProfile = {
+        ...profile,
+        avatarUrl,
+        backgroundUrl,
+        qqQrCode,
+        wechatQrCode
+      };
 
       console.log('[ProfileAccordion] PUT /user/profile/', userId, newProfile);
       const res = await httpClient.put(`/user/profile/${userId}`, newProfile);
-      console.log('[ProfileAccordion] 保存资料返回:', res.data);
+      
       if (res.data && res.data.code === 200) {
         setEditMsg('保存成功');
         localStorage.setItem('nickname', newProfile.nickname || '');
         localStorage.setItem('gender', newProfile.gender || '');
         window.dispatchEvent(new Event('auth-changed'));
 
-        // 清空本地文件和预览 (仅清空已处理的 section)
-        if (!section || section === 'media') {
-          setAvatarFile(null);
-          setAvatarPreview('');
-          setBackgroundFile(null);
-          setBackgroundPreview('');
-        }
-        if (!section || section === 'contact') {
-          setQqQrFile(null);
-          setQqQrPreview('');
-          setWechatQrFile(null);
-          setWechatQrPreview('');
-        }
+        // 清空本地文件和预览
+        setAvatarFile(null);
+        setAvatarPreview('');
+        setBackgroundFile(null);
+        setBackgroundPreview('');
+        setQqQrFile(null);
+        setQqQrPreview('');
+        setWechatQrFile(null);
+        setWechatQrPreview('');
 
         // 更新组件 state（显示最新）
         setProfile(newProfile);
@@ -494,13 +444,12 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
         setEditMsg(res.data?.msg || res.data?.message || '保存失败');
       }
     } catch (err) {
-      console.log('[ProfileAccordion] 保存异常:', err);
-      // 如果后端返回了详细信息，尝试显示
-      const serverMsg = err?.response?.data?.msg || err?.response?.data?.message;
-      if (serverMsg) setEditMsg(serverMsg);
-      else setEditMsg('保存异常');
+      console.error('[ProfileAccordion] 保存异常:', err);
+      const serverMsg = err?.response?.data?.msg || err?.response?.data?.message || err.message;
+      setEditMsg(serverMsg || '保存异常');
     } finally {
       setEditLoading(false);
+      setTimeout(() => setEditMsg(''), 3000);
     }
   };
 
@@ -628,9 +577,23 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                   <div className="profile-name-large" style={{
                     fontSize: isActive ? '1.5rem' : '1.1rem',
                     fontWeight: 'bold',
-                    marginBottom: isActive ? 15 : 0,
+                    marginBottom: isActive ? 5 : 0,
                     transition: 'all 0.3s ease'
                   }}>{profile.nickname}</div>
+                  {isActive && profile.signature && (
+                    <div className="profile-signature-large" style={{
+                      fontSize: '0.9rem',
+                      opacity: 0.9,
+                      marginBottom: 15,
+                      maxWidth: '80%',
+                      textAlign: 'center',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
+                    }}>
+                      {profile.signature}
+                    </div>
+                  )}
 
                   {isActive && (
                     <div className="profile-stats-row" style={{ display: 'flex', gap: '20px', opacity: 1, transition: 'opacity 0.3s ease' }}>
@@ -673,30 +636,52 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                   <div className="profilepanel-useredit-panel" style={{ display: 'flex', flexDirection: 'row', height: '100%', padding: 0, background: 'rgba(255,255,255,0.9)' }}>
                     {/* Sidebar */}
                     <div className="profilepanel-edit-sidebar" style={{ width: '90px', borderRight: '1px solid rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', background: 'rgba(249,249,249,0.8)', padding: '10px 0' }}>
-                      {['profile', 'tags', 'media', 'contact'].map(tab => (
-                        <div
-                          key={tab}
-                          className={`edit-tab-item ${activeTab === tab ? 'active' : ''}`}
-                          onClick={() => setActiveTab(tab)}
+                      <div style={{ flex: 1 }}>
+                        {['profile', 'tags', 'media', 'contact'].map(tab => (
+                          <div
+                            key={tab}
+                            className={`edit-tab-item ${activeTab === tab ? 'active' : ''}`}
+                            onClick={() => setActiveTab(tab)}
+                            style={{
+                              padding: '12px 2px',
+                              cursor: 'pointer',
+                              textAlign: 'center',
+                              background: activeTab === tab ? '#e6f7ff' : 'transparent',
+                              color: activeTab === tab ? '#1890ff' : '#555',
+                              fontSize: '0.95rem',
+                              fontWeight: activeTab === tab ? '600' : 'normal',
+                              margin: '4px 5px',
+                              borderRadius: '8px',
+                              transition: 'all 0.2s ease'
+                            }}
+                          >
+                            {tab === 'profile' && '个人资料'}
+                            {tab === 'tags' && '个性标签'}
+                            {tab === 'media' && '头像背景'}
+                            {tab === 'contact' && '联系方式'}
+                          </div>
+                        ))}
+                      </div>
+                      <div style={{ padding: '10px 5px' }}>
+                        <button
+                          onClick={() => handleProfileSave()}
+                          disabled={editLoading}
                           style={{
-                            padding: '12px 2px',
-                            cursor: 'pointer',
-                            textAlign: 'center',
-                            background: activeTab === tab ? '#e6f7ff' : 'transparent',
-                            color: activeTab === tab ? '#1890ff' : '#555',
-                            fontSize: '0.95rem',
-                            fontWeight: activeTab === tab ? '600' : 'normal',
-                            margin: '4px 5px',
-                            borderRadius: '8px',
-                            transition: 'all 0.2s ease'
+                            width: '100%',
+                            padding: '8px 0',
+                            background: editLoading ? '#ccc' : '#1890ff',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: '6px',
+                            cursor: editLoading ? 'not-allowed' : 'pointer',
+                            fontSize: '0.9rem',
+                            fontWeight: 'bold',
+                            boxShadow: '0 2px 6px rgba(24, 144, 255, 0.2)'
                           }}
                         >
-                          {tab === 'profile' && '个人资料'}
-                          {tab === 'tags' && '个性标签'}
-                          {tab === 'media' && '头像背景'}
-                          {tab === 'contact' && '联系方式'}
-                        </div>
-                      ))}
+                          {editLoading ? '保存...' : '保存资料'}
+                        </button>
+                      </div>
                     </div>
 
                     {/* Content Area */}
@@ -760,23 +745,6 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                               <div className="form-group">
                                 <label className="profile-form-label">自我介绍</label>
                                 <textarea name="bio" maxLength={300} value={profile.bio || ''} onChange={handleProfileChange} placeholder="详细介绍一下自己吧（最多300字）" className="profile-form-textarea" style={{ minHeight: '120px', resize: 'vertical' }} />
-                              </div>
-                              <div style={{ marginTop: 30, paddingTop: 20, borderTop: '1px solid #eee' }}>
-                                <button type="submit" disabled={editLoading} style={{
-                                  width: '100%',
-                                  padding: '12px',
-                                  background: 'linear-gradient(135deg, #1890ff 0%, #096dd9 100%)',
-                                  color: '#fff',
-                                  border: 'none',
-                                  borderRadius: '8px',
-                                  cursor: editLoading ? 'not-allowed' : 'pointer',
-                                  fontWeight: 'bold',
-                                  fontSize: '1rem',
-                                  boxShadow: '0 4px 12px rgba(24, 144, 255, 0.3)',
-                                  transition: 'all 0.2s'
-                                }}>
-                                  {editLoading ? '保存中...' : '保存资料'}
-                                </button>
                               </div>
                               {editMsg && <div className="form-msg" style={{ marginTop: 15, color: editMsg.includes('成功') ? '#52c41a' : '#ff4d4f', textAlign: 'center', fontWeight: '500' }}>{editMsg}</div>}
                             </>
@@ -889,23 +857,6 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                               </div>
                               <div style={{ marginTop: '10px', textAlign: 'right', fontSize: '0.85rem', color: '#999', flexShrink: 0 }}>
                                 {tagsList.length}/10
-                              </div>
-                              <div style={{ marginTop: 30, paddingTop: 20, borderTop: '1px solid #eee' }}>
-                                <button type="submit" disabled={editLoading} style={{
-                                  width: '100%',
-                                  padding: '12px',
-                                  background: 'linear-gradient(135deg, #1890ff 0%, #096dd9 100%)',
-                                  color: '#fff',
-                                  border: 'none',
-                                  borderRadius: '8px',
-                                  cursor: editLoading ? 'not-allowed' : 'pointer',
-                                  fontWeight: 'bold',
-                                  fontSize: '1rem',
-                                  boxShadow: '0 4px 12px rgba(24, 144, 255, 0.3)',
-                                  transition: 'all 0.2s'
-                                }}>
-                                  {editLoading ? '保存中...' : '保存资料'}
-                                </button>
                               </div>
                               {editMsg && <div className="form-msg" style={{ marginTop: 15, color: editMsg.includes('成功') ? '#52c41a' : '#ff4d4f', textAlign: 'center', fontWeight: '500' }}>{editMsg}</div>}
                             </div>
@@ -1041,23 +992,6 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                                     style={{ display: 'none' }}
                                   />
                                 </div>
-                              </div>
-                              <div style={{ marginTop: 30, paddingTop: 20, borderTop: '1px solid #eee' }}>
-                                <button type="submit" disabled={editLoading} style={{
-                                  width: '100%',
-                                  padding: '12px',
-                                  background: 'linear-gradient(135deg, #1890ff 0%, #096dd9 100%)',
-                                  color: '#fff',
-                                  border: 'none',
-                                  borderRadius: '8px',
-                                  cursor: editLoading ? 'not-allowed' : 'pointer',
-                                  fontWeight: 'bold',
-                                  fontSize: '1rem',
-                                  boxShadow: '0 4px 12px rgba(24, 144, 255, 0.3)',
-                                  transition: 'all 0.2s'
-                                }}>
-                                  {editLoading ? '保存中...' : '保存资料'}
-                                </button>
                               </div>
                               {editMsg && <div className="form-msg" style={{ marginTop: 15, color: editMsg.includes('成功') ? '#52c41a' : '#ff4d4f', textAlign: 'center', fontWeight: '500' }}>{editMsg}</div>}
                             </>
@@ -1237,24 +1171,6 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                                   </div>
                                 </div>
                               </div>
-
-                              <div style={{ marginTop: 30, paddingTop: 20, borderTop: '1px solid #eee' }}>
-                                <button type="submit" disabled={editLoading} style={{
-                                  width: '100%',
-                                  padding: '12px',
-                                  background: 'linear-gradient(135deg, #1890ff 0%, #096dd9 100%)',
-                                  color: '#fff',
-                                  border: 'none',
-                                  borderRadius: '8px',
-                                  cursor: editLoading ? 'not-allowed' : 'pointer',
-                                  fontWeight: 'bold',
-                                  fontSize: '1rem',
-                                  boxShadow: '0 4px 12px rgba(24, 144, 255, 0.3)',
-                                  transition: 'all 0.2s'
-                                }}>
-                                  {editLoading ? '保存中...' : '保存资料'}
-                                </button>
-                              </div>
                               {editMsg && <div className="form-msg" style={{ marginTop: 15, color: editMsg.includes('成功') ? '#52c41a' : '#ff4d4f', textAlign: 'center', fontWeight: '500' }}>{editMsg}</div>}
                             </>
                           )}
@@ -1393,47 +1309,62 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                 }
               >
                 {isActive ? (
-                  <div className="profilepanel-contact-panel" style={{ padding: '30px', height: '100%', overflowY: 'auto', boxSizing: 'border-box', display: 'flex', flexDirection: 'column' }}>
-                    <h3 style={{ marginTop: 0, marginBottom: '25px', color: '#333', borderBottom: '2px solid #f0f0f0', paddingBottom: '15px', fontSize: '1.4rem' }}>联系方式</h3>
+                  <div className="profilepanel-contact-panel" style={{ padding: '25px', height: '100%', overflowY: 'auto', boxSizing: 'border-box', display: 'flex', flexDirection: 'column' }}>
+                    <h3 style={{ marginTop: 0, marginBottom: '20px', color: '#333', borderBottom: '2px solid #f0f0f0', paddingBottom: '15px', fontSize: '1.3rem', letterSpacing: '1px' }}>联系方式</h3>
 
-                    <div className="profile-contact-list" style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                    <div className="profile-contact-list" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                       {/* QQ */}
                       {(profile.qq || profile.qqQrCode) && (
                         <div className="contact-item" style={{
                           display: 'flex',
                           alignItems: 'center',
                           background: '#fff',
-                          padding: '15px 20px',
-                          borderRadius: '12px',
-                          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-                          border: '1px solid #f0f0f0'
-                        }}>
-                          <img src={resolveUrl('/icons/contect/qq.svg')} alt="QQ" style={{ width: '32px', height: '32px', marginRight: '15px' }} />
-                          <div style={{ flex: 1 }}>
-                            <div style={{ fontSize: '1rem', fontWeight: 'bold', color: '#333' }}>QQ</div>
-                            {profile.qq && <div style={{ fontSize: '0.9rem', color: '#666', marginTop: '2px' }}>{profile.qq}</div>}
+                          padding: '16px 20px',
+                          borderRadius: '16px',
+                          boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
+                          border: '1px solid #f5f5f5',
+                          transition: 'all 0.3s ease',
+                          position: 'relative'
+                        }}
+                          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.08)'; }}
+                          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.04)'; }}
+                        >
+                          <div style={{
+                            width: '48px', height: '48px', borderRadius: '12px', background: '#e6f7ff',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '16px', flexShrink: 0
+                          }}>
+                            <img src={resolveUrl('/icons/contect/qq.svg')} alt="QQ" style={{ width: '28px', height: '28px' }} />
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: '1.05rem', fontWeight: 'bold', color: '#333', marginBottom: '4px' }}>QQ</div>
+                            {profile.qq && <div style={{ fontSize: '0.9rem', color: '#888', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{profile.qq}</div>}
                           </div>
                           {profile.qqQrCode && (
-                            <div className="qr-preview-hover" style={{ position: 'relative', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-                              <span style={{ fontSize: '12px', color: '#999', marginRight: '8px' }}>二维码</span>
-                              <img src={resolveUrl(profile.qqQrCode)} alt="QR" style={{ width: '32px', height: '32px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #eee' }} />
+                            <div className="qr-preview-hover" style={{ position: 'relative', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '5px' }}>
+                              <img src={resolveUrl('/icons/profile/qrcode_icon.svg')} alt="QR" style={{ width: '24px', height: '24px', opacity: 0.6 }} 
+                                onError={(e) => { e.target.onerror = null; e.target.src = resolveUrl(profile.qqQrCode); e.target.style.borderRadius = '4px'; }}
+                              />
                               <div className="qr-popup" style={{
-                                position: 'absolute',
-                                right: '0',
-                                top: '100%',
-                                marginTop: '10px',
+                                position: 'fixed',
+                                top: '50%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)',
                                 background: '#fff',
-                                padding: '10px',
-                                borderRadius: '8px',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                                zIndex: 10,
+                                padding: '15px',
+                                borderRadius: '16px',
+                                boxShadow: '0 12px 48px rgba(0,0,0,0.25)',
+                                zIndex: 9999,
                                 display: 'none',
-                                border: '1px solid #eee'
+                                border: '1px solid #eee',
+                                flexDirection: 'column',
+                                alignItems: 'center'
                               }}>
-                                <img src={resolveUrl(profile.qqQrCode)} alt="QQ QR" style={{ width: '280px', height: '280px', objectFit: 'contain', display: 'block' }} />
+                                <div style={{ marginBottom: '10px', fontWeight: 'bold', color: '#555', fontSize: '1rem' }}>QQ 二维码</div>
+                                <img src={resolveUrl(profile.qqQrCode)} alt="QQ QR" style={{ width: '320px', height: '320px', objectFit: 'contain', display: 'block', borderRadius: '8px' }} />
                               </div>
                               <style>{`
-                                 .qr-preview-hover:hover .qr-popup { display: block !important; }
+                                 .qr-preview-hover:hover .qr-popup { display: flex !important; animation: popIn 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28); }
+                                 @keyframes popIn { from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
                                `}</style>
                             </div>
                           )}
@@ -1446,38 +1377,49 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                           display: 'flex',
                           alignItems: 'center',
                           background: '#fff',
-                          padding: '15px 20px',
-                          borderRadius: '12px',
-                          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-                          border: '1px solid #f0f0f0'
-                        }}>
-                          <img src={resolveUrl('/icons/contect/微信.svg')} alt="WeChat" style={{ width: '32px', height: '32px', marginRight: '15px' }} />
-                          <div style={{ flex: 1 }}>
-                            <div style={{ fontSize: '1rem', fontWeight: 'bold', color: '#333' }}>微信</div>
-                            {profile.wechat && <div style={{ fontSize: '0.9rem', color: '#666', marginTop: '2px' }}>{profile.wechat}</div>}
+                          padding: '16px 20px',
+                          borderRadius: '16px',
+                          boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
+                          border: '1px solid #f5f5f5',
+                          transition: 'all 0.3s ease',
+                          position: 'relative'
+                        }}
+                          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.08)'; }}
+                          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.04)'; }}
+                        >
+                          <div style={{
+                            width: '48px', height: '48px', borderRadius: '12px', background: '#e9f7ef',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '16px', flexShrink: 0
+                          }}>
+                            <img src={resolveUrl('/icons/contect/微信.svg')} alt="WeChat" style={{ width: '28px', height: '28px' }} />
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: '1.05rem', fontWeight: 'bold', color: '#333', marginBottom: '4px' }}>微信</div>
+                            {profile.wechat && <div style={{ fontSize: '0.9rem', color: '#888', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{profile.wechat}</div>}
                           </div>
                           {profile.wechatQrCode && (
-                            <div className="qr-preview-hover" style={{ position: 'relative', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-                              <span style={{ fontSize: '12px', color: '#999', marginRight: '8px' }}>二维码</span>
-                              <img src={resolveUrl(profile.wechatQrCode)} alt="QR" style={{ width: '32px', height: '32px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #eee' }} />
+                            <div className="qr-preview-hover" style={{ position: 'relative', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '5px' }}>
+                              <img src={resolveUrl('/icons/profile/qrcode_icon.svg')} alt="QR" style={{ width: '24px', height: '24px', opacity: 0.6 }} 
+                                onError={(e) => { e.target.onerror = null; e.target.src = resolveUrl(profile.wechatQrCode); e.target.style.borderRadius = '4px'; }}
+                              />
                               <div className="qr-popup" style={{
-                                position: 'absolute',
-                                right: '0',
-                                top: '100%',
-                                marginTop: '10px',
+                                position: 'fixed',
+                                top: '50%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)',
                                 background: '#fff',
-                                padding: '10px',
-                                borderRadius: '8px',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                                zIndex: 10,
+                                padding: '15px',
+                                borderRadius: '16px',
+                                boxShadow: '0 12px 48px rgba(0,0,0,0.25)',
+                                zIndex: 9999,
                                 display: 'none',
-                                border: '1px solid #eee'
+                                border: '1px solid #eee',
+                                flexDirection: 'column',
+                                alignItems: 'center'
                               }}>
-                                <img src={resolveUrl(profile.wechatQrCode)} alt="WeChat QR" style={{ width: '280px', height: '280px', objectFit: 'contain', display: 'block' }} />
+                                <div style={{ marginBottom: '10px', fontWeight: 'bold', color: '#555', fontSize: '1rem' }}>微信 二维码</div>
+                                <img src={resolveUrl(profile.wechatQrCode)} alt="WeChat QR" style={{ width: '320px', height: '320px', objectFit: 'contain', display: 'block', borderRadius: '8px' }} />
                               </div>
-                              <style>{`
-                                 .qr-preview-hover:hover .qr-popup { display: block !important; }
-                               `}</style>
                             </div>
                           )}
                         </div>
@@ -1489,21 +1431,29 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                           display: 'flex',
                           alignItems: 'center',
                           background: '#fff',
-                          padding: '15px 20px',
-                          borderRadius: '12px',
-                          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-                          border: '1px solid #f0f0f0',
+                          padding: '16px 20px',
+                          borderRadius: '16px',
+                          boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
+                          border: '1px solid #f5f5f5',
                           textDecoration: 'none',
-                          transition: 'transform 0.2s'
+                          transition: 'all 0.3s ease'
                         }}
-                          onMouseEnter={e => e.currentTarget.style.transform = 'translateX(5px)'}
-                          onMouseLeave={e => e.currentTarget.style.transform = 'translateX(0)'}
+                          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.08)'; }}
+                          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.04)'; }}
                         >
-                          <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '15px', color: '#333', display: 'flex', alignItems: 'center' }}>
-                            <img src={resolveUrl('/icons/contect/github.svg')} alt="GitHub" style={{ width: '28px', height: '28px', marginRight: '10px' }} />
-                            GitHub
+                          <div style={{
+                            width: '48px', height: '48px', borderRadius: '12px', background: '#f0f0f0',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '16px', flexShrink: 0
+                          }}>
+                            <img src={resolveUrl('/icons/contect/github.svg')} alt="GitHub" style={{ width: '28px', height: '28px' }} />
                           </div>
-                          <div style={{ color: '#1890ff', wordBreak: 'break-all', textAlign: 'center', fontSize: '1rem', background: '#e6f7ff', padding: '8px 16px', borderRadius: '20px', fontWeight: '500' }}>点击访问主页</div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: '1.05rem', fontWeight: 'bold', color: '#333', marginBottom: '4px' }}>GitHub</div>
+                            <div style={{ fontSize: '0.85rem', color: '#1890ff', background: 'rgba(24, 144, 255, 0.1)', display: 'inline-block', padding: '2px 8px', borderRadius: '4px' }}>点击访问主页</div>
+                          </div>
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ccc" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                          </svg>
                         </a>
                       )}
 
@@ -1513,20 +1463,25 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                           display: 'flex',
                           alignItems: 'center',
                           background: '#fff',
-                          padding: '15px 20px',
-                          borderRadius: '12px',
-                          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-                          border: '1px solid #f0f0f0',
+                          padding: '16px 20px',
+                          borderRadius: '16px',
+                          boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
+                          border: '1px solid #f5f5f5',
                           textDecoration: 'none',
-                          transition: 'transform 0.2s'
+                          transition: 'all 0.3s ease'
                         }}
-                          onMouseEnter={e => e.currentTarget.style.transform = 'translateX(5px)'}
-                          onMouseLeave={e => e.currentTarget.style.transform = 'translateX(0)'}
+                          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.08)'; }}
+                          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.04)'; }}
                         >
-                          <img src={resolveUrl('/icons/contect/bilibili.svg')} alt="Bilibili" style={{ width: '32px', height: '32px', marginRight: '15px' }} />
-                          <div style={{ flex: 1 }}>
-                            <div style={{ fontSize: '1rem', fontWeight: 'bold', color: '#333' }}>Bilibili</div>
-                            <div style={{ fontSize: '0.9rem', color: '#fb7299', marginTop: '2px' }}>点击访问主页</div>
+                          <div style={{
+                            width: '48px', height: '48px', borderRadius: '12px', background: '#fff0f6',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '16px', flexShrink: 0
+                          }}>
+                            <img src={resolveUrl('/icons/contect/bilibili.svg')} alt="Bilibili" style={{ width: '28px', height: '28px' }} />
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: '1.05rem', fontWeight: 'bold', color: '#333', marginBottom: '4px' }}>Bilibili</div>
+                            <div style={{ fontSize: '0.85rem', color: '#fb7299', background: 'rgba(251, 114, 153, 0.1)', display: 'inline-block', padding: '2px 8px', borderRadius: '4px' }}>点击访问主页</div>
                           </div>
                           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ccc" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <polyline points="9 18 15 12 9 6"></polyline>

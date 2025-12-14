@@ -6,6 +6,7 @@ import { getDefaultAvatar } from '../utils/avatarUtils';
 import '@styles/pages/NotificationCenter.css';
 import MessageList from './MessageList';
 import PendingFriendRequests from './PendingFriendRequests';
+import ConversationDetail from './ConversationDetail';
 
 export default function NotificationCenter() {
     const [notifications, setNotifications] = useState([]);
@@ -13,6 +14,7 @@ export default function NotificationCenter() {
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const [activeTab, setActiveTab] = useState('ALL');
+    const [selectedConversationId, setSelectedConversationId] = useState(null);
     const [unreadStatus, setUnreadStatus] = useState({
         ALL: false,
         LIKES: false,
@@ -300,7 +302,12 @@ export default function NotificationCenter() {
             <div className="notification-content-wrapper">
                 <div className="notification-center-container">
                     {activeTab === 'MESSAGES' ? (
-                        <MessageList isEmbedded={true} />
+                        <div className="private-chat-wrapper" style={{ height: '100%', width: '100%', overflow: 'hidden' }}>
+                            <ConversationDetail 
+                                embeddedOtherId={selectedConversationId} 
+                                onConversationSelect={setSelectedConversationId} 
+                            />
+                        </div>
                     ) : (
                         <>
                             {activeTab === 'REQUESTS' && <PendingFriendRequests />}
@@ -322,7 +329,11 @@ export default function NotificationCenter() {
                             <div className="notification-list">
                                 {notifications.length === 0 && !loading ? (
                                     <div className="no-notifications">
-                                        <div className="no-notifications-icon">📭</div>
+                                        <img 
+                                            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%23a0c4ff' d='M32 2C15.4 2 2 15.4 2 32s13.4 30 30 30 30-13.4 30-30S48.6 2 32 2zm0 56C17.6 58 6 46.4 6 32S17.6 6 32 6s26 11.6 26 26-11.6 26-26 26z'/%3E%3Cpath fill='%23ffadad' d='M44 24H20c-2.2 0-4 1.8-4 4v16c0 2.2 1.8 4 4 4h24c2.2 0 4-1.8 4-4V28c0-2.2-1.8-4-4-4zm0 20H20V28h24v16z'/%3E%3Cpath fill='%23bdb2ff' d='M32 38l-12-8h24l-12 8z'/%3E%3C/svg%3E" 
+                                            alt="暂无通知" 
+                                            style={{ width: 120, height: 120, opacity: 0.8, marginBottom: 16 }} 
+                                        />
                                         <div>暂无通知</div>
                                     </div>
                                 ) : (

@@ -21,8 +21,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-// @Service
-// @Primary // 优先使用 COS 存储
+@Service
+@Primary // 优先使用 COS 存储
 public class CosStorageServiceImpl implements FileStorageService {
 
     private static final Logger logger = LoggerFactory.getLogger(CosStorageServiceImpl.class);

@@ -36,17 +36,17 @@ img {
 :root {
 	--navH: 15vh;
 
-	/* Light Mode Variables (Default) */
+	/* Light Mode Variables (Default) - Darkened as requested */
 	--bg-primary: #ffffff;
-	--bg-secondary: #f8f9fa;
-	--text-primary: #333333;
-	--text-secondary: #666666;
-	--border-color: #e0e0e0;
+	--bg-secondary: #f0f2f5; /* Darkened from #f8f9fa */
+	--text-primary: #1f1f1f; /* Darkened from #333333 */
+	--text-secondary: #4b4b4b; /* Darkened from #666666 */
+	--border-color: #d1d5db; /* Darkened from #e0e0e0 */
 	--card-bg: #ffffff;
-	--shadow-color: rgba(0, 0, 0, 0.1);
-    --bg-glass: rgba(255, 255, 255, 0.85);
-    --bg-glass-hover: rgba(255, 255, 255, 0.95);
-    --border-glass: rgba(255, 255, 255, 0.5);
+	--shadow-color: rgba(0, 0, 0, 0.15); /* Slightly stronger shadow */
+    --bg-glass: rgba(255, 255, 255, 0.9);
+    --bg-glass-hover: rgba(255, 255, 255, 0.98);
+    --border-glass: rgba(255, 255, 255, 0.6);
 }
 
 body {

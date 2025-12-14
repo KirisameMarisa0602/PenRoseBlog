@@ -1,7 +1,8 @@
 /* Layout-only styles for common shell */
 .app-main--default {
   padding-top: var(--navH);
-  background: linear-gradient(135deg, #e3e8f0 0%, #c9d6ff 100%);
+  /* Darker gradient using variables or darker hex codes */
+  background: linear-gradient(135deg, #f0f2f5 0%, #dbeafe 100%);
   min-height: 100vh;
   box-sizing: border-box;
 }

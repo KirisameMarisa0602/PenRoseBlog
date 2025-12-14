@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 用户搜索接口控制器。
@@ -24,7 +23,6 @@ import java.util.stream.Collectors;
  */
 @RestController
 public class UserSearchController {
-    private static final Logger logger = LoggerFactory.getLogger(UserSearchController.class);
 
     private final UserSearchService userSearchService;
 

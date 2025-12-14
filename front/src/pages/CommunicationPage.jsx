@@ -156,12 +156,12 @@ export default function CommunicationPage() {
 
     /** ---------------- Block API helpers (Disabled) ---------------- */
 
-    const checkBlockStatus = async (targetId) => {
+    const checkBlockStatus = async () => {
         // Feature disabled
         return false;
     };
 
-    const toggleBlockUser = async (targetId) => {
+    const toggleBlockUser = async () => {
         alert("拉黑功能暂未开放");
         return null;
     };

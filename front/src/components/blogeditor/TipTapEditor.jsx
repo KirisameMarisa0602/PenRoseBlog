@@ -202,10 +202,12 @@ const MediaModal = ({ isOpen, onClose, onSubmit, title, placeholder, userId }) =
             // 我们可以只传 key (sources/...)，让 resolveUrl 处理
             // 但 resolveUrl 目前逻辑是：如果不是 / 开头，且符合正则...
             // 让我们直接传 /key
-            const relativePath = '/' + key;
-            const resolved = resolveUrl(relativePath);
+            // const relativePath = '/' + key;
+            // const resolved = resolveUrl(relativePath);
             
-            onSubmit(resolved);
+            // 由于 resolveUrl 已被修改为不代理 /sources 到 CDN (为了支持本地存储)，
+            // 这里对于直传 COS 的文件，必须使用绝对 URL
+            onSubmit(finalUrl);
             onClose();
             setUploading(false);
           }

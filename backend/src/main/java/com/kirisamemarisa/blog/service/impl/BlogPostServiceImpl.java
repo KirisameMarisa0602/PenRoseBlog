@@ -17,7 +17,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -25,11 +24,6 @@ import java.util.List;
 import com.kirisamemarisa.blog.dto.PageResult;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.Files;
 import java.util.stream.Collectors;
 
 @Service
@@ -352,18 +346,26 @@ public class BlogPostServiceImpl implements BlogPostService {
         for (UserProfile profile : profiles) {
             profileMap.put(profile.getUser().getId(), profile);
         }
-        // TODO: Optimize this to use batch retrieval of view counts to avoid N+1 query
-        // pattern
-        // Consider adding a method like blogViewService.getBatchStats(List<Long>
-        // postIds)
-        // that uses Redis MGET or Pipeline to fetch all view counts in one call
+        // 批量获取浏览量
+        List<Long> postIds = posts.stream().map(BlogPost::getId).toList();
+        java.util.Map<Long, Long> viewCounts = new java.util.HashMap<>();
+        try {
+            ApiResponse<java.util.Map<Long, Long>> batchStats = blogViewService.getBatchStats(postIds);
+            if (batchStats != null && batchStats.getData() != null) {
+                viewCounts = batchStats.getData();
+            }
+        } catch (Exception e) {
+            logger.error("Failed to batch get view stats", e);
+        }
+        final java.util.Map<Long, Long> finalViewCounts = viewCounts;
+
         List<BlogPostDTO> dtoList = posts.stream().map(post -> {
             UserProfile profile = profileMap.get(post.getUser().getId());
             BlogPostDTO dto = blogpostMapper.toDTOWithProfile(post, profile);
 
-            // Add view count for each post using helper method
+            // Add view count for each post
             if (dto != null) {
-                setViewCount(dto, post.getId());
+                dto.setViewCount(finalViewCounts.getOrDefault(post.getId(), 0L));
             }
 
             return dto;
@@ -725,10 +727,6 @@ public class BlogPostServiceImpl implements BlogPostService {
 
     private long safeLong(Long v) {
         return v == null ? 0L : v;
-    }
-
-    private int safeInt(Integer v) {
-        return v == null ? 0 : v;
     }
 
     private String safeTitle(String title) {

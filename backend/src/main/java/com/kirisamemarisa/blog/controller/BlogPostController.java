@@ -14,7 +14,6 @@ import com.kirisamemarisa.blog.service.UserService;
 @RestController
 @RequestMapping("/api/blogpost")
 public class BlogPostController {
-    private static final Logger logger = LoggerFactory.getLogger(BlogPostController.class);
 
     private final BlogPostService blogPostService;
     private final FileStorageService fileStorageService;

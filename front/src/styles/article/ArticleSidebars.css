@@ -104,10 +104,10 @@
 }
 
 .author-card {
-    background: #fff;
+    background: transparent; /* Transparent to show bg */
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    padding: 0; /* Remove padding to let bg fill top */
+    padding: 0;
     text-align: center;
     position: relative;
     overflow: hidden;
@@ -115,15 +115,16 @@
     display: flex;
     flex-direction: column;
     border: none;
+    /* For 3D effect */
+    transform-style: preserve-3d;
 }
 
 .author-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
 }
 
 .author-card-bg {
-    height: 100px;
+    height: 100%; /* Cover full card */
     width: 100%;
     background-size: cover;
     background-position: center;
@@ -131,16 +132,33 @@
     top: 0;
     left: 0;
     z-index: 0;
+    filter: blur(10px); /* Default blurred */
+    transition: filter 0.5s ease;
+}
+
+.author-card:hover .author-card-bg {
+    filter: blur(0); /* Clear on hover */
 }
 
 .author-content-wrapper {
     position: relative;
     z-index: 1;
-    padding: 60px 20px 24px; /* Top padding pushes content down from bg */
+    padding: 40px 20px 24px;
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 100%;
+    background: rgba(255, 255, 255, 0.6); /* Semi-transparent overlay */
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px); /* Additional glass effect */
+    height: 100%;
+    transition: background 0.5s ease;
+}
+
+.author-card:hover .author-content-wrapper {
+    background: rgba(255, 255, 255, 0.2); /* More transparent on hover */
+    -webkit-backdrop-filter: blur(0);
+    backdrop-filter: blur(0);
 }
 
 .author-header {
@@ -149,14 +167,16 @@
     align-items: center;
     margin-bottom: 20px;
     width: 100%;
+    /* Ensure text is readable */
+    text-shadow: 0 1px 2px rgba(255,255,255,0.8);
 }
 
 .author-avatar {
     width: 80px;
     height: 80px;
-    border-radius: 20px; /* Rounded square as per image */
+    border-radius: 20px;
     object-fit: cover;
-    border: 4px solid #fff;
+    border: 4px solid rgba(255, 255, 255, 0.8);
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     transition: transform 0.3s;
     margin-bottom: 12px;

@@ -9,6 +9,7 @@ echo "Starting deployment process for branch: $BRANCH..."
 # echo "Pulling latest changes from git..."
 # git fetch origin
 # git checkout $BRANCH
+# ./mvnw spring-boot:run
 # git pull origin $BRANCH
 
 # 重新构建并启动容器

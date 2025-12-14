@@ -6,23 +6,14 @@ import com.kirisamemarisa.blog.dto.PrivateMessageDTO;
 import com.kirisamemarisa.blog.events.MessageEventPublisher;
 import com.kirisamemarisa.blog.model.PrivateMessage;
 import com.kirisamemarisa.blog.model.User;
-import com.kirisamemarisa.blog.model.UserProfile;
 import com.kirisamemarisa.blog.service.PrivateMessageService;
 // 分层：控制器避免直接依赖仓库
-import com.kirisamemarisa.blog.repository.PrivateMessageRepository;
 import com.kirisamemarisa.blog.service.UserService;
 import com.kirisamemarisa.blog.dto.PrivateMessageOperationDTO;
 import com.kirisamemarisa.blog.dto.ConversationSummaryDTO;
-import com.kirisamemarisa.blog.repository.UserProfileRepository;
-import com.kirisamemarisa.blog.service.NotificationService;
-import com.kirisamemarisa.blog.dto.NotificationDTO;
-import com.kirisamemarisa.blog.service.BlogUrlPreviewService;
 import com.kirisamemarisa.blog.service.PrivateMessageDtoService;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.io.IOException;
-import java.time.Instant;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -43,32 +34,20 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class PrivateMessageController {
     private final UserService userService;
     private final PrivateMessageService privateMessageService;
-    private final PrivateMessageRepository privateMessageRepository;
     private final MessageEventPublisher publisher;
-    private final UserProfileRepository userProfileRepository;
-    private final NotificationService notificationService;
-    private final BlogUrlPreviewService blogUrlPreviewService;
     private final FileStorageService fileStorageService;
     private final CurrentUserResolver currentUserResolver;
     private final PrivateMessageDtoService privateMessageDtoService;
 
     public PrivateMessageController(UserService userService,
             PrivateMessageService privateMessageService,
-            PrivateMessageRepository privateMessageRepository,
             MessageEventPublisher publisher,
-            UserProfileRepository userProfileRepository,
-            NotificationService notificationService,
-            BlogUrlPreviewService blogUrlPreviewService,
             FileStorageService fileStorageService,
             CurrentUserResolver currentUserResolver,
             PrivateMessageDtoService privateMessageDtoService) {
         this.userService = userService;
         this.privateMessageService = privateMessageService;
-        this.privateMessageRepository = privateMessageRepository;
         this.publisher = publisher;
-        this.userProfileRepository = userProfileRepository;
-        this.notificationService = notificationService;
-        this.blogUrlPreviewService = blogUrlPreviewService;
         this.fileStorageService = fileStorageService;
         this.currentUserResolver = currentUserResolver;
         this.privateMessageDtoService = privateMessageDtoService;

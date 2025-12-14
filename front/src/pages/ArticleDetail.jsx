@@ -59,7 +59,7 @@ export default function ArticleDetail() {
     const [friendsError, setFriendsError] = useState(null);
 
     // Cover image scroll effect
-    const [coverOpacity, setCoverOpacity] = useState(1);
+    // const [coverOpacity, setCoverOpacity] = useState(1);
     
     // TOC State
     const [toc, setToc] = useState([]);
@@ -83,20 +83,21 @@ export default function ArticleDetail() {
         }
     }, [post?.content]);
 
-    useEffect(() => {
-        const handleScroll = () => {
-            const scrollTop = window.scrollY;
-            const coverHeight = window.innerHeight;
-            const newOpacity = Math.max(0, 1 - scrollTop / coverHeight);
-            setCoverOpacity(newOpacity);
-        };
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+    // useEffect(() => {
+    //     const handleScroll = () => {
+    //         const scrollTop = window.scrollY;
+    //         const coverHeight = window.innerHeight;
+    //         const newOpacity = Math.max(0, 1 - scrollTop / coverHeight);
+    //         setCoverOpacity(newOpacity);
+    //     };
+    //     window.addEventListener('scroll', handleScroll);
+    //     return () => window.removeEventListener('scroll', handleScroll);
+    // }, []);
 
     // ---------------- 加载文章 & 记录浏览 ----------------
     useEffect(() => {
         let cancelled = false;
+        recordedRef.current = false; // Reset view record flag when id changes
         setPost(null);
         setNotFound(false); // 每次切换 id 时重�?
         fetchPostDetail(id, userId ? { currentUserId: userId } : {})

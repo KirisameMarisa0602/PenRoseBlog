@@ -25,17 +25,14 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/follow")
 public class FollowController {
-    private static final Logger logger = LoggerFactory.getLogger(FollowController.class);
 
     private final UserService userService;
     private final FollowService followService;
-    private final UserProfileRepository userProfileRepository;
 
     public FollowController(UserService userService, FollowService followService,
             UserProfileRepository userProfileRepository) {
         this.userService = userService;
         this.followService = followService;
-        this.userProfileRepository = userProfileRepository;
     }
 
     private User resolveCurrentUser(UserDetails principal, Long headerUserId) {

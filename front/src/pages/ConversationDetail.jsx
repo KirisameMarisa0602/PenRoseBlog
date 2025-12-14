@@ -22,8 +22,9 @@ import {
     loadCachedConversationSummaries
 } from '@utils/localPmCacheService';
 
-export default function ConversationDetail() {
-    const { otherId } = useParams();
+export default function ConversationDetail({ embeddedOtherId, onConversationSelect }) {
+    const { otherId: paramOtherId } = useParams();
+    const otherId = embeddedOtherId || paramOtherId;
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -89,6 +90,16 @@ export default function ConversationDetail() {
     // 来自 ?text= 的初始文本（用于从文章详情转发）
     const [initialSharedText, setInitialSharedText] = useState('');
     const [initialSharedTextSent, setInitialSharedTextSent] = useState(false);
+
+    // 表情选择器
+    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+    const emojiList = ['😀','😃','😄','😁','😆','😅','😂','🤣','😊','😇','🙂','🙃','😉','😌','😍','🥰','😘','😗','😙','😚','😋','😛','😝','😜','🤪','🤨','🧐','🤓','😎','🤩','🥳','😏','😒','😞','😔','😟','😕','🙁','☹️','😣','😖','😫','😩','🥺','😢','😭','😤','😠','😡','🤬','🤯','😳','🥵','🥶','😱','😨','😰','😥','😓','🤗','🤔','🤭','🤫','🤥','😶','😐','😑','😬','🙄','😯','😦','😧','😮','😲','🥱','😴','🤤','😪','😵','🤐','🥴','🤢','🤮','🤧','😷','🤒','🤕','🤑','🤠','😈','👿','👹','👺','🤡','💩','👻','💀','☠️','👽','👾','🤖','🎃','😺','😸','😹','😻','😼','😽','🙀','😿','😾'];
+
+    const onEmojiClick = (emoji) => {
+        setText(prev => prev + emoji);
+        setShowEmojiPicker(false);
+        inputRef.current?.focus();
+    };
 
     /** ---------------- 工具方法 ---------------- */
 
@@ -1030,7 +1041,11 @@ export default function ConversationDetail() {
 
     const gotoConversation = (id) => {
         if (!id || String(id) === String(otherId)) return;
-        navigate(`/conversation/${id}`);
+        if (onConversationSelect) {
+            onConversationSelect(id);
+        } else {
+            navigate(`/conversation/${id}`);
+        }
     };
 
     const openProfile = (uid) => {
@@ -1305,23 +1320,22 @@ export default function ConversationDetail() {
                 </aside>
 
                 <div className="conversation-main-content">
+                    {!otherId ? (
+                        <div className="conversation-empty-state" style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',color:'#999'}}>
+                            <div style={{fontSize:'48px',marginBottom:'16px'}}>💬</div>
+                            <div>选择一个联系人开始聊天</div>
+                        </div>
+                    ) : (
+                        <>
                     {/* 顶部用户信息栏 - 补充 Header */}
-                    <div className="conversation-detail-header" style={{
-                        height: '60px',
-                        borderBottom: '1px solid #e6e6e6',
-                        background: '#fff',
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '0 20px',
-                        flexShrink: 0
-                    }}>
+                    <div className="conversation-detail-header">
                         <img 
                             src={isValidAvatar(otherInfo.avatarUrl) ? resolveUrl(otherInfo.avatarUrl) : getDefaultAvatar(otherId)} 
                             alt={otherInfo.nickname}
-                            style={{ width: '36px', height: '36px', borderRadius: '50%', marginRight: '12px', objectFit: 'cover', border: '1px solid #eee' }}
+                            className="conversation-header-avatar"
                             onError={(e) => { e.target.onerror = null; e.target.src = getDefaultAvatar(otherId); }}
                         />
-                        <span style={{ fontSize: '16px', fontWeight: '600', color: '#333' }}>
+                        <span className="conversation-header-name">
                             {otherInfo.nickname || `用户${otherId}`}
                         </span>
                     </div>
@@ -1539,7 +1553,28 @@ export default function ConversationDetail() {
                             onMouseDown={startResize}
                         ></div>
 
-                        <div className="conversation-toolbar">
+                        <div className="conversation-toolbar" style={{position: 'relative'}}>
+                            <button
+                                type="button"
+                                className="icon-btn emoji-btn"
+                                title="表情"
+                                disabled={uploading}
+                                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                            >😊</button>
+                            {showEmojiPicker && (
+                                <div className="emoji-picker-popover">
+                                    {emojiList.map(emoji => (
+                                        <button
+                                            key={emoji}
+                                            type="button"
+                                            className="emoji-item"
+                                            onClick={() => onEmojiClick(emoji)}
+                                        >
+                                            {emoji}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
                             <button
                                 type="button"
                                 className="icon-btn icon-image"
@@ -1567,6 +1602,7 @@ export default function ConversationDetail() {
                         />
 
                         <div className="conversation-actions">
+                            <span style={{ fontSize: '12px', color: '#999', marginRight: 'auto', marginLeft: '12px' }}>按 Enter 发送</span>
                             <button
                                 type="submit"
                                 className="conversation-detail-sendbtn"
@@ -1603,6 +1639,8 @@ export default function ConversationDetail() {
                             />
                             <span className="pct">{uploadProgress}%</span>
                         </div>
+                    )}
+                        </>
                     )}
                 </div>
             </div>

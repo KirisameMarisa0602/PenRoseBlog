@@ -13,9 +13,9 @@ export default ({ mode }) => {
   const rootDir = fileURLToPath(new URL('.', import.meta.url));
   const env = loadEnv(mode, rootDir, '');
 
-  // 开发环境默认后端端口与 docker-compose/backend 保持一致：8080
+  // 开发环境默认后端端口与 docker-compose/backend 保持一致：8081
   // 如需调整请在 .env.development 设置 VITE_BACKEND_ORIGIN
-  const backendTarget = env.VITE_BACKEND_ORIGIN || 'http://localhost:8080';
+  const backendTarget = env.VITE_BACKEND_ORIGIN || 'http://localhost:8081';
 
   return defineConfig({
     plugins: [react()],

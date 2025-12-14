@@ -19,6 +19,9 @@ export default function AuthorSidebar({ post, currentUserId }) {
     const [isFriendStatus, setIsFriendStatus] = useState(false);
     const [authorProfile, setAuthorProfile] = useState(null);
 
+    // Tilt effect state
+    const [tiltStyle, setTiltStyle] = useState({});
+
     useEffect(() => {
         if (!authorId) return;
         
@@ -50,6 +53,30 @@ export default function AuthorSidebar({ post, currentUserId }) {
             });
         }
     }, [authorId, currentUserId]);
+
+    const handleMouseMove = (e) => {
+        const card = e.currentTarget;
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        const rotateX = ((y - centerY) / centerY) * -5; // Max 5 deg
+        const rotateY = ((x - centerX) / centerX) * 5;
+
+        setTiltStyle({
+            transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`,
+            transition: 'transform 0.1s ease-out'
+        });
+    };
+
+    const handleMouseLeave = () => {
+        setTiltStyle({
+            transform: 'perspective(1000px) rotateX(0) rotateY(0) scale(1)',
+            transition: 'transform 0.5s ease-out'
+        });
+    };
 
     if (!post) return null;
 
@@ -87,10 +114,9 @@ export default function AuthorSidebar({ post, currentUserId }) {
             alert('已经是好友了');
             return;
         }
-        const msg = prompt('请输入验证消息:');
-        if (msg === null) return;
+        // 直接发送请求，不需要验证消息
         try {
-            const res = await sendFriendRequest(authorId, msg);
+            const res = await sendFriendRequest(authorId, '');
             if (res && res.code === 200) {
                 alert('好友请求已发送');
             } else {
@@ -105,7 +131,12 @@ export default function AuthorSidebar({ post, currentUserId }) {
     return (
         <aside className="author-sidebar">
             <div className="author-card-container">
-                <div className="author-card">
+                <div 
+                    className="author-card"
+                    onMouseMove={handleMouseMove}
+                    onMouseLeave={handleMouseLeave}
+                    style={tiltStyle}
+                >
                     {/* Background Image Layer */}
                     <div 
                         className="author-card-bg" 
@@ -149,12 +180,21 @@ export default function AuthorSidebar({ post, currentUserId }) {
                                     >
                                         {isFollowing ? '已关注' : '关注'}
                                     </button>
-                                    <button 
-                                        className="action-btn message-btn"
-                                        onClick={() => window.location.href = `/conversation/${authorId}`}
-                                    >
-                                        私信
-                                    </button>
+                                    {isFriendStatus ? (
+                                        <button 
+                                            className="action-btn message-btn"
+                                            onClick={() => window.location.href = `/conversation/${authorId}`}
+                                        >
+                                            私信
+                                        </button>
+                                    ) : (
+                                        <button 
+                                            className="action-btn friend-btn"
+                                            onClick={handleAddFriend}
+                                        >
+                                            加好友
+                                        </button>
+                                    )}
                                 </>
                             )}
                         </div>

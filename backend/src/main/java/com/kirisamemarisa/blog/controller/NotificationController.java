@@ -6,7 +6,6 @@ import com.kirisamemarisa.blog.dto.PageResult;
 import com.kirisamemarisa.blog.model.User;
 import com.kirisamemarisa.blog.service.CurrentUserResolver;
 import com.kirisamemarisa.blog.service.NotificationService;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

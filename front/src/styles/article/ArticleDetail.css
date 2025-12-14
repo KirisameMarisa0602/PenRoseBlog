@@ -3,9 +3,8 @@
   background: #f9fafb;
   min-height: 100vh;
   padding-bottom: 80px;
-  /* 抵消 body 的全局 padding-top，使背景色延伸至顶部，消除“重复导航栏占位”视觉效果 */
-  margin-top: calc(var(--navH) * -1);
-  padding-top: var(--navH);
+  /* Removed negative margin hack to prevent occlusion */
+  padding-top: 20px; 
 }
 
 .page-blur-background {

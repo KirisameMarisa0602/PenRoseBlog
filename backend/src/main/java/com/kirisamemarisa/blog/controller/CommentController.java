@@ -8,12 +8,10 @@ import com.kirisamemarisa.blog.dto.CommentDTO;
 import com.kirisamemarisa.blog.dto.PageResult;
 import com.kirisamemarisa.blog.service.CommentService;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/comment")
 public class CommentController {
-    private static final Logger logger = LoggerFactory.getLogger(CommentController.class);
     private final CommentService commentService;
 
     public CommentController(CommentService commentService) {

@@ -14,8 +14,8 @@ position: relative;
 .maid-splitter::after { content: ""; position: absolute; left: 50%; transform: translateX(-50%); top: 2px; width: 40px; height: 4px; border-radius: 4px; background: rgba(99,102,241,0.3); }
 
 .maid-widget {
---maid-header-h: 48px;
---maid-bar-h: 60px;
+--maid-header-h: 52px; /* Slightly taller header */
+--maid-bar-h: 64px;
 --maid-stage-collapse: 300ms;
 --maid-stage-expand: 300ms;
 --maid-btn-collapse-duration: 260ms;
@@ -26,13 +26,14 @@ top: var(--navH, 15vh);
 right: 0;
 height: calc(100vh - var(--navH, 15vh));
 width: 28vw;
-    min-width: 320px;
+    min-width: 340px; /* Slightly wider min-width */
 display: flex;
 flex-direction: column;
-background: rgba(255, 255, 255, 0.85);
-backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-box-shadow: -10px 0 40px rgba(0,0,0,0.15);
+background: rgba(255, 255, 255, 0.75); /* More transparent for glass effect */
+-webkit-backdrop-filter: blur(24px) saturate(180%);
+backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+box-shadow: -8px 0 32px rgba(0,0,0,0.12), inset 1px 0 0 rgba(255,255,255,0.4);
 z-index: 2000;
 color: #333;
 -webkit-user-select: none;
@@ -40,7 +41,8 @@ user-select: none;
 overflow: visible;
 transform: translateX(0);
 transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    border-left: 1px solid rgba(255,255,255,0.3);
+    border-left: 1px solid rgba(255,255,255,0.4);
+    border-radius: 24px 0 0 24px; /* Rounded corners on the left */
 }
 
 .maid-resizer {
@@ -60,9 +62,9 @@ background: transparent;
     display: flex; 
     align-items: center; 
     justify-content: flex-end; 
-    padding: 0 16px; 
-    border-bottom: 1px solid rgba(0,0,0,0.06); 
-    background: rgba(255,255,255,0.5); 
+    padding: 0 20px; 
+    border-bottom: 1px solid rgba(0,0,0,0.04); 
+    background: rgba(255,255,255,0.4); 
 }
 .maid-header-actions { display: inline-flex; align-items: center; gap: 12px; }
 
@@ -79,8 +81,8 @@ flex: 3 1 0;
 min-height: 0;
 display: flex;
 flex-direction: column;
-background: rgba(255,255,255,0.4);
-border-top: 1px solid rgba(0,0,0,0.06);
+background: rgba(255,255,255,0.3); /* Subtle separation */
+border-top: 1px solid rgba(0,0,0,0.04);
 flex: 1 1 auto;
 }
 
@@ -109,6 +111,47 @@ height: 100%;
 background: transparent;
 }
 .maid-canvas-wrap canvas { width: 100%; height: 100%; display: block; }
+
+.maid-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 12px; /* Softer radius */
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.maid-btn:hover {
+  background: rgba(0,0,0,0.05);
+  transform: scale(1.05);
+}
+.maid-btn:active {
+  transform: scale(0.95);
+}
+
+.maid-iconbtn {
+  width: 44px; /* Slightly larger touch target */
+  height: 44px;
+}
+.maid-iconbtn img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+.maid-iconbtn:hover img {
+  opacity: 1;
+}
+.maid-iconbtn-active {
+  background: rgba(99,102,241,0.1);
+}
+.maid-iconbtn-active img {
+  opacity: 1;
+  filter: drop-shadow(0 2px 4px rgba(99,102,241,0.3));
+}
 
 .maid-controlbar {
 height: var(--maid-bar-h);
@@ -161,26 +204,30 @@ z-index: 60;
 .maid-ai-msg.assistant { align-self: flex-start; align-items: flex-start; }
 
 .maid-ai-msg-text { 
-    padding: 10px 14px; 
-    border-radius: 12px; 
+    padding: 12px 16px; 
+    border-radius: 16px; 
     font-size: 14px; 
     line-height: 1.6;
     position: relative;
     word-break: break-word;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    font-weight: 500;
 }
 
 .maid-ai-msg.user .maid-ai-msg-text { 
     background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); 
     color: #fff; 
-    border-bottom-right-radius: 2px;
+    border-bottom-right-radius: 4px;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
 }
 
 .maid-ai-msg.assistant .maid-ai-msg-text { 
-    background: #fff; 
-    color: #333; 
-    border: 1px solid rgba(0,0,0,0.05);
-    border-bottom-left-radius: 2px;
+    background: rgba(255,255,255,0.8); 
+    color: #1f2937; 
+    border: 1px solid rgba(255,255,255,0.6);
+    -webkit-backdrop-filter: blur(4px);
+    border-bottom-left-radius: 4px;
+    backdrop-filter: blur(4px);
 }
 
 .maid-ai-msg-actions { 
@@ -211,15 +258,17 @@ z-index: 60;
 .maid-input-wrap { 
     position: relative; 
     width: 100%; 
-    background: #fff;
-    border-radius: 20px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-    border: 1px solid rgba(0,0,0,0.08);
-    transition: all 0.3s;
+    background: rgba(255,255,255,0.9);
+    border-radius: 24px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+    border: 1px solid rgba(0,0,0,0.06);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .maid-input-wrap:focus-within {
-    box-shadow: 0 4px 16px rgba(99,102,241,0.15);
-    border-color: rgba(99,102,241,0.3);
+    box-shadow: 0 8px 24px rgba(99,102,241,0.12);
+    border-color: rgba(99,102,241,0.4);
+    background: #fff;
+    transform: translateY(-1px);
 }
 
 .maid-ai-input { 
@@ -291,3 +340,136 @@ box-shadow: -4px 0 20px rgba(0,0,0,0.1);
 .maid-widget.maid-collapsed .maid-ai-panel { display: none !important; }
 
 html.banner-is-hidden .maid-widget { top: 0; height: 100vh; }
+
+/* Settings Panel */
+.maid-settings-panel {
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.4);
+  border-top: 1px solid rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.maid-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.maid-controls-label {
+  font-size: 14px;
+  color: #555;
+  font-weight: 600;
+  min-width: 60px;
+}
+
+.maid-select {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.1);
+  background: rgba(255,255,255,0.6);
+  font-size: 13px;
+  color: #333;
+  outline: none;
+  transition: all 0.2s;
+  cursor: pointer;
+  appearance: none; /* Remove default arrow */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+}
+.maid-select:hover {
+  border-color: rgba(99,102,241,0.3);
+  background-color: #fff;
+}
+.maid-select:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+  background-color: #fff;
+}
+
+/* Emotion/Action/Clothes Panel */
+.maid-emotion-panel {
+  position: absolute;
+  bottom: var(--maid-bar-h);
+  left: 12px;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.6);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  padding: 16px;
+  z-index: 50;
+  max-height: 60%;
+  overflow-y: auto;
+  border-radius: 20px;
+  margin-bottom: 8px;
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: bottom center;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px) scale(0.95); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.maid-section-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #9ca3af;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.maid-emotion-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.maid-emotion-item {
+  padding: 8px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.06);
+  background: rgba(255,255,255,0.5);
+  font-size: 13px;
+  font-weight: 500;
+  color: #4b5563;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.maid-emotion-item:hover {
+  background: #fff;
+  border-color: rgba(99,102,241,0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  color: #6366f1;
+}
+
+.maid-emotion-item.active {
+  background: #6366f1;
+  color: #fff;
+  border-color: #6366f1;
+  box-shadow: 0 4px 12px rgba(99,102,241,0.3);
+  transform: translateY(-1px);
+}
+
+/* Scrollbar for emotion panel */
+.maid-emotion-panel::-webkit-scrollbar { width: 4px; }
+.maid-emotion-panel::-webkit-scrollbar-track { background: transparent; }
+.maid-emotion-panel::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 2px; }
+

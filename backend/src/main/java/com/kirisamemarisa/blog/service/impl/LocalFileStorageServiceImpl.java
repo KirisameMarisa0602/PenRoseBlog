@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Service
-@Primary
+// @Primary
 public class LocalFileStorageServiceImpl implements FileStorageService {
 
     private static final Logger logger = LoggerFactory.getLogger(LocalFileStorageServiceImpl.class);
@@ -45,7 +45,7 @@ public class LocalFileStorageServiceImpl implements FileStorageService {
         // type: avatar, background, profile
         String relativePath = type + "/" + userSegment + "/" + generateFileName(file);
         String url = saveFile(file, relativePath);
-        
+
         // Special handling for avatar to match Nginx config
         if ("avatar".equals(type)) {
             // Nginx maps /avatar/ to /app/sources/avatar/
@@ -91,7 +91,7 @@ public class LocalFileStorageServiceImpl implements FileStorageService {
         try {
             // fileUrl example: /sources/blogpostcontent/1/abc.jpg
             // or /avatar/1/abc.jpg -> /app/sources/avatar/1/abc.jpg
-            
+
             String relativePath = fileUrl;
             if (relativePath.startsWith("/sources/")) {
                 relativePath = relativePath.substring("/sources/".length());
@@ -105,7 +105,7 @@ public class LocalFileStorageServiceImpl implements FileStorageService {
 
             Path rootPath = Paths.get(BASE_DIR).toAbsolutePath();
             Path targetPath = rootPath.resolve(relativePath);
-            
+
             // Security check to prevent directory traversal
             if (!targetPath.normalize().startsWith(rootPath.normalize())) {
                 logger.warn("Attempt to delete file outside of base dir: {}", fileUrl);
@@ -124,15 +124,15 @@ public class LocalFileStorageServiceImpl implements FileStorageService {
             Path targetPath = rootPath.resolve(relativePath);
             Files.createDirectories(targetPath.getParent());
             file.transferTo(targetPath.toFile());
-            
+
             // Construct URL
             // Nginx maps:
             // /sources/ -> /app/sources/
             // /avatar/ -> /app/sources/avatar/
             // /files/messages/ -> /app/sources/messages/
-            
+
             String normalizedPath = relativePath.replace("\\", "/");
-            
+
             if (normalizedPath.startsWith("avatar/")) {
                 return "/" + normalizedPath; // /avatar/1/file.jpg
             } else if (normalizedPath.startsWith("messages/")) {
@@ -140,7 +140,7 @@ public class LocalFileStorageServiceImpl implements FileStorageService {
             } else {
                 return "/sources/" + normalizedPath; // /sources/blogpostcontent/...
             }
-            
+
         } catch (IOException e) {
             logger.error("Failed to store file locally", e);
             throw new BusinessException("文件存储失败");
