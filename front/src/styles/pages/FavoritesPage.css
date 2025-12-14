@@ -1,79 +1,197 @@
+/* FavoritesPage.css */
 .favorites-page-container {
-    margin-top: calc(-1 * var(--navH));
-    padding-top: var(--navH);
-    height: 100vh; /* Fixed height */
-    overflow: hidden; /* No scroll on body */
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background-color: #fceef5;
     display: flex;
     flex-direction: column;
+    padding: 20px;
+    margin: 0;
+    margin-top: calc(-1 * var(--navH));
+    padding-top: calc(var(--navH) + 20px);
+    gap: 20px;
 }
 
-.favorites-content {
-    width: 100%;
-    max-width: 1600px; /* Wider for horizontal view */
-    margin: 0 auto;
-    padding: 0 20px;
+.favorites-row {
     flex: 1;
     display: flex;
-    flex-direction: column;
-    overflow: hidden; /* Contain children */
+    width: 100%;
+    overflow: hidden;
+    padding: 0;
+    gap: 20px;
+    box-sizing: border-box;
 }
 
+.favorites-card {
+    flex: 1;
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: flex 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    background: #fff;
+    min-width: 0;
+}
+
+.favorites-card.active {
+    flex: 4;
+    cursor: default;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+
+.card-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    transition: opacity 0.3s;
+}
+
+.bg-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease, filter 0.6s ease;
+}
+
+.favorites-card:hover .bg-image {
+    transform: scale(1.05);
+}
+
+.favorites-card.active .bg-image {
+    transform: scale(1.05);
+    filter: blur(20px) brightness(0.7);
+}
+
+.bg-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.2);
+    transition: background 0.3s;
+}
+
+.favorites-card.active .bg-overlay {
+    background: rgba(0,0,0,0.3);
+}
+
+.card-label {
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    z-index: 2;
+    pointer-events: none;
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+.card-label span {
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    letter-spacing: 2px;
+}
+
+.favorites-card.active .card-label {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.favorites-content-area {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease 0.1s;
+    overflow-y: auto;
+    background: transparent;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.favorites-content-area.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.content-inner {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.articles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    padding-bottom: 20px;
+}
+
+.favorites-content-area::-webkit-scrollbar {
+    width: 6px;
+}
+.favorites-content-area::-webkit-scrollbar-track {
+    background: transparent;
+}
+.favorites-content-area::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.2);
+    border-radius: 3px;
+}
+
+.fav-article-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    height: auto;
+}
+
+.no-data, .loading-spinner {
+    text-align: center;
+    padding: 20px;
+    color: #888;
+    font-size: 0.9rem;
+    grid-column: 1 / -1;
+}
+
+
 .favorites-header {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     text-align: center;
     flex-shrink: 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 20px;
+    padding: 20px 20px 0;
 }
 
-.favorites-title {
-    font-size: 2rem;
-    color: #333;
-    margin: 0;
-    font-weight: 600;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.favorites-view-toggle {
-    display: flex;
-    gap: 10px;
-}
-
-.view-toggle-btn {
-    background: rgba(255, 255, 255, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    padding: 8px 16px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 14px;
-    color: #555; /* Ensure text is visible */
-    transition: all 0.3s;
-    -webkit-backdrop-filter: blur(5px); /* Safari support */
-    backdrop-filter: blur(5px);
-}
-
-.view-toggle-btn.active {
-    background: #6366f1;
-    color: white;
-    border-color: #6366f1;
-}
+/* ... existing code ... */
 
 .favorites-carousel-container {
-    margin-bottom: 20px;
-    height: 300px; /* Reduced height */
+    margin-bottom: 10px;
+    /* Remove fixed height to allow component to define it */
     position: relative;
     flex-shrink: 0;
+    z-index: 10; /* Ensure it stays on top */
 }
 
 /* Main List Container */
 .favorites-list-wrapper {
     flex: 1;
     position: relative;
-    min-height: 0; /* Important for flex child scrolling */
-    margin-bottom: 20px;
+    min-height: 400px; /* Ensure space for list */
+    margin-bottom: 40px;
 }
 
 /* Horizontal Mode */
@@ -82,11 +200,11 @@
     flex-direction: row;
     overflow-x: auto;
     overflow-y: hidden;
-    align-items: center;
-    height: 100%;
-    padding: 0 20px;
+    align-items: flex-start; /* Align to top */
+    padding: 20px;
     gap: 30px;
     scroll-behavior: smooth;
+    min-height: 380px; /* Ensure height for cards */
 }
 
 .favorites-list-scroll.mode-horizontal::-webkit-scrollbar {
@@ -123,9 +241,8 @@
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 24px;
     padding: 20px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    height: 100%;
+    /* Remove overflow-y: auto since page scrolls */
+    height: auto;
 }
 
 .favorites-list-scroll.mode-grid::-webkit-scrollbar {

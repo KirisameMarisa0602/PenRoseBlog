@@ -12,9 +12,6 @@ const Category3DCarousel = ({ categories, selectedCategory, onSelect }) => {
     if (index !== -1) {
       setActiveIndex(index);
     } else if (!selectedCategory && categories.length > 0) {
-      // If no category selected (e.g. "All"), maybe center the first one or keep 0
-      // Or we can add an "All" card?
-      // For now, let's just keep the internal state or default to 0
       setActiveIndex(0);
     }
   }, [selectedCategory, categories]);
@@ -38,19 +35,18 @@ const Category3DCarousel = ({ categories, selectedCategory, onSelect }) => {
     
     const isActive = offset === 0;
     const zIndex = 100 - absOffset;
-    const scale = isActive ? 1.1 : Math.max(0.8 - absOffset * 0.1, 0.6);
+    const scale = isActive ? 1.2 : Math.max(0.8 - absOffset * 0.1, 0.6);
     const opacity = Math.max(1 - absOffset * 0.3, 0);
-    const rotateY = offset === 0 ? 0 : (offset > 0 ? -45 : 45); // Rotate inwards
-    const translateX = offset * 140; // Spacing
-    const translateZ = isActive ? 100 : -100 * absOffset;
+    const rotateY = offset === 0 ? 0 : (offset > 0 ? -30 : 30); // Reduced rotation
+    const translateX = offset * 160; // Increased spacing
+    const translateZ = isActive ? 150 : -100 * absOffset;
 
     return {
       transform: `translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`,
       zIndex: zIndex,
       opacity: opacity < 0.1 ? 0 : opacity,
       pointerEvents: opacity < 0.1 ? 'none' : 'auto',
-      // Add transition for smooth movement
-      transition: 'all 0.5s ease'
+      transition: 'all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1)'
     };
   };
 
@@ -70,6 +66,7 @@ const Category3DCarousel = ({ categories, selectedCategory, onSelect }) => {
               onClick={() => handleCardClick(index, cat)}
             >
               <div className="card-inner" style={{ background: config.bgImage, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+                <div className="card-overlay"></div>
                 <div className="card-content">
                   <div className="card-title-split">
                     <div className="split-text-layer split-text-top">{cat}</div>
@@ -84,7 +81,7 @@ const Category3DCarousel = ({ categories, selectedCategory, onSelect }) => {
         })}
       </div>
       
-      {/* Navigation Dots or Arrows */}
+      {/* Navigation Arrows */}
       <div className="carousel-controls">
          <button 
            className="nav-btn prev" 
@@ -96,9 +93,6 @@ const Category3DCarousel = ({ categories, selectedCategory, onSelect }) => {
          >
            &lt;
          </button>
-         <div className="current-cat-label">
-            {categories[activeIndex]}
-         </div>
          <button 
            className="nav-btn next" 
            onClick={(e) => { 
