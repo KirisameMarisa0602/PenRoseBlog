@@ -38,7 +38,7 @@
 
 /* 容器略窄以便更多内容进入同屏，同时保留美观 */
 .home-articles-container {
-  max-width: 900px; /* Slightly wider to accommodate the new layout */
+  max-width: 1200px; /* Increased width for grid layout */
   margin: 0 auto;
   padding: 24px 24px;
   background: #fff;

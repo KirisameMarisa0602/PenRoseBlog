@@ -817,4 +817,18 @@ public class BlogPostServiceImpl implements BlogPostService {
 
         return urls;
     }
+
+    @Override
+    public List<BlogPostDTO> getTopPostPerCategory() {
+        List<Category> categories = categoryRepository.findAll();
+        List<BlogPostDTO> result = new java.util.ArrayList<>();
+        for (Category category : categories) {
+            BlogPost post = blogPostRepository.findFirstByCategoryOrderByLikeCountDesc(category);
+            if (post != null) {
+                UserProfile profile = userProfileRepository.findById(post.getUser().getId()).orElse(null);
+                result.add(blogpostMapper.toDTOWithProfile(post, profile));
+            }
+        }
+        return result;
+    }
 }

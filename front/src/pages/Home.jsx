@@ -1,18 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import '@styles/home/Home.css';
+import '@styles/home/HomeHero.css';
 import HomeSortTabs from '@components/home/HomeSortTabs';
 import HomeCategoryTabs from '@components/home/HomeCategoryTabs';
 import HomeArticleList from '@components/home/HomeArticleList';
+import HomeCarousel from '@components/home/HomeCarousel';
 import HomePagination from '@components/home/HomePagination';
+import ArticleCard from '@components/common/ArticleCard';
 import { fetchPosts } from '@utils/api/postService';
 import { useAuthState } from '@hooks/useAuthState';
 
 const Home = () => {
   const [posts, setPosts] = useState([]);
+  const [heroPosts, setHeroPosts] = useState([]);
   const [page, setPage] = useState(0);
   const [sortMode, setSortMode] = useState('latest'); // 'latest' | 'hot'
   const [selectedCategory, setSelectedCategory] = useState('首页');
-  const size = 5; // 每页 5 篇
+  const size = 12; // 每页 12 篇，适应网格布局
   const { user } = useAuthState();
   const userId = user?.id || null;
 
@@ -22,6 +26,19 @@ const Home = () => {
   const [lastFetchedCount, setLastFetchedCount] = useState(0);
   const handleSortChange = (mode) => { setSortMode(mode); setPage(0); };
   const handleCategoryChange = (cat) => { setSelectedCategory(cat); setPage(0); };
+
+  // 专门获取 Hero 区右侧的文章（始终显示最新/热门的前6个）
+  useEffect(() => {
+    const categoryParam = selectedCategory === '首页' ? null : selectedCategory;
+    fetchPosts({ page: 0, size: 6, sortMode: 'hot', category: categoryParam })
+        .then(res => {
+            if (res && res.code === 200) {
+                let list = res.data && res.data.list ? res.data.list : (res.data || []);
+                if (!Array.isArray(list) && Array.isArray(res.data)) list = res.data;
+                setHeroPosts(list.slice(0, 6));
+            }
+        });
+  }, [selectedCategory]);
 
   useEffect(() => {
     let mounted = true;
@@ -116,6 +133,22 @@ const Home = () => {
 
   const handlePrevPage = () => { if (canPrev) setPage(Math.max(0, page - 1)); };
   const handleNextPage = () => { if (canNext) setPage(page + 1); };
+{/* Hero Section: Carousel + Top Grid */}
+          <div className="home-hero-section">
+            <div className="home-hero-carousel">
+                <HomeCarousel />
+            </div>
+            <div className="home-hero-grid">
+                {heroPosts.map(p => (
+                    <ArticleCard 
+                        key={p.id || p.postId} 
+                        post={p} 
+                        className="home-hero-card" 
+                        mode="vertical" 
+                    />
+                ))}
+            </div>
+          </div>
 
   // 隐藏 Home 页滚动条（不影响滚动），离开时恢复
   useEffect(() => {
@@ -129,6 +162,7 @@ const Home = () => {
         <HomeCategoryTabs selectedCategory={selectedCategory} onSelectCategory={handleCategoryChange} />
         
         <div className="home-articles-container">
+          <HomeCarousel />
           <HomeSortTabs sortMode={sortMode} onChange={handleSortChange} />
           
           <div className="home-articles-list">

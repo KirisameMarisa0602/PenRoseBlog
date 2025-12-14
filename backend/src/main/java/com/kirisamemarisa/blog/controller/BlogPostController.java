@@ -75,6 +75,11 @@ public class BlogPostController {
         return new ApiResponse<>(200, "获取成功", blogPostService.getFavoriteCategories(userId));
     }
 
+    @GetMapping("/top-per-category")
+    public ApiResponse<java.util.List<BlogPostDTO>> getTopPostPerCategory() {
+        return new ApiResponse<>(200, "获取成功", blogPostService.getTopPostPerCategory());
+    }
+
     @PostMapping("/{id}/like")
     public ApiResponse<Boolean> toggleLike(@PathVariable Long id,
             @RequestParam Long userId) {
