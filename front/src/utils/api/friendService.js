@@ -19,7 +19,8 @@ export async function fetchFriendsList() {
 
 export async function sendFriendRequest(targetUserId, message) {
   // POST /api/friends/request/{targetId}
-  const response = await httpClient.post(`/friends/request/${targetUserId}`, message ? { message } : null);
+  // Always send a JSON object, even if message is empty
+  const response = await httpClient.post(`/friends/request/${targetUserId}`, { message: message || '' });
   return response.data;
 }
 

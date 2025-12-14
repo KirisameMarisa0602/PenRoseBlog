@@ -1008,9 +1008,33 @@ export default function ArticleDetail() {
                 url
             )}`
         );
-        sharePost(id).then(res => {
+        sharePost(id, userId).then(res => {
             if (res && res.code === 200) {
-                setPost(prev => prev ? { ...prev, shareCount: (prev.shareCount || 0) + 1 } : prev);
+                // 只有当后端返回 true (表示计数增加了) 时才更新前端计数
+                // 如果后端返回 "已分享过"，res.data 也是 true，但我们可能不想增加计数？
+                // 实际上后端逻辑是：如果已分享，不增加计数，返回 true。
+                // 所以前端应该重新拉取 post 或者根据后端返回的具体信息判断。
+                // 但为了简单，我们可以假设如果后端没报错，就认为操作成功。
+                // 可是如果后端没增加计数，前端增加了，刷新后会变回去。
+                // 最好是后端返回最新的 shareCount，或者前端不乐观更新。
+                // 这里我们暂时保持乐观更新，或者不更新（等待下次刷新）。
+                // 既然用户要求防止刷次数，那么前端也不应该无脑 +1。
+                // 我们可以重新 fetchPostDetail，或者让 sharePost 返回最新的 count。
+                // 目前 sharePost 返回 Boolean。
+                // 让我们简单处理：如果后端返回成功，我们不手动 +1，而是依赖重新获取或不做处理。
+                // 或者，我们可以只在第一次分享时 +1。但前端不知道是不是第一次。
+                // 让我们去掉前端的 +1 操作，或者改为重新获取详情。
+                // 为了体验，我们可以 +1，反正刷新后会准。
+                // 但如果用户反复点，前端一直 +1，体验也不好。
+                // 既然是转发给好友，这个操作频率不高。
+                // 让我们保留 +1，但加上防抖？
+                // 其实这里是转发成功后的回调。
+                // 让我们修改为：不手动更新 shareCount，因为转发跳转到了聊天页面，用户离开了当前页面（或者聊天页面是新标签？navigate 是路由跳转）。
+                // 如果 navigate 跳转了，那么 setPost 也没用了。
+                // 除非 navigate 是在后台？不，navigate 会卸载当前组件。
+                // 等等，navigate 跳转到 conversation，当前组件 ArticleDetail 会被卸载吗？
+                // 是的。所以这里的 setPost 会报错（Can't perform a React state update on an unmounted component）。
+                // 所以应该去掉 setPost。
             }
         });
     };

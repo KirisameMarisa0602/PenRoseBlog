@@ -45,8 +45,10 @@ export async function toggleFavorite(id, userId) {
   return response.data;
 }
 
-export async function sharePost(id) {
-  const response = await httpClient.post(`/blogpost/${id}/share`);
+export async function sharePost(id, userId) {
+  const response = await httpClient.post(`/blogpost/${id}/share`, null, {
+    params: { userId }
+  });
   return response.data;
 }
 

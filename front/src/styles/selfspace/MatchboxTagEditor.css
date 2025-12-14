@@ -16,7 +16,7 @@
     --mb-d: 80px;
     /* Depth of the box */
 
-    font-family: "BenchNine", sans-serif;
+    font-family: "BenchNine", "Microsoft YaHei", "SimHei", "Heiti SC", sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -27,41 +27,41 @@
     overflow: visible;
 }
 
-/* Read-only mode (Display mode) adjustments - Expanded Size */
+/* Read-only mode (Display mode) adjustments - Compact Size */
 .matchbox-wrapper.readonly {
-    --mb-w: 280px;
-    --mb-h: 180px;
-    --mb-d: 80px;
-    height: 340px;
+    --mb-w: 240px;
+    --mb-h: 150px;
+    --mb-d: 60px;
+    height: 280px;
     margin-top: 0;
     margin-bottom: 0;
 }
 
 .matchbox-wrapper.readonly .mb-label-circle {
-    width: 90px;
-    height: 90px;
+    width: 80px;
+    height: 80px;
 }
 
 .matchbox-wrapper.readonly .mb-label-text {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
 }
 
 .matchbox-wrapper.readonly .mb-subtext {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
 }
 
 .matchbox-wrapper.readonly .mb-match {
-    height: 24px;
-    padding-left: 30px;
+    height: 22px;
+    padding-left: 28px;
 }
 
 .matchbox-wrapper.readonly .mb-match::before {
-    width: 20px;
-    height: 16px;
+    width: 18px;
+    height: 14px;
 }
 
 .matchbox-wrapper.readonly .mb-match-text {
-    font-size: 1rem;
+    font-size: 0.9rem;
 }
 
 .matchbox-container {
@@ -70,14 +70,15 @@
     position: relative;
     transform-style: preserve-3d;
     transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-    /* Initial view angle */
-    transform: rotate(-10deg) rotateX(20deg) rotateZ(-5deg);
+    /* Initial view angle - Rotated counter-clockwise and scaled down slightly */
+    transform: scale(0.85) rotate(-15deg) rotateX(20deg) rotateZ(-5deg);
     cursor: pointer;
+    margin-left: -60px; /* Move left */
 }
 
 /* Hover state for the whole box */
 .matchbox-wrapper:hover .matchbox-container {
-    transform: rotate(-20deg) rotateX(35deg) rotateZ(-10deg);
+    transform: scale(0.85) rotate(-25deg) rotateX(35deg) rotateZ(-10deg);
 }
 
 /* Common face styles */
@@ -112,7 +113,7 @@
     z-index: 10;
     /* Front decoration */
     flex-direction: column;
-    overflow: hidden;
+    /* overflow: hidden; Removed to allow label outside */
 }
 
 .mb-outer .back {
@@ -170,6 +171,7 @@
     justify-content: center;
     align-items: center;
     margin-bottom: 10px;
+    z-index: 20; /* Ensure label is above everything on the front face */
 }
 
 .mb-label-text {
@@ -178,7 +180,11 @@
     text-transform: uppercase;
     text-align: center;
     line-height: 1;
-    transform: rotate(-5deg);
+    transform: rotate(-5deg) translateZ(2px);
+    position: relative;
+    z-index: 21; /* Ensure text is above the circle */
+    font-family: "Microsoft YaHei", "SimHei", sans-serif; /* Ensure Chinese font support */
+    font-weight: bold;
 }
 
 .mb-subtext {
@@ -203,3 +209,163 @@
 }
 
 /* Slide out on hover */
+.matchbox-wrapper:hover .mb-inner {
+    transform: translateX(calc(var(--mb-w) * 0.55));
+}
+
+/* Hide the right face of the outer box so the drawer can slide out */
+.mb-outer .right {
+    display: none;
+}
+
+/* Inner Drawer Styling */
+.floor {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #e0c0a0; /* Slightly darker than bg */
+    border: 2px solid var(--mb-outline);
+    box-sizing: border-box;
+}
+
+.mb-tray {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    transform: translateZ(2px);
+}
+
+.mb-tray-scroll {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-right: 4px;
+}
+
+/* Scrollbar */
+.mb-tray-scroll::-webkit-scrollbar {
+    width: 4px;
+}
+.mb-tray-scroll::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.05);
+}
+.mb-tray-scroll::-webkit-scrollbar-thumb {
+    background: var(--mb-outline);
+    border-radius: 2px;
+}
+
+/* Match Item (Tag) */
+.mb-match {
+    display: flex;
+    align-items: center;
+    min-height: 28px;
+    background: transparent; /* Transparent background */
+    border-radius: 0;
+    position: relative;
+    padding-left: 0;
+    padding-right: 0;
+    box-shadow: none;
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+    margin-bottom: 4px; /* Add some spacing */
+}
+
+.mb-match:hover {
+    transform: translateX(3px);
+}
+
+/* Match Head */
+.mb-match::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 14px;
+    background: var(--mb-match-head);
+    border-radius: 50% 40% 40% 50%;
+    box-shadow: inset -1px -1px 2px rgba(0,0,0,0.3);
+    z-index: 2;
+}
+
+/* Match Stick (New) */
+.mb-match::after {
+    content: '';
+    position: absolute;
+    left: 14px; /* Overlap slightly with head */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px; /* Fixed length stick */
+    height: 6px;
+    background: var(--mb-match-stick);
+    border-radius: 0 3px 3px 0;
+    z-index: 1;
+}
+
+.mb-match-text {
+    font-family: "Microsoft YaHei", "SimHei", sans-serif;
+    font-size: 1rem; /* Slightly larger */
+    color: #4a3b2a;
+    font-weight: bold;
+    white-space: nowrap;
+    max-width: 100%;
+    margin-left: 50px; /* Head + Stick + Gap */
+    text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+}
+
+/* Input for editing */
+.mb-match-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--mb-outline);
+    font-family: sans-serif;
+    font-size: 0.9rem;
+    color: #4a3b2a;
+    outline: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Delete button */
+.mb-match-delete {
+    margin-left: auto;
+    font-size: 14px;
+    color: var(--mb-outline);
+    opacity: 0.5;
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+}
+
+.mb-match-delete:hover {
+    opacity: 1;
+    color: #d00;
+}
+
+/* Add New Tag Button */
+.mb-match.add-new {
+    background: transparent;
+    border: 1px dashed var(--mb-outline);
+    box-shadow: none;
+    justify-content: center;
+    padding-left: 10px;
+    cursor: pointer;
+}
+
+.mb-match.add-new::before {
+    display: none;
+}
+
+.mb-match.add-new:hover {
+    background: rgba(255,255,255,0.3);
+}

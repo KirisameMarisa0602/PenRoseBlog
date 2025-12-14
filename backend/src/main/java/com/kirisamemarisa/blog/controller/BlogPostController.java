@@ -88,8 +88,8 @@ public class BlogPostController {
     }
 
     @PostMapping("/{id}/share")
-    public ApiResponse<Boolean> share(@PathVariable Long id) {
-        return blogPostService.share(id);
+    public ApiResponse<Boolean> share(@PathVariable Long id, @RequestParam(required = false) Long userId) {
+        return blogPostService.share(id, userId);
     }
 
     @PostMapping("/comment")

@@ -871,19 +871,19 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                                     className="avatar-upload-preview"
                                     style={{
                                       position: 'relative',
-                                      width: '140px',
-                                      height: '140px',
-                                      borderRadius: '50%',
+                                      width: '200px',
+                                      height: '200px',
+                                      borderRadius: '4px',
                                       cursor: 'pointer',
                                       boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
                                       border: '4px solid #fff',
                                       overflow: 'hidden',
                                       transition: 'transform 0.3s',
-                                      background: '#fff'
+                                      background: '#f8f8f8'
                                     }}
                                     onClick={() => document.getElementById('avatar-upload-hidden').click()}
                                     onMouseEnter={e => {
-                                      e.currentTarget.style.transform = 'scale(1.05)';
+                                      e.currentTarget.style.transform = 'scale(1.02)';
                                       e.currentTarget.querySelector('.avatar-overlay').style.opacity = 1;
                                     }}
                                     onMouseLeave={e => {
@@ -894,7 +894,7 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                                     <img
                                       src={avatarPreview || (profile.avatarUrl ? resolveUrl(profile.avatarUrl) : resolveUrl(getDefaultAvatar(profile.id || userId)))}
                                       alt="Avatar"
-                                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                                     />
                                     <div className="avatar-overlay" style={{
                                       position: 'absolute',
@@ -922,15 +922,15 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                                 </div>
                               </div>
 
-                              <div className="form-group" style={{ marginTop: '30px' }}>
-                                <label className="profile-form-label" style={{ marginBottom: '15px', display: 'block' }}>背景图/视频设置</label>
+                              <div className="form-group" style={{ marginTop: '10px' }}>
+                                <label className="profile-form-label" style={{ marginBottom: '1px', display: 'block' }}>背景设置</label>
                                 <div
                                   className="bg-upload-preview"
                                   style={{
                                     position: 'relative',
                                     width: '100%',
-                                    height: '200px',
-                                    borderRadius: '16px',
+                                    height: '240px',
+                                    borderRadius: '8px',
                                     overflow: 'hidden',
                                     cursor: 'pointer',
                                     boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
@@ -952,9 +952,9 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                                     const url = backgroundPreview || profile.backgroundUrl;
                                     if (url) {
                                       if (/\.(mp4|webm)$/i.test(url)) {
-                                        return <video src={resolveUrl(url)} className="profilepanel-bg-video" style={{ width: '100%', height: '100%', objectFit: 'cover' }} muted loop autoPlay />;
+                                        return <video src={resolveUrl(url)} className="profilepanel-bg-video" style={{ width: '100%', height: '100%', objectFit: 'contain', backgroundColor: '#000' }} muted loop autoPlay />;
                                       } else {
-                                        return <img src={resolveUrl(url)} alt="Background" className="profilepanel-bg-img" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />;
+                                        return <img src={resolveUrl(url)} alt="Background" className="profilepanel-bg-img" style={{ width: '100%', height: '100%', objectFit: 'contain', backgroundColor: '#f8f8f8' }} />;
                                       }
                                     } else {
                                       return (
@@ -1227,36 +1227,34 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                 }
               >
                 {isActive ? (
-                  <div className="profilepanel-info-panel" style={{ padding: '30px', width: '100%', boxSizing: 'border-box' }}>
-                    <h3 style={{ marginTop: 0, marginBottom: '25px', color: '#333', borderBottom: '2px solid #f0f0f0', paddingBottom: '15px', fontSize: '1.4rem' }}>关于我</h3>
+                  <div className="profilepanel-info-panel" style={{ padding: '30px', width: '100%', height: '100%', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
+                    <h3 style={{ marginTop: 0, marginBottom: '20px', color: '#333', borderBottom: '2px solid #f0f0f0', paddingBottom: '15px', fontSize: '1.4rem', flexShrink: 0 }}>关于我</h3>
 
-                    <div className="profile-tags-section" style={{ marginBottom: '35px' }}>
-                      <div className="profile-tags-display" style={{ display: 'flex', justifyContent: 'center', padding: '10px 0' }}>
-                        {tagsList && tagsList.length > 0 ? (
-                          <MatchboxTagEditor tags={tagsList} readOnly={true} />
-                        ) : (
-                          <span style={{ color: '#999', fontStyle: 'italic', padding: '5px 0' }}>暂无标签</span>
-                        )}
+                    <div className="profile-about-content">
+                      {/* Left: Matchbox (Fixed width) */}
+                      <div className="profile-tags-section">
+                        <div className="profile-tags-display">
+                          {tagsList && tagsList.length > 0 ? (
+                            <div className="matchbox-scale-wrapper">
+                              <MatchboxTagEditor tags={tagsList} readOnly={true} />
+                            </div>
+                          ) : (
+                            <div className="no-tags-placeholder">
+                              暂无标签
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
 
-                    <div className="profile-bio-section">
-                      <h4 style={{ color: '#555', marginBottom: '15px', fontSize: '1.1rem', display: 'flex', alignItems: 'center' }}>
-                        <span style={{ width: '4px', height: '16px', background: '#1890ff', marginRight: '8px', borderRadius: '2px' }}></span>
-                        个人简介
-                      </h4>
-                      <div className="profile-bio-content" style={{
-                        lineHeight: '1.8',
-                        color: '#444',
-                        background: '#f8f9fa',
-                        padding: '25px',
-                        borderRadius: '12px',
-                        whiteSpace: 'pre-wrap',
-                        fontSize: '1rem',
-                        border: '1px solid #eee',
-                        boxShadow: 'inset 0 1px 4px rgba(0,0,0,0.02)'
-                      }}>
-                        {profile.bio || '这个人很懒，什么都没有写~'}
+                      {/* Right: Bio (Flexible) */}
+                      <div className="profile-bio-section">
+                        <h4 className="profile-bio-title">
+                          <span className="title-accent"></span>
+                          个人简介
+                        </h4>
+                        <div className="profile-bio-text-area">
+                          {profile.bio || '这个人很懒，什么都没有写~'}
+                        </div>
                       </div>
                     </div>
                   </div>

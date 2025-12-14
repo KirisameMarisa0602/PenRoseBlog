@@ -1,5 +1,6 @@
 import React from 'react';
 import resolveUrl from '@utils/resolveUrl';
+import { getDefaultAvatar } from '@utils/avatarUtils';
 
 export default function ForwardFriendsModal({
     show,
@@ -94,9 +95,13 @@ export default function ForwardFriendsModal({
                                 <img
                                     src={
                                         f.avatarUrl ? resolveUrl(f.avatarUrl) :
-                                        '/imgs/loginandwelcomepanel/1.png'
+                                        getDefaultAvatar(f.id)
                                     }
                                     alt="avatar"
+                                    onError={(e) => {
+                                        e.target.onerror = null;
+                                        e.target.src = getDefaultAvatar(f.id);
+                                    }}
                                     style={{
                                         width: 40,
                                         height: 40,
@@ -104,11 +109,6 @@ export default function ForwardFriendsModal({
                                         objectFit: 'cover',
                                         marginRight: 12,
                                         border: '1px solid #e2e8f0',
-                                    }}
-                                    onError={(e) => {
-                                        e.target.onerror = null;
-                                        e.target.src =
-                                            '/imgs/loginandwelcomepanel/1.png';
                                     }}
                                 />
                                 <div style={{ flex: 1 }}>

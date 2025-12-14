@@ -49,7 +49,7 @@ public interface BlogPostService {
         // 新增：删除博客接口（只能作者删除）
         ApiResponse<Boolean> delete(Long blogPostId, Long userId);
 
-        ApiResponse<Boolean> share(Long blogPostId);
+        ApiResponse<Boolean> share(Long blogPostId, Long userId);
 
         // 获取用户收藏的文章
         PageResult<BlogPostDTO> getFavorites(Long userId, String categoryName, int page, int size);

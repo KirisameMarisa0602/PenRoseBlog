@@ -34,6 +34,7 @@ public class BlogPostServiceImpl implements BlogPostService {
     private final CommentRepository commentRepository;
     private final BlogPostLikeRepository blogPostLikeRepository;
     private final BlogPostFavoriteRepository blogPostFavoriteRepository;
+    private final BlogPostShareRepository blogPostShareRepository; // Added
     private final CommentLikeRepository commentLikeRepository;
     private final CommentReplyRepository commentReplyRepository;
     private final CommentReplyLikeRepository commentReplyLikeRepository;
@@ -51,6 +52,7 @@ public class BlogPostServiceImpl implements BlogPostService {
             CommentRepository commentRepository,
             BlogPostLikeRepository blogPostLikeRepository,
             BlogPostFavoriteRepository blogPostFavoriteRepository,
+            BlogPostShareRepository blogPostShareRepository, // Added
             CommentLikeRepository commentLikeRepository,
             CommentReplyRepository commentReplyRepository,
             CommentReplyLikeRepository commentReplyLikeRepository,
@@ -67,6 +69,7 @@ public class BlogPostServiceImpl implements BlogPostService {
         this.commentRepository = commentRepository;
         this.blogPostLikeRepository = blogPostLikeRepository;
         this.blogPostFavoriteRepository = blogPostFavoriteRepository;
+        this.blogPostShareRepository = blogPostShareRepository; // Added
         this.commentLikeRepository = commentLikeRepository;
         this.commentReplyRepository = commentReplyRepository;
         this.commentReplyLikeRepository = commentReplyLikeRepository;
@@ -685,12 +688,25 @@ public class BlogPostServiceImpl implements BlogPostService {
 
     @Override
     @Transactional
-    public ApiResponse<Boolean> share(Long blogPostId) {
+    public ApiResponse<Boolean> share(Long blogPostId, Long userId) {
         Optional<BlogPost> opt = blogPostRepository.findById(blogPostId);
         if (opt.isEmpty()) {
             return new ApiResponse<>(404, "博客不存在", false);
         }
         BlogPost post = opt.get();
+
+        // 如果提供了 userId，检查是否已分享
+        if (userId != null) {
+            boolean alreadyShared = blogPostShareRepository.existsByBlogPostIdAndUserId(blogPostId, userId);
+            if (alreadyShared) {
+                // 已分享过，不增加计数，但返回成功
+                return new ApiResponse<>(200, "已分享过", true);
+            }
+            // 记录分享
+            BlogPostShare share = new BlogPostShare(blogPostId, userId);
+            blogPostShareRepository.save(share);
+        }
+
         post.setShareCount(post.getShareCount() + 1);
         blogPostRepository.save(post);
         return new ApiResponse<>(200, "分享成功", true);

@@ -22,6 +22,8 @@ import {
     loadCachedConversationSummaries
 } from '@utils/localPmCacheService';
 
+import ArticleCard from '@components/common/ArticleCard';
+
 export default function ConversationDetail({ embeddedOtherId, onConversationSelect }) {
     const { otherId: paramOtherId } = useParams();
     const otherId = embeddedOtherId || paramOtherId;
@@ -1432,15 +1434,33 @@ export default function ConversationDetail({ embeddedOtherId, onConversationSele
                                                 target.src = getDefaultAvatar(msg.senderId);
                                             }}
                                         />
-                                        <span className="conversation-detail-msg-nickname">
-                                            {msg.senderNickname || (isSelf ? '你' : otherInfo.nickname)}
-                                        </span>
+                                        {/* 移除昵称显示 */}
                                     </div>
 
-                                    <div className="conversation-detail-msgtext">
-                                        {/* 文本 / 媒体 */}
-                                        {!hasPreview && (
-                                            msg?.type === 'IMAGE' && msg?.mediaUrl ? (
+                                    {hasPreview ? (
+                                        <div className="pm-blog-preview-wrapper" style={{ width: '400px', maxWidth: '100%' }}>
+                                            <ArticleCard 
+                                                post={{
+                                                    id: msg.blogPreview.blogId,
+                                                    title: msg.blogPreview.title,
+                                                    coverImageUrl: msg.blogPreview.coverImageUrl,
+                                                    authorAvatarUrl: msg.blogPreview.authorAvatarUrl,
+                                                    authorNickname: msg.blogPreview.authorNickname,
+                                                    authorId: msg.blogPreview.authorId,
+                                                    // 转发卡片中可能缺少部分统计数据，可设为0或不显示
+                                                    likeCount: 0,
+                                                    commentCount: 0,
+                                                    viewCount: 0,
+                                                    createdAt: msg.blogPreview.createdAt || null // 显示时间
+                                                }}
+                                                className="chat-article-card"
+                                                mode="horizontal"
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div className="conversation-detail-msgtext">
+                                            {/* 文本 / 媒体 */}
+                                            {msg?.type === 'IMAGE' && msg?.mediaUrl ? (
                                                 <img
                                                     className="conversation-detail-msgmedia"
                                                     src={toAbsUrl(msg.mediaUrl)}
@@ -1467,56 +1487,11 @@ export default function ConversationDetail({ embeddedOtherId, onConversationSele
                                                     : msg?.type === 'VIDEO'
                                                         ? '[视频]'
                                                         : '')
-                                            )
-                                        )}
-
-                                        {/* 博客预览卡片 */}
-                                        {hasPreview && (
-                                            <div className="pm-blog-preview-card clickable"
-                                                onClick={() => navigate(`/post/${msg.blogPreview.blogId}`)}>
-                                                <div className="pm-blog-preview-cover">
-                                                    {msg.blogPreview.coverImageUrl ? (
-                                                        <img
-                                                            src={toAbsUrl(msg.blogPreview.coverImageUrl)}
-                                                            alt={msg.blogPreview.title || '封面'}
-                                                            onError={e => { e.target.onerror = null; e.target.src = ''; }}
-                                                        />
-                                                    ) : (
-                                                        <div className="pm-blog-preview-cover-placeholder">
-                                                            博客
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                <div className="pm-blog-preview-body">
-                                                    <div className="pm-blog-preview-title">
-                                                        {msg.blogPreview.title || '博客'}
-                                                    </div>
-                                                    <div className="pm-blog-preview-meta">
-                                                        {msg.blogPreview.authorAvatarUrl && (
-                                                            <img
-                                                                src={toAbsUrl(msg.blogPreview.authorAvatarUrl)}
-                                                                className="pm-blog-preview-avatar"
-                                                                alt=""
-                                                                onError={e => { e.target.onerror = null; e.target.src = getDefaultAvatar(msg.blogPreview.authorId); }}
-                                                            />
-                                                        )}
-                                                        <span className="pm-blog-preview-author">
-                                                            {msg.blogPreview.authorNickname || ''}
-                                                        </span>
-                                                    </div>
-                                                    <div className="pm-blog-preview-footer">
-                                                        <span className="pm-blog-preview-btn">查看原文</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <div className="conversation-detail-msgtime">
-                                        {msg.createdAt
-                                            ? new Date(msg.createdAt).toLocaleString()
-                                            : ''}
-                                    </div>
+                                            )}
+                                        </div>
+                                    )}
+                                    
+                                    {/* 移除时间显示 */}
                                 </div>
                             );
                         })}

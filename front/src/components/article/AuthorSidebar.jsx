@@ -120,7 +120,7 @@ export default function AuthorSidebar({ post, currentUserId }) {
             if (res && res.code === 200) {
                 alert('好友请求已发送');
             } else {
-                alert(res?.message || '发送失败');
+                alert(res?.msg || res?.message || '发送失败');
             }
         } catch (e) {
             console.error('Friend request failed', e);
