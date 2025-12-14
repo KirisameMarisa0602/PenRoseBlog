@@ -25,7 +25,7 @@ function truncateByUnits(text = '', limitUnits = 48) {
     return out;
 }
 
-export default function ArticleCard({ post, className, onDelete, mode = 'horizontal' }) {
+export default function ArticleCard({ post, className, onDelete, mode = 'horizontal', style }) {
     const coverSrc = resolveUrl(post.coverImageUrl) || null;
     const avatar = resolveUrl(post.authorAvatarUrl || post.avatarUrl) || getDefaultAvatar(post.userId || post.authorId);
     const author = post.authorNickname || post.authorName || post.author || post.username || '匿名';
@@ -57,7 +57,7 @@ export default function ArticleCard({ post, className, onDelete, mode = 'horizon
     const isVertical = mode === 'vertical';
 
     return (
-        <div className={`article-card-new ${isVertical ? 'article-card-vertical' : ''} ${className || ''}`}>
+        <div className={`article-card-new ${isVertical ? 'article-card-vertical' : ''} ${className || ''}`} style={style}>
             <Link to={linkTarget} className="article-card-link">
                 <div className="article-card-cover-wrapper">
                     {coverSrc ? (

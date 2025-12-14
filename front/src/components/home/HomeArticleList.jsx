@@ -9,12 +9,13 @@ export default function HomeArticleList({ posts }) {
 
   return (
     <div className="home-article-grid">
-      {posts.map((p) => (
+      {posts.map((p, index) => (
         <ArticleCard 
           key={p.id || p.postId} 
           post={p} 
           className="home-article-card" 
           mode="vertical" 
+          style={{ '--stagger-index': index % 15 }}
         />
       ))}
     </div>
