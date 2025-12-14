@@ -6,6 +6,7 @@ import ArticleFolderTree from '@components/selfspace/ArticleFolderTree.jsx';
 import { useAuthState } from '@hooks/useAuthState';
 import resolveUrl from '@utils/resolveUrl';
 import { getDefaultAvatar, isValidAvatar } from '@utils/avatarUtils';
+import '@styles/common/AnimeBackground.css';
 
 // SelfSpace 页面：左侧 25vw 手风琴资料面板 + 右侧内容区域
 export default function SelfSpace() {
@@ -76,7 +77,7 @@ export default function SelfSpace() {
 
   return (
     <>
-      <div className="selfspace-page" data-page="selfspace">
+      <div className="selfspace-page anime-neon-bg" data-page="selfspace">
         <aside className="selfspace-left-panel" aria-label="个人空间侧边栏">
           <div className="selfspace-left-panel-inner">
             {/* 非本人时：在手风琴上方展示一个简介条 */}

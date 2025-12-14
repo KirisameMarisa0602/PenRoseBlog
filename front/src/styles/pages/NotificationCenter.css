@@ -4,72 +4,72 @@
     width: 100%;
     max-width: 100%;
     margin: 0;
-    /* Fill remaining height (viewport - navbar) to prevent body scroll */
     height: calc(100vh - var(--navH));
-    padding: 20px;
-    gap: 24px;
+    min-height: 0 !important; /* Override anime-neon-bg */
+    padding: 20px 40px;
+    gap: 30px;
     overflow: hidden;
     box-sizing: border-box;
-    /* Removed fixed positioning to restore Navbar and Maid visibility */
-    background-color: transparent; 
 }
 
 /* Sidebar Styles */
 .notification-sidebar {
-    width: 260px;
-    background: rgba(255, 255, 255, 0.65);
+    width: 280px;
+    background: rgba(255, 255, 255, 0.7);
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
     border-radius: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    padding: 24px 16px;
+    padding: 30px 20px;
     flex-shrink: 0;
 }
 
 .sidebar-title {
-    font-size: 1.5rem;
+    font-size: 1.6rem;
     font-weight: 800;
     color: #2c3e50;
-    margin-bottom: 24px;
+    margin-bottom: 30px;
     padding: 0 12px;
     letter-spacing: -0.5px;
 }
 
 .notification-sidebar-item {
-    padding: 14px 20px;
-    margin-bottom: 8px;
-    border-radius: 16px;
+    padding: 16px 24px;
+    margin-bottom: 10px;
+    border-radius: 18px;
     cursor: pointer;
     font-weight: 600;
-    color: #666;
+    color: #64748b;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     align-items: center;
     justify-content: space-between;
     position: relative;
+    border: 1px solid transparent;
 }
 
 .notification-sidebar-item:hover {
-    background: rgba(255, 255, 255, 0.5);
-    color: #333;
+    background: rgba(255, 255, 255, 0.6);
+    color: #334155;
     transform: translateX(4px);
 }
 
 .notification-sidebar-item.active {
     background: #fff;
-    color: #3498db;
-    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.15);
+    color: #3b82f6;
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.15);
+    border-color: rgba(255, 255, 255, 0.8);
 }
 
 .sidebar-badge-dot {
     width: 8px;
     height: 8px;
-    background: #ff4d4f;
+    background: #ef4444;
     border-radius: 50%;
-    box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15);
 }
 
 /* Content Area */
@@ -84,15 +84,15 @@
 .notification-center-container {
     width: 100%;
     height: 100%;
-    background: rgba(255, 255, 255, 0.65);
+    background: rgba(255, 255, 255, 0.7);
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
     border-radius: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    padding: 0; /* Reset padding */
+    padding: 0;
     overflow: hidden;
 }
 

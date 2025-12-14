@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import '@styles/home/Home.css';
 import '@styles/home/HomeHero.css';
+import '@styles/common/AnimeBackground.css';
 import HeroSection from '@components/home/HeroSection';
 import HomeSortTabs from '@components/home/HomeSortTabs';
 import HomeCategoryTabs from '@components/home/HomeCategoryTabs';
@@ -12,6 +14,8 @@ import { fetchPosts } from '@utils/api/postService';
 import { useAuthState } from '@hooks/useAuthState';
 
 const Home = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
   const [heroPosts, setHeroPosts] = useState([]);
   const [page, setPage] = useState(0);
@@ -23,8 +27,29 @@ const Home = () => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
+  // Initialize category from location state if available
+  useEffect(() => {
+    if (location.state?.category) {
+      setSelectedCategory(location.state.category);
+    }
+    if (location.state?.scrollToCarousel) {
+      const carouselElement = document.querySelector('.home-hero-carousel');
+      if (carouselElement) {
+        carouselElement.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }, [location.state]);
+
   const handleSortChange = (mode) => { setSortMode(mode); setPage(0); setPosts([]); setHasMore(true); };
-  const handleCategoryChange = (cat) => { setSelectedCategory(cat); setPage(0); setPosts([]); setHasMore(true); };
+  
+  const handleCategoryChange = (cat) => { 
+    // Update history state so back button works
+    navigate('.', { state: { category: cat }, replace: true });
+    setSelectedCategory(cat); 
+    setPage(0); 
+    setPosts([]); 
+    setHasMore(true); 
+  };
 
   // 专门获取 Hero 区右侧的文章（始终显示最新/热门的前6个）
   // 增加换一换功能：每次随机获取6个
@@ -172,7 +197,7 @@ const Home = () => {
   }, []);
 
   return (
-    <>
+    <div className="anime-neon-bg">
       <HeroSection />
       <div className="home-page-wrapper">
         <HomeCategoryTabs selectedCategory={selectedCategory} onSelectCategory={handleCategoryChange} />
@@ -209,14 +234,14 @@ const Home = () => {
           <HomeSortTabs sortMode={sortMode} onChange={handleSortChange} />
           
           <div className="home-articles-list">
-            <HomeArticleList posts={posts} />
+            <HomeArticleList posts={posts} selectedCategory={selectedCategory} />
             {loadingMore && <div className="home-loading-more">加载中...</div>}
             {!hasMore && posts.length > 0 && <div className="home-no-more">没有更多了</div>}
           </div>
         </div>
       </div>
       <ScrollControls showComments={false} />
-    </>
+    </div>
   );
 };
 

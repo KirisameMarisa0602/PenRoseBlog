@@ -16,6 +16,8 @@ import { fetchFriendsList } from '@utils/api/friendService';
 import SimpleEmojiPicker from '@components/common/SimpleEmojiPicker';
 import resolveUrl from '@utils/resolveUrl';
 import { getDefaultAvatar, isValidAvatar } from '@utils/avatarUtils';
+import NeonBackground from '@components/common/NeonBackground';
+import '@styles/common/AnimeBackground.css';
 
 // 本地缓存服务
 import {
@@ -1192,7 +1194,8 @@ export default function CommunicationPage() {
     /** ---------------- 渲染 ---------------- */
 
     return (
-        <div className="conversation-detail-page">
+        <div className="conversation-detail-page anime-neon-bg">
+            <NeonBackground />
             <div
                 className="conversation-detail-container two-columns"
                 style={{ ['--input-height']: `${inputHeight}px` }}
@@ -1203,13 +1206,6 @@ export default function CommunicationPage() {
                     ref={leftScrollRef}
                     aria-label="会话列表"
                 >
-                    <div className="conversation-sidebar-header">
-                        <div className="sidebar-search-wrapper">
-                            <input type="text" placeholder="Search here..." className="sidebar-search-input" />
-                            <svg className="sidebar-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        </div>
-                    </div>
-
                     <div className="conversation-sidebar-content">
                         {/* Groups Section - Placeholder for now as backend might not support it yet */}
                         {/* <div className="sidebar-section">

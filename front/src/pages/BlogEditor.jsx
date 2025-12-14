@@ -12,6 +12,8 @@ import hljs from 'highlight.js';
 import 'highlight.js/styles/atom-one-dark.css';
 import { BLOG_CATEGORIES } from '@utils/constants';
 import resolveUrl from '@utils/resolveUrl';
+import NeonBackground from '@components/common/NeonBackground';
+import '@styles/common/AnimeBackground.css';
 
 const turndownService = new TurndownService();
 
@@ -565,10 +567,11 @@ const BlogEditor = () => {
   };
 
   return (
-    <div className="blog-editor-container">
+    <div className="blog-editor-container anime-neon-bg">
+      <NeonBackground />
       {/* Top Header: Title & Main Actions */}
       <div className="blog-editor-header">
-        <button className="blog-editor-back-btn" onClick={() => navigate('/')} title="返回首页">
+        <button className="blog-editor-back-btn" onClick={() => navigate('/', { state: { scrollToCarousel: true } })} title="返回首页">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
         </button>
         

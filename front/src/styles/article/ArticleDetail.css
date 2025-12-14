@@ -23,12 +23,7 @@
 .article-detail-container {
   position: relative;
   z-index: 1;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 40px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+  /* Layout handled by ArticleSidebars.css */
 }
 
 .article-main {
@@ -801,5 +796,6 @@ html.banner-is-hidden .article-cover-wrapper {
  . a r t i c l e - c o n t e n t   h 6   { 
      s c r o l l - m a r g i n - t o p :   c a l c ( 1 5 v h   +   2 0 p x ) ; 
  } 
-  
+ 
+ 
  

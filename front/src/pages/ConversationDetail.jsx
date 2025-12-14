@@ -38,6 +38,17 @@ export default function ConversationDetail({ embeddedOtherId, onConversationSele
     useEffect(() => { otherInfoRef.current = otherInfo; }, [otherInfo]);
 
     const [conversations, setConversations] = useState([]); // 左侧会话摘要列表
+    const [searchTerm, setSearchTerm] = useState('');
+    
+    const filteredConversations = useMemo(() => {
+        if (!searchTerm) return conversations;
+        const lower = searchTerm.toLowerCase();
+        return conversations.filter(c => 
+            (c.nickname || '').toLowerCase().includes(lower) ||
+            String(c.otherId).includes(lower)
+        );
+    }, [conversations, searchTerm]);
+
     const { user } = useAuthState();
     const userId = user?.id || null;
 
@@ -1266,10 +1277,24 @@ export default function ConversationDetail({ embeddedOtherId, onConversationSele
                 {/* 左侧会话列表 */}
                 <aside
                     className="conversation-sidebar"
-                    ref={leftScrollRef}
                     aria-label="会话列表"
                 >
-                    {conversations.map(c => (
+                    <div className="conversation-sidebar-header">
+                        <div className="sidebar-search-wrapper">
+                            <input 
+                                type="text" 
+                                className="sidebar-search-input" 
+                                placeholder="Search conversations..." 
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                            <button className="sidebar-search-btn" title="Search">
+                                🔍
+                            </button>
+                        </div>
+                    </div>
+                    <div className="conversation-sidebar-content" ref={leftScrollRef}>
+                        {filteredConversations.map(c => (
                         <button
                             key={c.otherId}
                             className={`conversation-sidebar-item${String(c.otherId) ===
@@ -1319,6 +1344,7 @@ export default function ConversationDetail({ embeddedOtherId, onConversationSele
                             )}
                         </button>
                     ))}
+                    </div>
                 </aside>
 
                 <div className="conversation-main-content">

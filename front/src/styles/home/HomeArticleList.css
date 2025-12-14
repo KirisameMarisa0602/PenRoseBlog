@@ -94,19 +94,21 @@
     font-size: 0.8rem;
 }
 
-/* Animation for card entry */
-@keyframes fadeInUp {
+/* Animation for card entry - Row by Row Slide In */
+@keyframes slideInRow {
     0% {
         opacity: 0;
-        transform: translateY(40px);
+        transform: translateY(60px) scale(0.95);
     }
     100% {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
     }
 }
 
 .home-article-card {
-    animation: fadeInUp 0.6s cubic-bezier(0.215, 0.610, 0.355, 1.000) backwards;
-    animation-delay: calc(var(--stagger-index) * 0.08s);
+    /* Use a spring-like bezier for smooth "Apple-like" feel */
+    animation: slideInRow 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+    /* Delay based primarily on row index, with slight column stagger */
+    animation-delay: calc(var(--row-index) * 0.15s + var(--col-index) * 0.04s);
 }

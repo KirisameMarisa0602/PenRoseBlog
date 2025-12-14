@@ -4,6 +4,8 @@ import ArticleCard from '@components/common/ArticleCard';
 import UserSearch from './UserSearch'; // Reuse existing UserSearch page component
 import '@styles/home/Home.css'; // Reuse Home styles for article list
 import '@styles/pages/SearchPage.css';
+import NeonBackground from '@components/common/NeonBackground';
+import '@styles/common/AnimeBackground.css';
 
 export default function SearchPage() {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -67,7 +69,8 @@ export default function SearchPage() {
     };
 
     return (
-        <div className="search-page-container">
+        <div className="search-page-container anime-neon-bg">
+            <NeonBackground />
             <div className="search-header">
                 <div className="search-tabs">
                     <button

@@ -8,6 +8,7 @@ import { useAuthState } from '@hooks/useAuthState';
 import { fetchFriendIds, fetchFollowingIds } from '@utils/api/friendService';
 import resolveUrl from '@utils/resolveUrl';
 import { getDefaultAvatar } from '@utils/avatarUtils';
+import NeonBackground from '@components/common/NeonBackground';
 
 export default function UserSearch({ embedded = false, externalKeyword = '', externalMode = 'nickname', searchTrigger = 0 }) {
   const [mode, setMode] = useState('nickname'); // 默认优先按昵称搜索
@@ -80,6 +81,7 @@ export default function UserSearch({ embedded = false, externalKeyword = '', ext
 
   return (
     <div className={embedded ? "user-search-embedded" : "user-search-page"}>
+      {!embedded && <NeonBackground />}
       <div className={embedded ? "user-search-container-embedded" : "user-search-container"}>
         {!embedded && (
           <div className="user-search-controls">

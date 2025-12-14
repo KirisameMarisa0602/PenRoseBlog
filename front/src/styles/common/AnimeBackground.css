@@ -1,0 +1,28 @@
+.anime-neon-bg {
+    /* Fallback */
+    background-color: #f0f2f5;
+    /* Neon Gradient: Pink, Purple, Blue, Cyan - Vibrant Pastels */
+    background: linear-gradient(
+        135deg,
+        #f386ee 0%,
+        #bc64ff 25%,
+        #6942f5 50%,
+        #f73656 75%,
+        #f4b260 100%
+    );
+    background-size: 200% 200%;
+    animation: anime-bg-shift 10s ease infinite;
+    
+    /* Ensure it covers the container */
+    min-height: 100vh;
+    width: 100%;
+    /* Fix for some layouts to ensure background is behind everything */
+    position: relative;
+    z-index: 0;
+}
+
+@keyframes anime-bg-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}

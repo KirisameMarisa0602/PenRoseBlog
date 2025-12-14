@@ -9,13 +9,19 @@ export default function MainLayout({ children, onMaidLoaded }) {
   const location = useLocation();
   const isWelcomePage = location.pathname === '/welcome';
   const isHomePage = location.pathname === '/';
+  const isSearchPage = location.pathname === '/search';
+  const isBlogEditorPage = location.pathname === '/blog-edit';
+
+  // 这些页面不需要顶部导航栏占位（padding-top）
+  const isNoPaddingPage = isHomePage || isSearchPage || isBlogEditorPage;
+
   const mainClassName = isWelcomePage 
     ? 'app-main' 
-    : (isHomePage ? 'app-main app-main--home' : 'app-main app-main--default');
+    : (isNoPaddingPage ? 'app-main app-main--home' : 'app-main app-main--default');
   const [sidebarWidth, setSidebarWidth] = React.useState(0);
 
   return (
-    <div className={`app-layout${isWelcomePage ? ' app-layout--welcome' : (isHomePage ? ' app-layout--home' : '')}`}>
+    <div className={`app-layout${isWelcomePage ? ' app-layout--welcome' : (isNoPaddingPage ? ' app-layout--home' : '')}`}>
       {!isWelcomePage && <BannerNavbar />}
       <div className={mainClassName}>
         {children}
