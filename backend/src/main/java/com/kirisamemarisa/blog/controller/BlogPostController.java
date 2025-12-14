@@ -131,6 +131,7 @@ public class BlogPostController {
 
     @PostMapping("/{id}/withcover")
     public ApiResponse<Boolean> updateWithCover(@PathVariable Long id,
+            @RequestParam(value = "title", required = false) String title,
             @RequestParam(value = "content", required = false) String content,
             @RequestParam(value = "directory", required = false) String directory,
             @RequestParam(value = "categoryName", required = false) String categoryName,
@@ -138,7 +139,8 @@ public class BlogPostController {
             @RequestParam(value = "status", required = false) String status,
             @RequestParam(value = "cover", required = false) MultipartFile cover,
             @RequestParam(value = "removeCover", required = false) Boolean removeCover) {
-        return blogPostService.updateWithCover(id, content, directory, categoryName, tags, status, cover, removeCover);
+        return blogPostService.updateWithCover(id, title, content, directory, categoryName, tags, status, cover,
+                removeCover);
     }
 
     // 新增：删除博客接口

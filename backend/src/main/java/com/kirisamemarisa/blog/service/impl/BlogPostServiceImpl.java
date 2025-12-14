@@ -497,12 +497,16 @@ public class BlogPostServiceImpl implements BlogPostService {
 
     @Override
     @Transactional
-    public ApiResponse<Boolean> updateWithCover(Long id, String content, String directory, String categoryName,
+    public ApiResponse<Boolean> updateWithCover(Long id, String title, String content, String directory,
+            String categoryName,
             java.util.List<String> tags, String status, MultipartFile cover, Boolean removeCover) {
         Optional<BlogPost> opt = blogPostRepository.findById(id);
         if (opt.isEmpty())
             return new ApiResponse<>(404, "博客不存在", false);
         BlogPost post = opt.get();
+        if (title != null && !title.trim().isEmpty()) {
+            post.setTitle(title.trim());
+        }
         if (content != null && !content.trim().isEmpty()) {
             // 1. Extract images from old content
             List<String> oldImages = extractImageUrls(post.getContent());
