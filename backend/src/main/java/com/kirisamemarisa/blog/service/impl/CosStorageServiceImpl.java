@@ -191,9 +191,16 @@ public class CosStorageServiceImpl implements FileStorageService {
                     metadata);
             cosClient.putObject(putObjectRequest);
 
-            // 返回相对路径，前端 resolveUrl 会自动拼接 CDN 域名
-            // 注意：这里返回的必须是 / 开头的路径，或者符合 resolveUrl 的正则
-            return "/" + key;
+            // 返回完整 URL，确保前端能正确访问（尤其是 COS 场景）
+            String cdnUrl = cosProperties.getCdnUrl();
+            if (cdnUrl != null && !cdnUrl.isEmpty()) {
+                if (!cdnUrl.endsWith("/")) {
+                    cdnUrl += "/";
+                }
+                return cdnUrl + key;
+            }
+            return "https://" + cosProperties.getBucketName() + ".cos." + cosProperties.getRegion() + ".myqcloud.com/"
+                    + key;
         } catch (IOException e) {
             logger.error("上传文件到 COS 失败: {}", key, e);
             throw new BusinessException(500, "文件上传失败");

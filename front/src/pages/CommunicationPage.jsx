@@ -813,6 +813,9 @@ export default function CommunicationPage() {
         e.target.value = '';
         if (!file) return;
 
+        // Create blob URL for immediate preview
+        const blobUrl = URL.createObjectURL(file);
+
         const oid = otherId ? String(otherId) : '';
         const uploadUrl = oid
             ? `/messages/upload?otherId=${encodeURIComponent(oid)}`
@@ -833,11 +836,33 @@ export default function CommunicationPage() {
                 otherId // Pass otherId for presigned URL generation
             }).then(dto => {
                 // If user is still on this page, update the list optimistically or via result
-                if (dto && String(dto.receiverId) === String(otherId) || String(dto.senderId) === String(otherId)) {
-                    // The global event 'pm-event' will likely trigger a refresh, 
-                    // but we can also manually update if we want instant feedback.
-                    // For now, we rely on the 'pm-event' dispatched by GlobalUploadContext or the SSE/Poll.
-                    console.log('Background upload completed for current conversation');
+                if (dto && (String(dto.receiverId) === String(otherId) || String(dto.senderId) === String(otherId))) {
+                    setMessages(prev => {
+                        // Avoid duplicates if pm-event handled it first
+                        if (prev.some(m => m.id === dto.id)) return prev;
+
+                        const next = Array.isArray(prev) ? prev.slice() : [];
+                        next.push({
+                            id: dto.id,
+                            senderId: dto.senderId,
+                            receiverId: dto.receiverId,
+                            text: dto.text || '',
+                            mediaUrl: dto.mediaUrl || '',
+                            previewUrl: blobUrl, // Use blobUrl for immediate display
+                            type: dto.type || type,
+                            createdAt: dto.createdAt,
+                            senderNickname: dto.senderNickname || '你',
+                            senderAvatarUrl: dto.senderAvatarUrl || (otherInfo?.avatarUrl || ''),
+                            receiverNickname: dto.receiverNickname || otherInfo?.nickname || '',
+                            receiverAvatarUrl: dto.receiverAvatarUrl || (otherInfo?.avatarUrl || '')
+                        });
+                        return next;
+                    });
+                    
+                    requestAnimationFrame(() => {
+                        const el = rightScrollRef.current;
+                        if (el) el.scrollTop = el.scrollHeight;
+                    });
                 }
             }).catch(err => {
                 console.error('Background upload failed', err);
@@ -1334,10 +1359,10 @@ export default function CommunicationPage() {
 
                                         <div className="conversation-detail-msgtext">
                                             {/* 文本 / 媒体 */}
-                                            {msg?.type === 'IMAGE' && msg?.mediaUrl ? (
+                                            {msg?.type === 'IMAGE' && (msg?.mediaUrl || msg?.previewUrl) ? (
                                                 <img
                                                     className="conversation-detail-msgmedia"
-                                                    src={resolveMessageUrl(msg.mediaUrl)}
+                                                    src={msg.previewUrl || resolveMessageUrl(msg.mediaUrl)}
                                                     alt="image"
                                                     onError={(ev) => {
                                                         const target = ev.target;
@@ -1345,10 +1370,10 @@ export default function CommunicationPage() {
                                                         target.src = '';
                                                     }}
                                                 />
-                                            ) : msg?.type === 'VIDEO' && msg?.mediaUrl ? (
+                                            ) : msg?.type === 'VIDEO' && (msg?.mediaUrl || msg?.previewUrl) ? (
                                                 <video
                                                     className="conversation-detail-msgmedia"
-                                                    src={resolveMessageUrl(msg.mediaUrl)}
+                                                    src={msg.previewUrl || resolveMessageUrl(msg.mediaUrl)}
                                                     controls
                                                     preload="metadata"
                                                     playsInline

@@ -6,7 +6,6 @@ import { getDefaultAvatar } from '../utils/avatarUtils';
 import '@styles/pages/NotificationCenter.css';
 import MessageList from './MessageList';
 import PendingFriendRequests from './PendingFriendRequests';
-import ConversationDetail from './ConversationDetail';
 
 export default function NotificationCenter() {
     const [notifications, setNotifications] = useState([]);
@@ -14,7 +13,6 @@ export default function NotificationCenter() {
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const [activeTab, setActiveTab] = useState('ALL');
-    const [selectedConversationId, setSelectedConversationId] = useState(null);
     const [unreadStatus, setUnreadStatus] = useState({
         ALL: false,
         LIKES: false,
@@ -289,7 +287,7 @@ export default function NotificationCenter() {
                     关注通知
                     {unreadStatus.FOLLOW && <span className="sidebar-badge-dot"></span>}
                 </div>
-                <div className={`notification-sidebar-item ${activeTab === 'MESSAGES' ? 'active' : ''}`} onClick={() => setActiveTab('MESSAGES')}>
+                <div className="notification-sidebar-item" onClick={() => navigate('/messages')}>
                     好友消息
                     {unreadStatus.MESSAGES && <span className="sidebar-badge-dot"></span>}
                 </div>
@@ -301,18 +299,9 @@ export default function NotificationCenter() {
 
             <div className="notification-content-wrapper">
                 <div className="notification-center-container">
-                    {activeTab === 'MESSAGES' ? (
-                        <div className="private-chat-wrapper" style={{ height: '100%', width: '100%', overflow: 'hidden' }}>
-                            <ConversationDetail 
-                                embeddedOtherId={selectedConversationId} 
-                                onConversationSelect={setSelectedConversationId} 
-                            />
-                        </div>
-                    ) : (
-                        <>
-                            {activeTab === 'REQUESTS' && <PendingFriendRequests />}
+                    {activeTab === 'REQUESTS' && <PendingFriendRequests />}
 
-                            <div className="notification-center-header">
+                    <div className="notification-center-header">
                                 <h2>
                                     {activeTab === 'ALL' && '全部通知'}
                                     {activeTab === 'LIKES' && '赞与收藏'}
@@ -345,8 +334,6 @@ export default function NotificationCenter() {
                                     {loading ? '加载中...' : '加载更多'}
                                 </button>
                             )}
-                        </>
-                    )}
                 </div>
             </div>
         </div>

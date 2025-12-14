@@ -9,6 +9,7 @@ import com.kirisamemarisa.blog.repository.PrivateMessageRepository;
 import com.kirisamemarisa.blog.service.FollowService;
 import com.kirisamemarisa.blog.service.FriendService;
 import com.kirisamemarisa.blog.service.PrivateMessageService;
+import com.kirisamemarisa.blog.service.FileStorageService;
 import com.kirisamemarisa.blog.events.MessageEventPublisher;
 import com.kirisamemarisa.blog.service.PrivateMessageDtoService;
 import com.kirisamemarisa.blog.dto.PrivateMessageDTO;
@@ -29,17 +30,20 @@ public class PrivateMessageServiceImpl implements PrivateMessageService {
     private final FriendService friendService;
     private final MessageEventPublisher publisher;
     private final PrivateMessageDtoService dtoService;
+    private final com.kirisamemarisa.blog.service.FileStorageService fileStorageService;
 
     public PrivateMessageServiceImpl(PrivateMessageRepository messageRepository,
             FollowService followService,
             FriendService friendService,
             MessageEventPublisher publisher,
-            PrivateMessageDtoService dtoService) {
+            PrivateMessageDtoService dtoService,
+            com.kirisamemarisa.blog.service.FileStorageService fileStorageService) {
         this.messageRepository = messageRepository;
         this.followService = followService;
         this.friendService = friendService;
         this.publisher = publisher;
         this.dtoService = dtoService;
+        this.fileStorageService = fileStorageService;
     }
 
     @Override
@@ -137,6 +141,18 @@ public class PrivateMessageServiceImpl implements PrivateMessageService {
         if (java.time.Instant.now().minusSeconds(120).isAfter(msg.getCreatedAt())) {
             throw new IllegalStateException("超过2分钟无法撤回");
         }
+
+        // 如果是媒体消息，尝试删除 COS 文件
+        if ((msg.getType() == PrivateMessage.MessageType.IMAGE || msg.getType() == PrivateMessage.MessageType.VIDEO)
+                && msg.getMediaUrl() != null && !msg.getMediaUrl().isEmpty()) {
+            try {
+                fileStorageService.deleteFile(msg.getMediaUrl());
+            } catch (Exception e) {
+                logger.warn("撤回消息时删除文件失败: {}", msg.getMediaUrl(), e);
+                // 不阻断撤回流程
+            }
+        }
+
         msg.setRecalled(true);
         PrivateMessage saved = messageRepository.save(msg);
         try {
@@ -163,13 +179,15 @@ public class PrivateMessageServiceImpl implements PrivateMessageService {
 
     @Override
     public long countUnreadTotal(Long userId) {
-        if (userId == null) return 0L;
+        if (userId == null)
+            return 0L;
         return messageRepository.countUnreadTotal(userId);
     }
 
     @Override
     public int markConversationRead(Long otherUserId, Long meUserId) {
-        if (otherUserId == null || meUserId == null) return 0;
+        if (otherUserId == null || meUserId == null)
+            return 0;
         return messageRepository.markConversationRead(otherUserId, meUserId);
     }
 }
