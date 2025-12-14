@@ -8,11 +8,14 @@ import '../../styles/components/MainLayout.css';
 export default function MainLayout({ children, onMaidLoaded }) {
   const location = useLocation();
   const isWelcomePage = location.pathname === '/welcome';
-  const mainClassName = isWelcomePage ? 'app-main' : 'app-main app-main--default';
+  const isHomePage = location.pathname === '/';
+  const mainClassName = isWelcomePage 
+    ? 'app-main' 
+    : (isHomePage ? 'app-main app-main--home' : 'app-main app-main--default');
   const [sidebarWidth, setSidebarWidth] = React.useState(0);
 
   return (
-    <div className={`app-layout${isWelcomePage ? ' app-layout--welcome' : ''}`}>
+    <div className={`app-layout${isWelcomePage ? ' app-layout--welcome' : (isHomePage ? ' app-layout--home' : '')}`}>
       {!isWelcomePage && <BannerNavbar />}
       <div className={mainClassName}>
         {children}

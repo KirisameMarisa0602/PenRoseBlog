@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '@styles/home/Home.css';
 import '@styles/home/HomeHero.css';
+import HeroSection from '@components/home/HeroSection';
 import HomeSortTabs from '@components/home/HomeSortTabs';
 import HomeCategoryTabs from '@components/home/HomeCategoryTabs';
 import HomeArticleList from '@components/home/HomeArticleList';
@@ -142,6 +143,7 @@ const Home = () => {
 
   return (
     <>
+      <HeroSection />
       <div className="home-page-wrapper">
         <HomeCategoryTabs selectedCategory={selectedCategory} onSelectCategory={handleCategoryChange} />
         
