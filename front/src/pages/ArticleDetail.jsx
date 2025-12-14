@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
-import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useNavigate, useParams, Link, useSearchParams } from 'react-router-dom';
 import { marked } from 'marked';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/atom-one-dark.css';
@@ -11,6 +11,7 @@ import ArticleActions from '@components/article/ArticleActions';
 import CommentsSection from '@components/article/CommentsSection';
 import ForwardFriendsModal from '@components/article/ForwardFriendsModal';
 import { fetchPostDetail, recordPostView, toggleFavorite, sharePost, deletePost } from '@utils/api/postService';
+import { getReply } from '@utils/api/commentService';
 // 评论操作改为使用 useArticleComments 提供的方法
 import useArticleComments from '@hooks/useArticleComments';
 import { fetchFriendsList } from '@utils/api/friendService';
@@ -20,6 +21,9 @@ import ScrollControls from '@components/common/ScrollControls';
 
 export default function ArticleDetail() {
     const { id } = useParams();
+    const [searchParams] = useSearchParams();
+    const targetCommentId = searchParams.get('commentId');
+    const targetReplyId = searchParams.get('replyId');
     const navigate = useNavigate();
     const { user } = useAuthState();
     const userId = user?.id ? String(user.id) : null;
@@ -60,7 +64,7 @@ export default function ArticleDetail() {
 
     // Cover image scroll effect
     // const [coverOpacity, setCoverOpacity] = useState(1);
-    
+
     // TOC State
     const [toc, setToc] = useState([]);
 
@@ -82,6 +86,48 @@ export default function ArticleDetail() {
             setToc(newToc);
         }
     }, [post?.content]);
+
+    // Handle jump to comment/reply
+    useEffect(() => {
+        const handleJump = async () => {
+            if (targetReplyId) {
+                // Fetch reply to get commentId
+                try {
+                    const res = await getReply(targetReplyId);
+                    if (res && res.code === 200 && res.data) {
+                        const reply = res.data;
+                        const commentId = reply.commentId;
+
+                        // Expand replies for this comment
+                        setOpenReplies(prev => ({ ...prev, [commentId]: true }));
+
+                        // Wait for render
+                        setTimeout(() => {
+                            const el = document.getElementById(`reply-${targetReplyId}`);
+                            if (el) {
+                                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                el.classList.add('highlight-comment');
+                                setTimeout(() => el.classList.remove('highlight-comment'), 2000);
+                            }
+                        }, 800);
+                    }
+                } catch (e) { console.error(e); }
+            } else if (targetCommentId) {
+                setTimeout(() => {
+                    const el = document.getElementById(`comment-${targetCommentId}`);
+                    if (el) {
+                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        el.classList.add('highlight-comment');
+                        setTimeout(() => el.classList.remove('highlight-comment'), 2000);
+                    }
+                }, 800);
+            }
+        };
+
+        if (comments.length > 0) {
+            handleJump();
+        }
+    }, [targetCommentId, targetReplyId, comments]);
 
     // useEffect(() => {
     //     const handleScroll = () => {
@@ -109,7 +155,7 @@ export default function ArticleDetail() {
                         // Parse markdown content
                         // Fix headers missing space (e.g. ##Title -> ## Title)
                         let fixedContent = (p.content || '').replace(/(^|\n)(#{1,6})([^\s#])/g, '$1$2 $3');
-                        
+
                         // Fix: Handle headers wrapped in <p> tags (e.g. <p># Title</p> -> <h1>Title</h1>)
                         // This happens when users write markdown in Rich Text Editor
                         fixedContent = fixedContent.replace(/<p>(#{1,6})\s*(.*?)<\/p>/g, (match, hashes, text) => {
@@ -118,7 +164,7 @@ export default function ArticleDetail() {
                         });
 
                         p.content = await marked.parse(fixedContent);
-                        
+
                         // Add IDs to headers for TOC
                         const tempDiv = document.createElement('div');
                         tempDiv.innerHTML = p.content;
@@ -156,7 +202,7 @@ export default function ArticleDetail() {
                     const now = Date.now();
                     const last = Number(localStorage.getItem(key) || 0);
                     const lastAnon = Number(localStorage.getItem(anonKey) || 0);
-                    
+
                     let recentlyViewed = false;
                     if (last && now - last < VIEW_RECORD_EXPIRE_MS) recentlyViewed = true;
                     if (userId && lastAnon && now - lastAnon < VIEW_RECORD_EXPIRE_MS) recentlyViewed = true;
@@ -168,7 +214,7 @@ export default function ArticleDetail() {
                         localStorage.setItem(key, String(now));
                         const payload = { blogPostId: Number(id) };
                         if (userId) payload.userId = Number(userId);
-                        
+
                         const jr = await recordPostView(payload);
                         if (jr && jr.code === 200 && jr.data) {
                             const vc = Number(jr.data.viewCount || 0);
@@ -218,7 +264,7 @@ export default function ArticleDetail() {
         try {
             // getReplies 现在直接返回数组（已在 hook 中处理了 response 结构）
             const rawList = await getReplies(commentId);
-            
+
             const normalized = (rawList || []).map((r) => ({
                 ...(r || {}),
                 likedByCurrentUser: Boolean(
@@ -424,12 +470,12 @@ export default function ArticleDetail() {
                     delete next[commentId];
                     return next;
                 });
-                
+
                 // 稍作延迟再加载，确保后端事务已提交
                 await new Promise(r => setTimeout(r, 200));
 
                 const list = (await loadReplies(commentId)) || [];
-                
+
                 // 更新状态
                 setRepliesMap((prev) => ({ ...prev, [commentId]: list }));
 
@@ -506,7 +552,7 @@ export default function ArticleDetail() {
             const token = localStorage.getItem('token');
             const res = await fetch(
                 `/api/comment/${commentId}/like?userId=${userId}`,
-                { 
+                {
                     method: 'POST',
                     headers: {
                         'Authorization': token ? `Bearer ${token}` : ''
@@ -531,7 +577,7 @@ export default function ArticleDetail() {
             const token = localStorage.getItem('token');
             const res = await fetch(
                 `/api/comment-reply/${replyId}/like?userId=${userId}`,
-                { 
+                {
                     method: 'POST',
                     headers: {
                         'Authorization': token ? `Bearer ${token}` : ''
@@ -608,7 +654,7 @@ export default function ArticleDetail() {
             const token = localStorage.getItem('token');
             const res = await fetch(
                 `/api/blogpost/${id}/like?userId=${userId}`,
-                { 
+                {
                     method: 'POST',
                     headers: {
                         'Authorization': token ? `Bearer ${token}` : ''
@@ -1055,9 +1101,9 @@ export default function ArticleDetail() {
             )}
             <div className="article-detail-container">
                 {/* Left Sidebar: Author Info */}
-                <AuthorSidebar 
-                    post={post} 
-                    currentUserId={userId} 
+                <AuthorSidebar
+                    post={post}
+                    currentUserId={userId}
                 />
 
                 {/* Center: Article Content */}
@@ -1116,10 +1162,10 @@ export default function ArticleDetail() {
                 </article>
 
                 {/* Right Sidebar: TOC & Info */}
-                <ArticleSidebar 
-                    post={post} 
-                    isOwner={isOwner} 
-                    onDelete={handleDeletePost} 
+                <ArticleSidebar
+                    post={post}
+                    isOwner={isOwner}
+                    onDelete={handleDeletePost}
                     toc={toc}
                 />
             </div>
@@ -1141,19 +1187,19 @@ export default function ArticleDetail() {
 const hotHighlightTimers = new Map();
 
 function addHotHighlight(el) {
-  if (!el) return;
-  const key = el.id || `${Math.random()}`;
-  // 如果已有计时器，先清除旧计时器（重置高亮时长�?
+    if (!el) return;
+    const key = el.id || `${Math.random()}`;
+    // 如果已有计时器，先清除旧计时器（重置高亮时长�?
     if (hotHighlightTimers.has(key)) {
         try { clearTimeout(hotHighlightTimers.get(key)); } catch (err) { void err; }
     }
     // �?class（如果已存在也没关系），然后设置新的移除计时�?
     try { el.classList.add('hot-highlight'); } catch (err) { void err; }
-  const t = setTimeout(() => {
+    const t = setTimeout(() => {
         try { el.classList.remove('hot-highlight'); } catch (err) { void err; }
-    hotHighlightTimers.delete(key);
-  }, 2600);
-  hotHighlightTimers.set(key, t);
+        hotHighlightTimers.delete(key);
+    }, 2600);
+    hotHighlightTimers.set(key, t);
 }
 
 function clearAllHotHighlights() {

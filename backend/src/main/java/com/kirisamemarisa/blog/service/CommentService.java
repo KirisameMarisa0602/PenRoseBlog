@@ -12,4 +12,5 @@ public interface CommentService {
     ApiResponse<Boolean> deleteComment(Long commentId, Long userId);
     ApiResponse<Boolean> toggleLike(Long commentId, Long userId);
     PageResult<CommentDTO> pageComments(Long blogPostId, int page, int size, Long currentUserId);
+    CommentDTO getCommentById(Long commentId);
 }

@@ -33,3 +33,13 @@ export async function fetchReplies(commentId, params = {}) {
   });
   return response.data;
 }
+
+export async function getComment(commentId) {
+  const response = await httpClient.get(`/comment/${commentId}`);
+  return response.data;
+}
+
+export async function getReply(replyId) {
+  const response = await httpClient.get(`/comment-reply/${replyId}`);
+  return response.data;
+}

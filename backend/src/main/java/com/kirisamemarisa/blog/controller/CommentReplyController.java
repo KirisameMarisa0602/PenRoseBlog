@@ -44,4 +44,13 @@ public class CommentReplyController {
     public ApiResponse<Boolean> toggleLike(@PathVariable Long replyId, @RequestParam Long userId) {
         return commentReplyService.toggleLike(replyId, userId);
     }
+
+    @GetMapping("/{replyId}")
+    public ApiResponse<CommentReplyDTO> getReply(@PathVariable Long replyId) {
+        CommentReplyDTO dto = commentReplyService.getReplyById(replyId);
+        if (dto == null) {
+            return new ApiResponse<>(404, "回复不存在", null);
+        }
+        return new ApiResponse<>(200, "获取成功", dto);
+    }
 }

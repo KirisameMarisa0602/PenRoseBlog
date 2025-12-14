@@ -14,4 +14,6 @@ public interface CommentReplyService {
     ApiResponse<Boolean> deleteReply(Long replyId, Long userId);
 
     ApiResponse<Boolean> toggleLike(Long replyId, Long userId);
+
+    CommentReplyDTO getReplyById(Long replyId);
 }

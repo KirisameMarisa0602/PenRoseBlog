@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { notificationApi } from '../utils/api/notificationApi';
+import { getComment, getReply } from '../utils/api/commentService';
 import { useNavigate } from 'react-router-dom';
 import resolveUrl from '../utils/resolveUrl';
 import { getDefaultAvatar } from '../utils/avatarUtils';
@@ -119,13 +120,13 @@ export default function NotificationCenter() {
                 }
                 return { ...prev, [activeTab]: false };
             });
-            
+
             const userId = localStorage.getItem('userId');
             if (userId) {
                 localStorage.setItem(`notification_unread_count_${userId}`, '0');
                 window.dispatchEvent(new Event('pm-unread-refresh'));
             }
-            
+
             // Force reload stats to ensure sync
             setTimeout(() => {
                 const checkUnread = async () => {
@@ -171,14 +172,50 @@ export default function NotificationCenter() {
             }
         }
 
-        if (note.type === 'POST_LIKE' || note.type === 'POST_FAVORITE' || note.type === 'POST_COMMENT') {
-            navigate(`/post/${note.referenceId}`);
-        } else if (note.type === 'COMMENT_REPLY' || note.type === 'COMMENT_LIKE' || note.type === 'REPLY_LIKE') {
-            navigate(`/post/${note.referenceId}`);
+        let targetPath = null;
+
+        if (note.type === 'POST_LIKE' || note.type === 'POST_FAVORITE') {
+            if (note.referenceId) targetPath = `/post/${note.referenceId}`;
+        } else if (note.type === 'POST_COMMENT') {
+            if (note.referenceId) {
+                targetPath = `/post/${note.referenceId}?commentId=${note.referenceExtraId}`;
+            }
+        } else if (note.type === 'COMMENT_LIKE') {
+            if (note.referenceId) {
+                targetPath = `/post/${note.referenceId}?commentId=${note.referenceExtraId}`;
+            } else if (note.referenceExtraId) {
+                // Fallback
+                try {
+                    const res = await getComment(note.referenceExtraId);
+                    if (res && res.code === 200 && res.data) {
+                        targetPath = `/post/${res.data.blogPostId}?commentId=${note.referenceExtraId}`;
+                    }
+                } catch (e) { console.error(e); }
+            }
+        } else if (note.type === 'COMMENT_REPLY' || note.type === 'REPLY_LIKE') {
+            if (note.referenceId) {
+                targetPath = `/post/${note.referenceId}?replyId=${note.referenceExtraId}`;
+            } else if (note.referenceExtraId) {
+                // Fallback
+                try {
+                    const res = await getReply(note.referenceExtraId);
+                    if (res && res.code === 200 && res.data) {
+                        const reply = res.data;
+                        const commentRes = await getComment(reply.commentId);
+                        if (commentRes && commentRes.code === 200 && commentRes.data) {
+                            targetPath = `/post/${commentRes.data.blogPostId}?replyId=${note.referenceExtraId}`;
+                        }
+                    }
+                } catch (e) { console.error(e); }
+            }
         } else if (note.type === 'FRIEND_REQUEST') {
             // Already in REQUESTS tab or will stay there
         } else if (note.type === 'FOLLOW') {
-            navigate(`/selfspace?userId=${note.senderId}`);
+            targetPath = `/selfspace?userId=${note.senderId}`;
+        }
+
+        if (targetPath) {
+            navigate(targetPath);
         }
     };
 
@@ -236,20 +273,20 @@ export default function NotificationCenter() {
                 actionText = '新通知';
         }
 
-        const avatarUrl = note.senderAvatarUrl 
-            ? resolveUrl(note.senderAvatarUrl) 
+        const avatarUrl = note.senderAvatarUrl
+            ? resolveUrl(note.senderAvatarUrl)
             : getDefaultAvatar(note.senderId);
 
         return (
             <div className={`notification-item ${!note.read ? 'unread' : ''}`} key={note.requestId || note.id} onClick={() => handleNotificationClick(note)}>
                 <div className="notification-avatar">
-                    <img 
-                        src={avatarUrl} 
-                        alt="avatar" 
-                        onError={(e) => { 
-                            e.target.onerror = null; 
-                            e.target.src = getDefaultAvatar(note.senderId); 
-                        }} 
+                    <img
+                        src={avatarUrl}
+                        alt="avatar"
+                        onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = getDefaultAvatar(note.senderId);
+                        }}
                     />
                 </div>
                 <div className="notification-content">
@@ -302,38 +339,38 @@ export default function NotificationCenter() {
                     {activeTab === 'REQUESTS' && <PendingFriendRequests />}
 
                     <div className="notification-center-header">
-                                <h2>
-                                    {activeTab === 'ALL' && '全部通知'}
-                                    {activeTab === 'LIKES' && '赞与收藏'}
-                                    {activeTab === 'COMMENTS' && '评论与回复'}
-                                    {activeTab === 'FOLLOW' && '关注通知'}
-                                    {activeTab === 'REQUESTS' && '申请记录'}
-                                </h2>
-                                <button className="mark-read-btn" onClick={markAllRead}>
-                                    {/* <img src={resolveUrl('/icons/message/read.svg')} alt="" style={{ width: 16, height: 16 }} onError={(e) => { e.target.style.display = 'none'; }} /> */}
-                                    全部已读
-                                </button>
-                            </div>
+                        <h2>
+                            {activeTab === 'ALL' && '全部通知'}
+                            {activeTab === 'LIKES' && '赞与收藏'}
+                            {activeTab === 'COMMENTS' && '评论与回复'}
+                            {activeTab === 'FOLLOW' && '关注通知'}
+                            {activeTab === 'REQUESTS' && '申请记录'}
+                        </h2>
+                        <button className="mark-read-btn" onClick={markAllRead}>
+                            {/* <img src={resolveUrl('/icons/message/read.svg')} alt="" style={{ width: 16, height: 16 }} onError={(e) => { e.target.style.display = 'none'; }} /> */}
+                            全部已读
+                        </button>
+                    </div>
 
-                            <div className="notification-list">
-                                {notifications.length === 0 && !loading ? (
-                                    <div className="no-notifications">
-                                        <img 
-                                            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%23a0c4ff' d='M32 2C15.4 2 2 15.4 2 32s13.4 30 30 30 30-13.4 30-30S48.6 2 32 2zm0 56C17.6 58 6 46.4 6 32S17.6 6 32 6s26 11.6 26 26-11.6 26-26 26z'/%3E%3Cpath fill='%23ffadad' d='M44 24H20c-2.2 0-4 1.8-4 4v16c0 2.2 1.8 4 4 4h24c2.2 0 4-1.8 4-4V28c0-2.2-1.8-4-4-4zm0 20H20V28h24v16z'/%3E%3Cpath fill='%23bdb2ff' d='M32 38l-12-8h24l-12 8z'/%3E%3C/svg%3E" 
-                                            alt="暂无通知" 
-                                            style={{ width: 120, height: 120, opacity: 0.8, marginBottom: 16 }} 
-                                        />
-                                        <div>暂无通知</div>
-                                    </div>
-                                ) : (
-                                    notifications.map(renderNotificationItem)
-                                )}
+                    <div className="notification-list">
+                        {notifications.length === 0 && !loading ? (
+                            <div className="no-notifications">
+                                <img
+                                    src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%23a0c4ff' d='M32 2C15.4 2 2 15.4 2 32s13.4 30 30 30 30-13.4 30-30S48.6 2 32 2zm0 56C17.6 58 6 46.4 6 32S17.6 6 32 6s26 11.6 26 26-11.6 26-26 26z'/%3E%3Cpath fill='%23ffadad' d='M44 24H20c-2.2 0-4 1.8-4 4v16c0 2.2 1.8 4 4 4h24c2.2 0 4-1.8 4-4V28c0-2.2-1.8-4-4-4zm0 20H20V28h24v16z'/%3E%3Cpath fill='%23bdb2ff' d='M32 38l-12-8h24l-12 8z'/%3E%3C/svg%3E"
+                                    alt="暂无通知"
+                                    style={{ width: 120, height: 120, opacity: 0.8, marginBottom: 16 }}
+                                />
+                                <div>暂无通知</div>
                             </div>
-                            {hasMore && notifications.length > 0 && (
-                                <button className="load-more-btn" onClick={handleLoadMore} disabled={loading}>
-                                    {loading ? '加载中...' : '加载更多'}
-                                </button>
-                            )}
+                        ) : (
+                            notifications.map(renderNotificationItem)
+                        )}
+                    </div>
+                    {hasMore && notifications.length > 0 && (
+                        <button className="load-more-btn" onClick={handleLoadMore} disabled={loading}>
+                            {loading ? '加载中...' : '加载更多'}
+                        </button>
+                    )}
                 </div>
             </div>
         </div>

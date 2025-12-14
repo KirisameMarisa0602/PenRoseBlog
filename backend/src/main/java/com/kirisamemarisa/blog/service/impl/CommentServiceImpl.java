@@ -81,8 +81,8 @@ public class CommentServiceImpl implements CommentService {
                     n.setReceiverId(ownerId);
                     n.setMessage("你的文章《" + safeTitle(blogPost.getTitle()) + "》收到了新的评论");
                     n.setCreatedAt(Instant.now());
-                    n.setReferenceId(comment.getId()); // 评论ID
-                    n.setReferenceExtraId(blogPost.getId()); // 文章ID
+                    n.setReferenceId(blogPost.getId()); // 文章ID
+                    n.setReferenceExtraId(comment.getId()); // 评论ID
 
                     // 填充发送者信息
                     UserProfile up = userProfileRepository.findById(commenterId).orElse(null);
@@ -216,10 +216,8 @@ public class CommentServiceImpl implements CommentService {
                         n.setReceiverId(authorId);
                         n.setMessage("你的评论收到了一个点赞");
                         n.setCreatedAt(Instant.now());
-                        n.setReferenceId(comment.getId());
-                        if (comment.getBlogPost() != null) {
-                            n.setReferenceExtraId(comment.getBlogPost().getId());
-                        }
+                        n.setReferenceId(comment.getBlogPost() != null ? comment.getBlogPost().getId() : null);
+                        n.setReferenceExtraId(comment.getId());
 
                         // 填充发送者信息
                         UserProfile up = userProfileRepository.findById(likerId).orElse(null);
@@ -242,5 +240,20 @@ public class CommentServiceImpl implements CommentService {
         if (title == null)
             return "";
         return title.length() > 50 ? title.substring(0, 50) + "..." : title;
+    }
+
+    @Override
+    public CommentDTO getCommentById(Long commentId) {
+        Optional<Comment> opt = commentRepository.findById(commentId);
+        if (opt.isEmpty()) return null;
+        Comment comment = opt.get();
+        CommentDTO dto = commentMapper.toDTO(comment);
+        // 填充用户信息
+        UserProfile profile = userProfileRepository.findById(comment.getUser().getId()).orElse(null);
+        if (profile != null) {
+            dto.setNickname(profile.getNickname());
+            dto.setAvatarUrl(profile.getAvatarUrl());
+        }
+        return dto;
     }
 }

@@ -95,8 +95,8 @@ public class CommentReplyServiceImpl implements CommentReplyService {
                                                n.setMessage("你的评论收到了新的回复");
                                                n.setCreatedAt(Instant.now());
                                                 // 关键：统一约定
-                                                        n.setReferenceId(reply.getId());     // 回复 ID（前端可视为“被高亮的评论/回复 ID”）
-                                                n.setReferenceExtraId(blogPostId);   // 文章 ID
+                                                n.setReferenceId(blogPostId);        // 文章 ID
+                                                n.setReferenceExtraId(reply.getId()); // 回复 ID
                                                 notificationService.sendNotification(commentAuthorId, n);
                                             }
                                     }
@@ -202,8 +202,8 @@ public class CommentReplyServiceImpl implements CommentReplyService {
                                                 n.setReceiverId(authorId);
                                                 n.setMessage("你的回复收到了一个点赞");
                                                 n.setCreatedAt(Instant.now());
-                                                n.setReferenceId(reply.getId());    // 被点赞的回复 ID
-                                                n.setReferenceExtraId(blogPostId);  // 所在文章 ID
+                                                n.setReferenceId(blogPostId);       // 所在文章 ID
+                                                n.setReferenceExtraId(reply.getId()); // 被点赞的回复 ID
                                                 notificationService.sendNotification(authorId, n);
                                             }
                                     }
@@ -212,5 +212,21 @@ public class CommentReplyServiceImpl implements CommentReplyService {
 
             return new ApiResponse<>(200, "点赞成功", true);
         }
+    }
+
+    @Override
+    public CommentReplyDTO getReplyById(Long replyId) {
+        Optional<CommentReply> opt = replyRepository.findById(replyId);
+        if (opt.isEmpty()) return null;
+        CommentReply reply = opt.get();
+        CommentReplyDTO dto = replyMapper.toDTO(reply);
+        
+        // Fill user info
+        UserProfile profile = userProfileRepository.findById(reply.getUser().getId()).orElse(null);
+        if (profile != null) {
+            dto.setNickname(profile.getNickname());
+            dto.setAvatarUrl(profile.getAvatarUrl());
+        }
+        return dto;
     }
 }

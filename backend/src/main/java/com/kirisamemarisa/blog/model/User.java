@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 // 用户表结构
 public class User {
     private static final Logger logger = LoggerFactory.getLogger(User.class);

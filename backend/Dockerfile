@@ -10,7 +10,7 @@ RUN mkdir -p /root/.m2 && \
     <mirrors> \
         <mirror> \
             <id>aliyunmaven</id> \
-            <mirrorOf>*</mirrorOf> \
+            <mirrorOf>*,!spring-milestones,!spring-snapshots,!spring-release-plugins,!spring-milestone-plugins</mirrorOf> \
             <name>Aliyun Public Repository</name> \
             <url>https://maven.aliyun.com/repository/public</url> \
         </mirror> \
@@ -21,7 +21,7 @@ COPY pom.xml .
 # Download dependencies first to cache them
 RUN mvn dependency:go-offline -B
 COPY src ./src
-RUN mvn clean package -DskipTests
+RUN mvn clean package -DskipTests -T 1C
 
 # Run stage
 FROM openjdk:17-jdk-slim
