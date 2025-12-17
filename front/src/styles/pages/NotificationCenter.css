@@ -5,8 +5,6 @@
     max-width: 100%;
     margin: 0;
     margin-top: var(--navH, 60px);
-    /* Add margin to avoid overlap with fixed navbar */
-    height: calc(100vh - var(--navH));
     min-height: 0 !important;
     /* Override anime-neon-bg */
     padding: 20px 40px;
