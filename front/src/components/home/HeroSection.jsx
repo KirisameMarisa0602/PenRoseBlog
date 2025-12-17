@@ -81,8 +81,8 @@ const HeroSection = () => {
 
       <div className="hero-content">
         {/* Content can be added here later, e.g., title, subtitle */}
-        <h1 className="hero-title">Lovely Firefly!</h1>
-        <p className="hero-subtitle">In Reddened Chrysalis, I Once Rest</p>
+        <h1 className="hero-title">Welcome to PenRoseBlog!</h1>
+        <p className="hero-subtitle">Enjoy yourself</p>
       </div>
       
       <div className="hero-scroll-down" onClick={scrollToContent}>
