@@ -50,10 +50,8 @@ public class UserController {
     // 更新用户个人信息
     @PutMapping("/profile/{userId}")
     public ApiResponse<Void> updateProfile(@PathVariable Long userId,
-            @RequestBody @Valid UserProfileDTO userProfileDTO,
-            @RequestHeader(value = "Authorization", required = false) String authHeader) {
-        String token = (authHeader != null && authHeader.startsWith("Bearer ")) ? authHeader.substring(7) : authHeader;
-        Long currentUserId = com.kirisamemarisa.blog.common.JwtUtil.getUserIdFromToken(token);
+            @RequestBody @Valid UserProfileDTO userProfileDTO) {
+        Long currentUserId = com.kirisamemarisa.blog.common.JwtUtil.getCurrentUserId();
         if (currentUserId == null || !currentUserId.equals(userId)) {
             return new ApiResponse<>(403, "无权修改他人资料", null);
         }
@@ -65,10 +63,8 @@ public class UserController {
     // 上传用户头像
     @PostMapping("/profile/{userId}/avatar")
     public ApiResponse<String> uploadAvatar(@PathVariable Long userId,
-            @RequestParam("file") MultipartFile file,
-            @RequestHeader(value = "Authorization", required = false) String authHeader) {
-        String token = (authHeader != null && authHeader.startsWith("Bearer ")) ? authHeader.substring(7) : authHeader;
-        Long currentUserId = com.kirisamemarisa.blog.common.JwtUtil.getUserIdFromToken(token);
+            @RequestParam("file") MultipartFile file) {
+        Long currentUserId = com.kirisamemarisa.blog.common.JwtUtil.getCurrentUserId();
         if (currentUserId == null || !currentUserId.equals(userId)) {
             return new ApiResponse<>(403, "无权修改他人资料", null);
         }
@@ -79,10 +75,8 @@ public class UserController {
     // 上传用户背景
     @PostMapping("/profile/{userId}/background")
     public ApiResponse<String> uploadBackground(@PathVariable Long userId,
-            @RequestParam("file") MultipartFile file,
-            @RequestHeader(value = "Authorization", required = false) String authHeader) {
-        String token = (authHeader != null && authHeader.startsWith("Bearer ")) ? authHeader.substring(7) : authHeader;
-        Long currentUserId = com.kirisamemarisa.blog.common.JwtUtil.getUserIdFromToken(token);
+            @RequestParam("file") MultipartFile file) {
+        Long currentUserId = com.kirisamemarisa.blog.common.JwtUtil.getCurrentUserId();
         if (currentUserId == null || !currentUserId.equals(userId)) {
             return new ApiResponse<>(403, "无权修改他人资料", null);
         }
@@ -93,10 +87,8 @@ public class UserController {
     // 上传QQ二维码
     @PostMapping("/profile/{userId}/qq-qrcode")
     public ApiResponse<String> uploadQqQrCode(@PathVariable Long userId,
-            @RequestParam("file") MultipartFile file,
-            @RequestHeader(value = "Authorization", required = false) String authHeader) {
-        String token = (authHeader != null && authHeader.startsWith("Bearer ")) ? authHeader.substring(7) : authHeader;
-        Long currentUserId = com.kirisamemarisa.blog.common.JwtUtil.getUserIdFromToken(token);
+            @RequestParam("file") MultipartFile file) {
+        Long currentUserId = com.kirisamemarisa.blog.common.JwtUtil.getCurrentUserId();
         if (currentUserId == null || !currentUserId.equals(userId)) {
             return new ApiResponse<>(403, "无权修改他人资料", null);
         }
@@ -107,10 +99,8 @@ public class UserController {
     // 上传微信二维码
     @PostMapping("/profile/{userId}/wechat-qrcode")
     public ApiResponse<String> uploadWechatQrCode(@PathVariable Long userId,
-            @RequestParam("file") MultipartFile file,
-            @RequestHeader(value = "Authorization", required = false) String authHeader) {
-        String token = (authHeader != null && authHeader.startsWith("Bearer ")) ? authHeader.substring(7) : authHeader;
-        Long currentUserId = com.kirisamemarisa.blog.common.JwtUtil.getUserIdFromToken(token);
+            @RequestParam("file") MultipartFile file) {
+        Long currentUserId = com.kirisamemarisa.blog.common.JwtUtil.getCurrentUserId();
         if (currentUserId == null || !currentUserId.equals(userId)) {
             return new ApiResponse<>(403, "无权修改他人资料", null);
         }
@@ -120,10 +110,8 @@ public class UserController {
 
     // 修改密码
     @PostMapping("/change-password")
-    public ApiResponse<Void> changePassword(@RequestBody @Valid ChangePasswordDTO dto,
-            @RequestHeader(value = "Authorization", required = false) String authHeader) {
-        String token = (authHeader != null && authHeader.startsWith("Bearer ")) ? authHeader.substring(7) : authHeader;
-        Long currentUserId = com.kirisamemarisa.blog.common.JwtUtil.getUserIdFromToken(token);
+    public ApiResponse<Void> changePassword(@RequestBody @Valid ChangePasswordDTO dto) {
+        Long currentUserId = com.kirisamemarisa.blog.common.JwtUtil.getCurrentUserId();
         if (currentUserId == null) {
             return new ApiResponse<>(401, "未登录", null);
         }

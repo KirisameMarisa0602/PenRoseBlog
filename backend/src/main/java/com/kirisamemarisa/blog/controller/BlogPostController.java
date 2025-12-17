@@ -28,12 +28,17 @@ public class BlogPostController {
 
     @PostMapping
     public ApiResponse<Long> create(@RequestBody BlogPostCreateDTO dto) {
+        Long currentUserId = com.kirisamemarisa.blog.common.JwtUtil.getCurrentUserId();
+        if (currentUserId == null) {
+            return new ApiResponse<>(401, "未登录", null);
+        }
+        dto.setUserId(currentUserId);
         return blogPostService.create(dto);
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<BlogPostDTO> get(@PathVariable Long id,
-            @RequestParam(required = false) Long currentUserId) {
+    public ApiResponse<BlogPostDTO> get(@PathVariable Long id) {
+        Long currentUserId = com.kirisamemarisa.blog.common.JwtUtil.getCurrentUserId();
         BlogPostDTO dto = blogPostService.getById(id, currentUserId);
         if (dto == null) {
             return new ApiResponse<>(404, "博客不存在", null);
@@ -48,8 +53,8 @@ public class BlogPostController {
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) String directory,
             @RequestParam(required = false) String categoryName,
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) Long currentUserId) {
+            @RequestParam(required = false) String status) {
+        Long currentUserId = com.kirisamemarisa.blog.common.JwtUtil.getCurrentUserId();
         PageResult<BlogPostDTO> result = blogPostService.search(keyword, userId, directory, categoryName, status, page,
                 size,
                 currentUserId);
@@ -81,20 +86,30 @@ public class BlogPostController {
     }
 
     @PostMapping("/{id}/like")
-    public ApiResponse<Boolean> toggleLike(@PathVariable Long id,
-            @RequestParam Long userId) {
-        return blogPostService.toggleLike(id, userId);
+    public ApiResponse<Boolean> toggleLike(@PathVariable Long id) {
+        Long currentUserId = com.kirisamemarisa.blog.common.JwtUtil.getCurrentUserId();
+        if (currentUserId == null) {
+            return new ApiResponse<>(401, "未登录", null);
+        }
+        return blogPostService.toggleLike(id, currentUserId);
     }
 
     @PostMapping("/{id}/favorite")
-    public ApiResponse<Boolean> toggleFavorite(@PathVariable Long id,
-            @RequestParam Long userId) {
-        return blogPostService.toggleFavorite(id, userId);
+    public ApiResponse<Boolean> toggleFavorite(@PathVariable Long id) {
+        Long currentUserId = com.kirisamemarisa.blog.common.JwtUtil.getCurrentUserId();
+        if (currentUserId == null) {
+            return new ApiResponse<>(401, "未登录", null);
+        }
+        return blogPostService.toggleFavorite(id, currentUserId);
     }
 
     @PostMapping("/{id}/share")
-    public ApiResponse<Boolean> share(@PathVariable Long id, @RequestParam(required = false) Long userId) {
-        return blogPostService.share(id, userId);
+    public ApiResponse<Boolean> share(@PathVariable Long id) {
+        Long currentUserId = com.kirisamemarisa.blog.common.JwtUtil.getCurrentUserId();
+        if (currentUserId == null) {
+            return new ApiResponse<>(401, "未登录", null);
+        }
+        return blogPostService.share(id, currentUserId);
     }
 
     @PostMapping("/comment")

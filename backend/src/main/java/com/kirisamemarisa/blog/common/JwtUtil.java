@@ -119,4 +119,26 @@ public class JwtUtil {
             return false;
         }
     }
+
+    /**
+     * 从 SecurityContext 中获取当前登录用户 ID
+     * @return userId or null if not authenticated
+     */
+    public static Long getCurrentUserId() {
+        try {
+            org.springframework.security.core.Authentication authentication = 
+                org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.getPrincipal() != null) {
+                Object principal = authentication.getPrincipal();
+                if (principal instanceof Long) {
+                    return (Long) principal;
+                }
+                // 兼容处理：如果 Principal 是 UserDetails 或其他类型，尝试转换
+                // 但在 JwtAuthenticationFilter 中我们明确设置了 Long 类型的 principal
+            }
+        } catch (Exception e) {
+            logger.warn("[JWT] Failed to get current user id from context", e);
+        }
+        return null;
+    }
 }

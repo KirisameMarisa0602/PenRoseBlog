@@ -52,11 +52,16 @@ public class SecurityConfig {
     public CorsFilter corsFilter() {
         // 跨域资源共享配置对象
         CorsConfiguration config = new CorsConfiguration();
-        config.addAllowedOriginPattern("*"); // 允许所有来源（域名）
+        // 限制允许的来源
+        config.setAllowedOriginPatterns(java.util.Arrays.asList(
+            "http://localhost*", 
+            "http://127.0.0.1*", 
+            "http://62.234.102.189*"
+        ));
         config.addAllowedHeader("*"); // 允许所有请求头
         config.addAllowedMethod("*"); // 允许所有请求方法
         // 与通配来源同时开启凭证将导致浏览器拒绝；Bearer Token 方案无需 Cookie
-        config.setAllowCredentials(false);
+        config.setAllowCredentials(true); // 允许凭证（如果前端需要发送 Cookie 或认证头）
         // 定义基于URL的跨域配置源
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         // 将跨域配置应用到所有URL路径
