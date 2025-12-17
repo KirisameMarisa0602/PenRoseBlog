@@ -1,5 +1,5 @@
 import React, { Suspense, lazy, useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AiAssistantProvider } from './contexts/AiAssistantContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { GlobalUploadProvider } from './contexts/GlobalUploadContext';
@@ -24,6 +24,7 @@ const SecurityCenter = lazy(() => import('./pages/SecurityCenter'));
 const Loading = lazy(() => import('./pages/Loading'));
 
 function AppContent() {
+	const location = useLocation();
 	const [isLoading, setIsLoading] = useState(true);
 	const [maidLoaded, setMaidLoaded] = useState(false);
 	const [contentPreloaded, setContentPreloaded] = useState(false);
@@ -34,50 +35,52 @@ function AppContent() {
 
 	// 检查是否可以结束 Loading
 	useEffect(() => {
-		if (maidLoaded && contentPreloaded) {
+		const isWelcome = location.pathname === '/welcome';
+		const maidReady = isWelcome || maidLoaded;
+		if (maidReady && contentPreloaded) {
 			setIsLoading(false);
 		}
-	}, [maidLoaded, contentPreloaded]);
+	}, [maidLoaded, contentPreloaded, location.pathname]);
 
-	// 5秒兜底
+	// 10秒兜底
 	useEffect(() => {
 		const timer = setTimeout(() => {
 			setIsLoading(false);
-		}, 5000);
+		}, 10000);
 		return () => clearTimeout(timer);
 	}, []);
 
 	return (
 		<ThemeProvider>
-		<BackgroundProvider>
-		<GlobalUploadProvider>
-			<AiAssistantProvider>
-				{isLoading && <Loading onReady={handleContentPreloaded} />}
-				<MainLayout onMaidLoaded={handleMaidLoaded}>
-					<Suspense fallback={null}>
-						<Routes>
-							<Route path="/" element={<Home />} />
-							<Route path="/home" element={<Home />} />
-							<Route path="/welcome" element={<Welcome />} />
-							<Route path="/selfspace" element={<SelfSpace />} />
-							<Route path="/blog-edit" element={<BlogEditor />} />
-							<Route path="/post/:id" element={<ArticleDetail />} />
-							<Route path="/messages" element={<CommunicationPage />} />
-							<Route path="/conversation/:otherId" element={<CommunicationPage />} />
-							<Route path="/friends/pending" element={<PendingFriendRequests />} />
-							<Route path="/friends" element={<CommunicationPage />} />
-							<Route path="/follows" element={<FollowingList />} />
-							<Route path="/favorites" element={<FavoritesPage />} />
-							<Route path="/search" element={<SearchPage />} />
-							<Route path="/notifications" element={<NotificationCenter />} />
-							<Route path="/security" element={<SecurityCenter />} />
-							<Route path="/users/search" element={<UserSearch />} />
-						</Routes>
-					</Suspense>
-				</MainLayout>
-			</AiAssistantProvider>
-		</GlobalUploadProvider>
-		</BackgroundProvider>
+			<BackgroundProvider>
+				<GlobalUploadProvider>
+					<AiAssistantProvider>
+						{isLoading && <Loading onReady={handleContentPreloaded} />}
+						<MainLayout onMaidLoaded={handleMaidLoaded}>
+							<Suspense fallback={null}>
+								<Routes>
+									<Route path="/" element={<Home />} />
+									<Route path="/home" element={<Home />} />
+									<Route path="/welcome" element={<Welcome />} />
+									<Route path="/selfspace" element={<SelfSpace />} />
+									<Route path="/blog-edit" element={<BlogEditor />} />
+									<Route path="/post/:id" element={<ArticleDetail />} />
+									<Route path="/messages" element={<CommunicationPage />} />
+									<Route path="/conversation/:otherId" element={<CommunicationPage />} />
+									<Route path="/friends/pending" element={<PendingFriendRequests />} />
+									<Route path="/friends" element={<CommunicationPage />} />
+									<Route path="/follows" element={<FollowingList />} />
+									<Route path="/favorites" element={<FavoritesPage />} />
+									<Route path="/search" element={<SearchPage />} />
+									<Route path="/notifications" element={<NotificationCenter />} />
+									<Route path="/security" element={<SecurityCenter />} />
+									<Route path="/users/search" element={<UserSearch />} />
+								</Routes>
+							</Suspense>
+						</MainLayout>
+					</AiAssistantProvider>
+				</GlobalUploadProvider>
+			</BackgroundProvider>
 		</ThemeProvider>
 	);
 }

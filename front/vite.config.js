@@ -15,7 +15,7 @@ export default ({ mode }) => {
 
   // 开发环境默认后端端口与 docker-compose/backend 保持一致：8081
   // 如需调整请在 .env.development 设置 VITE_BACKEND_ORIGIN
-  const backendTarget = env.VITE_BACKEND_ORIGIN || 'http://localhost:8081';
+  const backendTarget = env.VITE_BACKEND_ORIGIN || 'http://localhost:8080';
 
   return defineConfig({
     plugins: [react()],
@@ -80,6 +80,17 @@ export default ({ mode }) => {
         // 注意：本地开发时，不要在此处添加 /live2dsrc 的代理。
         // 因为配置了 publicDir: '../site_assets'，Vite 会自动处理 live2d 资源。
         // 如果添加了代理，请求会被错误转发到后端导致 404。
+      }
+    },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+            'editor-vendor': ['@tiptap/react', '@tiptap/starter-kit'],
+            'pixi-vendor': ['pixi.js', 'pixi-live2d-display']
+          }
+        }
       }
     }
   });

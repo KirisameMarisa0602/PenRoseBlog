@@ -108,9 +108,9 @@ export default function Loading({ onReady }) {
     const to = location.pathname + location.search;
     let stopped = false;
     (async () => {
-      // 资源加载优先：若预加载先完成则立即进入；否则 5 秒后兜底跳转
+      // 资源加载优先：若预加载先完成则立即进入；否则由 App.jsx 的 10 秒兜底处理
       const preloadTask = preloadForPath(to);
-      await Promise.race([preloadTask, wait(5000)]);
+      await preloadTask;
       if (!stopped && onReady) onReady();
     })();
     return () => { stopped = true; };
