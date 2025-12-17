@@ -8,12 +8,12 @@ RUN mkdir -p /root/.m2 && \
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" \
     xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd"> \
     <mirrors> \
-        <mirror> \
-            <id>aliyunmaven</id> \
-            <mirrorOf>*,!spring-milestones,!spring-snapshots,!spring-release-plugins,!spring-milestone-plugins</mirrorOf> \
-            <name>Aliyun Public Repository</name> \
-            <url>https://maven.aliyun.com/repository/public</url> \
-        </mirror> \
+    <mirror> \
+    <id>aliyunmaven</id> \
+    <mirrorOf>*,!spring-milestones,!spring-snapshots,!spring-release-plugins,!spring-milestone-plugins</mirrorOf> \
+    <name>Aliyun Public Repository</name> \
+    <url>https://maven.aliyun.com/repository/public</url> \
+    </mirror> \
     </mirrors> \
     </settings>' > /root/.m2/settings.xml
 
@@ -32,4 +32,5 @@ COPY --from=build /app/target/*.jar app.jar
 RUN mkdir -p /app/sources
 
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=prod", "app.jar"]
+# 生产环境固定服务端口为 8080（覆盖开发期的 8081 配置）
+ENTRYPOINT ["java", "-Dserver.port=8080", "-Dspring.profiles.active=prod", "-jar", "app.jar"]
