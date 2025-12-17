@@ -17,10 +17,10 @@ const img05 = '/background/img05.png';
 const img06 = '/background/img06.png';
 
 export const BACKGROUND_DATA = [
-  { id: 1, type: 'video', src: bg01, preview: img01, title: 'Background 01' },
-  { id: 2, type: 'video', src: bg02, preview: img02, title: 'Background 02' },
-  { id: 3, type: 'video', src: bg03, preview: img03, title: 'Background 03' },
-  { id: 4, type: 'video', src: bg04, preview: img04, title: 'Background 04' },
-  { id: 5, type: 'video', src: bg05, preview: img05, title: 'Background 05' },
-  { id: 6, type: 'video', src: bg06, preview: img06, title: 'Background 06' },
+  { id: 1, type: 'image', src: img01, preview: img01, title: 'Background 01' },
+  { id: 2, type: 'image', src: img02, preview: img02, title: 'Background 02' },
+  { id: 3, type: 'image', src: img03, preview: img03, title: 'Background 03' },
+  { id: 4, type: 'image', src: img04, preview: img04, title: 'Background 04' },
+  { id: 5, type: 'image', src: img05, preview: img05, title: 'Background 05' },
+  { id: 6, type: 'image', src: img06, preview: img06, title: 'Background 06' },
 ];

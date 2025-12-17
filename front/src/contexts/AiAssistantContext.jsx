@@ -34,7 +34,7 @@ export function AiAssistantProvider({ children }) {
     };
 
     try {
-      const headers = { 
+      const headers = {
         'Content-Type': 'application/json',
         'Accept': 'text/event-stream'
       };
@@ -45,27 +45,27 @@ export function AiAssistantProvider({ children }) {
       } catch { /* ignore */ }
 
       const body = { message, model };
-      
+
       // Use the new POST streaming endpoint
-      const res = await fetch('/api/ai/chat/stream', { 
-        method: 'POST', 
-        headers, 
+      const res = await fetch('/api/ai/chat/stream', {
+        method: 'POST',
+        headers,
         body: JSON.stringify(body),
-        signal 
+        signal
       });
 
-      if (!res.ok) { 
-        const txt = await res.text().catch(() => ''); 
-        throw new Error(`HTTP ${res.status}: ${txt}`); 
+      if (!res.ok) {
+        const txt = await res.text().catch(() => '');
+        throw new Error(`HTTP ${res.status}: ${txt}`);
       }
-      
+
       if (!res.body) throw new Error('No response body');
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder('utf-8');
       let buffer = '';
       let currentEventData = null;
-      
+
       if (firstChunkTimeoutMs > 0) {
         firstTimer = setTimeout(() => { try { reader.cancel(); } catch { /* ignore */ } }, firstChunkTimeoutMs);
       }
@@ -74,28 +74,28 @@ export function AiAssistantProvider({ children }) {
         const { done, value } = await reader.read();
         if (done) break;
         if (firstTimer) { clearTimeout(firstTimer); firstTimer = null; }
-        
+
         const chunk = decoder.decode(value, { stream: true });
         buffer += chunk;
-        
+
         const lines = buffer.split(/\r?\n/);
         buffer = lines.pop() || '';
 
         for (const line of lines) {
-            if (line.startsWith('data:')) {
-                const data = line.substring(5);
-                if (currentEventData === null) {
-                    currentEventData = data;
-                } else {
-                    currentEventData += "\n" + data;
-                }
-            } else if (line.trim() === '') {
-                if (currentEventData !== null) {
-                    if (currentEventData.trim() === '[DONE]') return acc;
-                    append(currentEventData);
-                    currentEventData = null;
-                }
+          if (line.startsWith('data:')) {
+            const data = line.substring(5);
+            if (currentEventData === null) {
+              currentEventData = data;
+            } else {
+              currentEventData += "\n" + data;
             }
+          } else if (line.trim() === '') {
+            if (currentEventData !== null) {
+              if (currentEventData.trim() === '[DONE]') return acc;
+              append(currentEventData);
+              currentEventData = null;
+            }
+          }
         }
       }
       return acc;
@@ -115,7 +115,36 @@ export function AiAssistantProvider({ children }) {
     }
   }, [sendMessage]);
 
-  const value = useMemo(() => ({ sendMessage, sendMessageStream, loading, error }), [sendMessage, sendMessageStream, loading, error]);
+  const summarizeArticle = useCallback((content, options) => {
+    const prompt = `请简要总结以下文章的核心内容：\n\n${content}`;
+    return sendMessageStream(prompt, options);
+  }, [sendMessageStream]);
+
+  const polishText = useCallback((text, options) => {
+    const prompt = `请润色以下文本，使其更加专业流畅：\n\n${text}`;
+    return sendMessageStream(prompt, options);
+  }, [sendMessageStream]);
+
+  const continueWriting = useCallback((text, options) => {
+    const prompt = `根据以下上下文，请继续写作：\n\n${text}`;
+    return sendMessageStream(prompt, options);
+  }, [sendMessageStream]);
+
+  const explainCode = useCallback((code, options) => {
+    const prompt = `请解释以下代码的功能和逻辑：\n\n${code}`;
+    return sendMessageStream(prompt, options);
+  }, [sendMessageStream]);
+
+  const value = useMemo(() => ({
+    sendMessage,
+    sendMessageStream,
+    loading,
+    error,
+    summarizeArticle,
+    polishText,
+    continueWriting,
+    explainCode
+  }), [sendMessage, sendMessageStream, loading, error, summarizeArticle, polishText, continueWriting, explainCode]);
 
   return (
     <AiAssistantContext.Provider value={value}>{children}</AiAssistantContext.Provider>

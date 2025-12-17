@@ -8,7 +8,39 @@
   flex-direction: column;
   transition: none;
   position: relative;
-  height: 100%; /* Fill parent */
+  height: 100%;
+  /* Fill parent */
+}
+
+.ai-btn {
+  color: #6366f1 !important;
+  width: auto !important;
+  padding: 0 8px !important;
+  background: rgba(99, 102, 241, 0.1) !important;
+}
+
+.ai-btn:hover {
+  background: rgba(99, 102, 241, 0.2) !important;
+}
+
+.ai-btn.processing {
+  opacity: 0.6;
+  cursor: wait;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.6;
+  }
 }
 
 .tiptap-editor:focus-within {
@@ -21,15 +53,20 @@
   align-items: center;
   gap: 6px;
   padding: 10px 16px;
-  background: #f1f5f9; /* 加深工具栏背景 */
-  border-bottom: 1px solid #cbd5e1; /* 加深工具栏边框 */
-  flex-wrap: wrap; /* 允许换行，防止下拉菜单被裁剪 */
-  overflow: visible; /* 允许下拉菜单溢出 */
+  background: #f1f5f9;
+  /* 加深工具栏背景 */
+  border-bottom: 1px solid #cbd5e1;
+  /* 加深工具栏边框 */
+  flex-wrap: wrap;
+  /* 允许换行，防止下拉菜单被裁剪 */
+  overflow: visible;
+  /* 允许下拉菜单溢出 */
   position: sticky;
   top: 0;
   z-index: 20;
   border-radius: 12px 12px 0 0;
-  -ms-overflow-style: none; /* IE and Edge */
+  -ms-overflow-style: none;
+  /* IE and Edge */
 }
 
 @supports (scrollbar-width: none) {
@@ -39,7 +76,8 @@
 }
 
 .tiptap-toolbar::-webkit-scrollbar {
-  display: none; /* Chrome/Safari 隐藏滚动条 */
+  display: none;
+  /* Chrome/Safari 隐藏滚动条 */
 }
 
 .tt-toolbar-group {
@@ -47,11 +85,14 @@
   align-items: center;
   gap: 1px;
   position: relative;
-  background: transparent; /* 移除背景 */
+  background: transparent;
+  /* 移除背景 */
   padding: 0;
   border-radius: 0;
-  border: none; /* 移除边框 */
-  flex-shrink: 0; /* 防止被压缩 */
+  border: none;
+  /* 移除边框 */
+  flex-shrink: 0;
+  /* 防止被压缩 */
 }
 
 /* 添加分隔线 */
@@ -65,7 +106,8 @@
 }
 
 .tt-btn {
-  height: 32px; /* 稍微减小高度 */
+  height: 32px;
+  /* 稍微减小高度 */
   min-width: 32px;
   padding: 0 6px;
   border: 1px solid transparent;
@@ -102,7 +144,8 @@
 }
 
 .tt-sep {
-  display: none; /* 隐藏分隔符，使用分组样式代替 */
+  display: none;
+  /* 隐藏分隔符，使用分组样式代替 */
 }
 
 .tt-grow {
@@ -116,16 +159,20 @@
 
 .tt-dropdown-menu {
   position: absolute;
-  top: calc(100% + 4px); /* 稍微靠近一点 */
+  top: calc(100% + 4px);
+  /* 稍微靠近一点 */
   left: 0;
   background: white;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); /* 更柔和的阴影 */
-  min-width: 180px; /* 稍微加宽 */
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  /* 更柔和的阴影 */
+  min-width: 180px;
+  /* 稍微加宽 */
   max-height: 300px;
   overflow-y: auto;
-  z-index: 1000; /* 确保在最上层 */
+  z-index: 1000;
+  /* 确保在最上层 */
   animation: slideDown 0.2s ease;
 }
 
@@ -237,8 +284,8 @@
   margin: 0 0 1.2em;
 }
 
-.tiptap-content h1, 
-.tiptap-content h2, 
+.tiptap-content h1,
+.tiptap-content h2,
 .tiptap-content h3 {
   color: #111827;
   font-weight: 700;
@@ -247,11 +294,19 @@
   line-height: 1.3;
 }
 
-.tiptap-content h1 { font-size: 2em; }
-.tiptap-content h2 { font-size: 1.5em; }
-.tiptap-content h3 { font-size: 1.25em; }
+.tiptap-content h1 {
+  font-size: 2em;
+}
 
-.tiptap-content ul, 
+.tiptap-content h2 {
+  font-size: 1.5em;
+}
+
+.tiptap-content h3 {
+  font-size: 1.25em;
+}
+
+.tiptap-content ul,
 .tiptap-content ol {
   padding-left: 1.5em;
   margin-bottom: 1.2em;
@@ -273,7 +328,8 @@
 }
 
 .tiptap-content pre {
-  background: #282c34; /* Atom One Dark background */
+  background: #282c34;
+  /* Atom One Dark background */
   color: #abb2bf;
   border-radius: 12px;
   padding: 20px;
@@ -411,7 +467,7 @@
   height: auto;
   border-radius: 12px;
   margin: 1.5em 0;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease;
 }
 
@@ -589,18 +645,37 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 @keyframes slideDown {
-  from { transform: translateY(-10px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 /* Responsive styles */

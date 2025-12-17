@@ -4,8 +4,11 @@
     width: 100%;
     max-width: 100%;
     margin: 0;
+    margin-top: var(--navH, 60px);
+    /* Add margin to avoid overlap with fixed navbar */
     height: calc(100vh - var(--navH));
-    min-height: 0 !important; /* Override anime-neon-bg */
+    min-height: 0 !important;
+    /* Override anime-neon-bg */
     padding: 20px 40px;
     gap: 30px;
     overflow: hidden;
@@ -116,7 +119,7 @@
 .mark-read-btn {
     padding: 0.8rem 1.8rem;
     background: rgba(255, 255, 255, 0.8);
-    border: 1px solid rgba(0,0,0,0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
     border-radius: 50px;
     color: #555;
     cursor: pointer;
@@ -126,7 +129,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     -webkit-backdrop-filter: blur(5px);
     backdrop-filter: blur(5px);
 }
@@ -152,13 +155,16 @@
 .notification-list::-webkit-scrollbar {
     width: 6px;
 }
+
 .notification-list::-webkit-scrollbar-track {
     background: transparent;
 }
+
 .notification-list::-webkit-scrollbar-thumb {
     background: rgba(0, 0, 0, 0.1);
     border-radius: 3px;
 }
+
 .notification-list::-webkit-scrollbar-thumb:hover {
     background: rgba(0, 0, 0, 0.2);
 }
@@ -173,7 +179,8 @@
     border: 1px solid rgba(255, 255, 255, 0.5);
     transition: all 0.2s ease;
     cursor: pointer;
-    position: relative; /* Added for positioning the unread dot */
+    position: relative;
+    /* Added for positioning the unread dot */
 }
 
 .notification-item:hover {
@@ -291,7 +298,7 @@
         height: auto;
         overflow: visible;
     }
-    
+
     .notification-sidebar {
         width: 100%;
         flex-direction: row;
@@ -299,16 +306,16 @@
         padding: 12px;
         gap: 8px;
     }
-    
+
     .notification-sidebar-item {
         margin-bottom: 0;
         white-space: nowrap;
     }
-    
+
     .sidebar-title {
         display: none;
     }
-    
+
     .notification-center-container {
         height: 80vh;
     }
