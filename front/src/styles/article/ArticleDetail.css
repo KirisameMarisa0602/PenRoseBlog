@@ -787,15 +787,12 @@ html.banner-is-hidden .article-cover-wrapper {
   100% { background-color: transparent; }
 }
 
- / *   F i x   a n c h o r   s c r o l l i n g   o v e r l a p   * / 
- . a r t i c l e - c o n t e n t   h 1 , 
- . a r t i c l e - c o n t e n t   h 2 , 
- . a r t i c l e - c o n t e n t   h 3 , 
- . a r t i c l e - c o n t e n t   h 4 , 
- . a r t i c l e - c o n t e n t   h 5 , 
- . a r t i c l e - c o n t e n t   h 6   { 
-     s c r o l l - m a r g i n - t o p :   c a l c ( 1 5 v h   +   2 0 p x ) ; 
- } 
- 
- 
- 
+/* Fix anchor scrolling overlap */
+.article-content h1,
+.article-content h2,
+.article-content h3,
+.article-content h4,
+.article-content h5,
+.article-content h6 {
+  scroll-margin-top: calc(15vh + 20px);
+}

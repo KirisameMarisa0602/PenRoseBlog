@@ -42,11 +42,11 @@
   width: 92%; /* Slightly reduced width percentage */
   margin: 0 auto;
   padding: 24px 24px;
-  background: rgba(255, 255, 255, 0.95); /* Slightly transparent white */
+  background: rgba(255, 255, 255, 0.4); /* More transparent */
   border-radius: 16px;
   box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15); /* Glassmorphism-ish shadow */
-  -webkit-backdrop-filter: blur(4px);
-  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   position: relative;
   min-height: 800px; /* Ensure substantial height */
 }

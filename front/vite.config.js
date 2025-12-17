@@ -50,7 +50,7 @@ export default ({ mode }) => {
           changeOrigin: true,
           rewrite: path => path,
           bypass: (req) => {
-            if (req.url.includes('.mp4')) {
+            if (req.url.match(/\.(mp4|png|jpg|jpeg|gif|webp)$/i)) {
               return req.url;
             }
           }

@@ -3,7 +3,6 @@ import { useAuthState } from '@hooks/useAuthState';
 import { BLOG_CATEGORIES } from '@utils/constants';
 import ArticleCard from '@components/common/ArticleCard';
 import '@styles/pages/FavoritesPage.css';
-import '@styles/common/AnimeBackground.css';
 
 export default function FavoritesPage() {
     const { user } = useAuthState();

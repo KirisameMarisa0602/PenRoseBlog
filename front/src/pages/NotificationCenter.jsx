@@ -7,8 +7,6 @@ import { getDefaultAvatar } from '../utils/avatarUtils';
 import '@styles/pages/NotificationCenter.css';
 import MessageList from './MessageList';
 import PendingFriendRequests from './PendingFriendRequests';
-import NeonBackground from '@components/common/NeonBackground';
-import '@styles/common/AnimeBackground.css';
 
 export default function NotificationCenter() {
     const [notifications, setNotifications] = useState([]);
@@ -307,8 +305,7 @@ export default function NotificationCenter() {
     };
 
     return (
-        <div className="notification-layout anime-neon-bg">
-            <NeonBackground />
+        <div className="notification-layout">
             <div className="notification-sidebar">
                 <div className="sidebar-title" style={{ padding: '20px 24px', fontSize: '1.2rem', fontWeight: 'bold' }}>通知中心</div>
                 <div className={`notification-sidebar-item ${activeTab === 'ALL' ? 'active' : ''}`} onClick={() => setActiveTab('ALL')}>

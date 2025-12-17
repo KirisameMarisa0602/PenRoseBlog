@@ -6,7 +6,6 @@ import ArticleFolderTree from '@components/selfspace/ArticleFolderTree.jsx';
 import { useAuthState } from '@hooks/useAuthState';
 import resolveUrl from '@utils/resolveUrl';
 import { getDefaultAvatar, isValidAvatar } from '@utils/avatarUtils';
-import '@styles/common/AnimeBackground.css';
 
 // SelfSpace 页面：左侧 25vw 手风琴资料面板 + 右侧内容区域
 export default function SelfSpace() {

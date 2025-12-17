@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AiAssistantProvider } from './contexts/AiAssistantContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { GlobalUploadProvider } from './contexts/GlobalUploadContext';
+import { BackgroundProvider } from './contexts/BackgroundContext';
 import MainLayout from './components/layout/MainLayout';
 import '@styles/index.css';
 
@@ -48,6 +49,7 @@ function AppContent() {
 
 	return (
 		<ThemeProvider>
+		<BackgroundProvider>
 		<GlobalUploadProvider>
 			<AiAssistantProvider>
 				{isLoading && <Loading onReady={handleContentPreloaded} />}
@@ -75,6 +77,7 @@ function AppContent() {
 				</MainLayout>
 			</AiAssistantProvider>
 		</GlobalUploadProvider>
+		</BackgroundProvider>
 		</ThemeProvider>
 	);
 }

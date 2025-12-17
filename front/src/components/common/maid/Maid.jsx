@@ -225,6 +225,10 @@ export default function Maid({ defaultCollapsed = true, onModelLoaded, onWidthCh
       powerPreference: 'high-performance',
     });
     appRef.current = app;
+    // 清理可能存在的旧 canvas，防止重复添加
+    while (canvasEl.firstChild) {
+      canvasEl.removeChild(canvasEl.firstChild);
+    }
     try { if (app.view && app.view.parentNode !== canvasEl) canvasEl.appendChild(app.view); } catch { /* ignore */ }
 
     const handleResize = () => {

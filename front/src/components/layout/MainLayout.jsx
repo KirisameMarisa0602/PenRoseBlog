@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import Maid from '@components/common/maid/Maid';
 import BannerNavbar from '@components/common/BannerNavbar';
 import GlobalUploadIndicator from '@components/common/GlobalUploadIndicator';
+import GlobalBackground from '@components/common/GlobalBackground';
 import '../../styles/components/MainLayout.css';
 
 export default function MainLayout({ children, onMaidLoaded }) {
@@ -22,6 +23,7 @@ export default function MainLayout({ children, onMaidLoaded }) {
 
   return (
     <div className={`app-layout${isWelcomePage ? ' app-layout--welcome' : (isNoPaddingPage ? ' app-layout--home' : '')}`}>
+      <GlobalBackground />
       {!isWelcomePage && <BannerNavbar />}
       <div className={mainClassName}>
         {children}

@@ -1,8 +1,11 @@
 import React, { useEffect, useRef } from 'react';
+import { useBackground } from '@contexts/useBackground';
+import { BACKGROUND_DATA } from '@utils/backgroundData';
 import '@styles/home/HeroSection.css';
 
 const HeroSection = () => {
   const containerRef = useRef(null);
+  const { backgrounds, activeBackground, nextBackground, prevBackground, setBackgroundById } = useBackground();
 
   useEffect(() => {
     const handleMove = (e) => {
@@ -32,14 +35,62 @@ const HeroSection = () => {
     };
   }, []);
 
+  const scrollToContent = () => {
+    window.scrollTo({
+      top: window.innerHeight,
+      behavior: 'smooth'
+    });
+  };
+
   return (
     <div className="hero-section" ref={containerRef}>
-      <div className="hero-background"></div>
+      {/* Carousel Slider */}
+      <div className="hero-slider">
+        {backgrounds.map((bg) => (
+          <div 
+            key={bg.id} 
+            className="hero-slide-box" 
+            style={{ backgroundImage: `url(${bg.preview})` }}
+          >
+            <div className="hero-slide-content">
+               {/* Optional content per slide */}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Navigation Buttons */}
+      <div className="hero-slider-buttons">
+        <button className="hero-slider-prev" onClick={prevBackground}>&lt;</button>
+        <button className="hero-slider-next" onClick={nextBackground}>&gt;</button>
+      </div>
+
+      {/* Bottom Right Preview List */}
+      <div className="hero-preview-list">
+        {BACKGROUND_DATA.map((bg) => (
+          <div 
+            key={bg.id}
+            className={`hero-preview-item ${activeBackground?.id === bg.id ? 'active' : ''}`}
+            onClick={() => setBackgroundById(bg.id)}
+            title={bg.title}
+          >
+            <img src={bg.preview} alt={bg.title} />
+          </div>
+        ))}
+      </div>
+
       <div className="hero-content">
         {/* Content can be added here later, e.g., title, subtitle */}
         <h1 className="hero-title">Lovely Firefly!</h1>
         <p className="hero-subtitle">In Reddened Chrysalis, I Once Rest</p>
       </div>
+      
+      <div className="hero-scroll-down" onClick={scrollToContent}>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M7 13l5 5 5-5M7 6l5 5 5-5"/>
+        </svg>
+      </div>
+
       <div className="hero-waves-container">
         <svg className="waves" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink"
           viewBox="0 10 150 45" preserveAspectRatio="none" shapeRendering="auto">

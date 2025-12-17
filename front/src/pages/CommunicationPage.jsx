@@ -16,8 +16,6 @@ import { fetchFriendsList } from '@utils/api/friendService';
 import SimpleEmojiPicker from '@components/common/SimpleEmojiPicker';
 import resolveUrl from '@utils/resolveUrl';
 import { getDefaultAvatar, isValidAvatar } from '@utils/avatarUtils';
-import NeonBackground from '@components/common/NeonBackground';
-import '@styles/common/AnimeBackground.css';
 
 // 本地缓存服务
 import {
@@ -1194,8 +1192,7 @@ export default function CommunicationPage() {
     /** ---------------- 渲染 ---------------- */
 
     return (
-        <div className="conversation-detail-page anime-neon-bg">
-            <NeonBackground />
+        <div className="conversation-detail-page">
             <div
                 className="conversation-detail-container two-columns"
                 style={{ ['--input-height']: `${inputHeight}px` }}
