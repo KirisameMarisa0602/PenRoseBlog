@@ -1163,15 +1163,15 @@ export default function ArticleDetail() {
                 {/* Left Column: Back Button + Author Info */}
                 <div className="article-left-column" style={{ display: 'flex', flexDirection: 'column', gap: '20px', position: 'sticky', top: '80px', height: 'fit-content' }}>
                     <div className="article-back-nav-container">
-                        <button 
-                            onClick={handleBack} 
-                            style={{ 
-                                background: 'rgba(255, 255, 255, 0.8)', 
+                        <button
+                            onClick={handleBack}
+                            style={{
+                                background: 'rgba(255, 255, 255, 0.8)',
                                 backdropFilter: 'blur(8px)',
-                                border: '1px solid rgba(255, 255, 255, 0.6)', 
-                                color: '#4a5568', 
-                                cursor: 'pointer', 
-                                display: 'inline-flex', 
+                                border: '1px solid rgba(255, 255, 255, 0.6)',
+                                color: '#4a5568',
+                                cursor: 'pointer',
+                                display: 'inline-flex',
                                 alignItems: 'center',
                                 fontSize: '15px',
                                 fontWeight: '600',
@@ -1199,9 +1199,9 @@ export default function ArticleDetail() {
                             </svg>
                             返回 {fromCategory || '首页'}
                         </button>
-                        
+
                         {/* AI Summary Button */}
-                        <button 
+                        <button
                             onClick={handleAiSummarize}
                             style={{
                                 marginTop: '10px',
@@ -1226,7 +1226,6 @@ export default function ArticleDetail() {
                             </svg>
                             AI 摘要
                         </button>
-                    </div>
                     </div>
 
                     {/* Left Sidebar: Author Info */}
