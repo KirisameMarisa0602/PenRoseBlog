@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
-import { useNavigate, useParams, Link, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, Link, useSearchParams, useLocation } from 'react-router-dom';
 import { marked } from 'marked';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/atom-one-dark.css';
@@ -25,6 +25,17 @@ export default function ArticleDetail() {
     const targetCommentId = searchParams.get('commentId');
     const targetReplyId = searchParams.get('replyId');
     const navigate = useNavigate();
+    const location = useLocation();
+    const fromCategory = location.state?.fromCategory;
+
+    const handleBack = () => {
+        if (fromCategory) {
+            navigate('/', { state: { category: fromCategory, scrollToCarousel: true } });
+        } else {
+            navigate('/', { state: { scrollToCarousel: true } });
+        }
+    };
+
     const { user } = useAuthState();
     const userId = user?.id ? String(user.id) : null;
     const [post, setPost] = useState(null);
@@ -1042,7 +1053,8 @@ export default function ArticleDetail() {
 
     const handleChooseFriendToForward = async (targetUserId) => {
         if (!targetUserId) return;
-        const url = await ensureShareUrl();
+        // Use getCopyableUrl to ensure a clean URL format (e.g. /post/123) that the backend can recognize
+        const url = getCopyableUrl(); 
         if (!url) {
             alert('暂时无法获取文章链接');
             return;
@@ -1100,11 +1112,53 @@ export default function ArticleDetail() {
                 <div className="page-blur-background" style={{ backgroundImage: `url(${coverUrl})` }}></div>
             )}
             <div className="article-detail-container">
-                {/* Left Sidebar: Author Info */}
-                <AuthorSidebar
-                    post={post}
-                    currentUserId={userId}
-                />
+                {/* Left Column: Back Button + Author Info */}
+                <div className="article-left-column" style={{ display: 'flex', flexDirection: 'column', gap: '20px', position: 'sticky', top: '80px', height: 'fit-content' }}>
+                    <div className="article-back-nav-container">
+                        <button 
+                            onClick={handleBack} 
+                            style={{ 
+                                background: 'rgba(255, 255, 255, 0.8)', 
+                                backdropFilter: 'blur(8px)',
+                                border: '1px solid rgba(255, 255, 255, 0.6)', 
+                                color: '#4a5568', 
+                                cursor: 'pointer', 
+                                display: 'inline-flex', 
+                                alignItems: 'center',
+                                fontSize: '15px',
+                                fontWeight: '600',
+                                padding: '8px 16px',
+                                borderRadius: '20px',
+                                boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                                transition: 'all 0.3s ease',
+                                width: 'fit-content'
+                            }}
+                            onMouseEnter={e => {
+                                e.target.style.background = '#fff';
+                                e.target.style.color = 'var(--theme-color)';
+                                e.target.style.transform = 'translateX(-2px)';
+                                e.target.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+                            }}
+                            onMouseLeave={e => {
+                                e.target.style.background = 'rgba(255, 255, 255, 0.8)';
+                                e.target.style.color = '#4a5568';
+                                e.target.style.transform = 'none';
+                                e.target.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)';
+                            }}
+                        >
+                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                            返回 {fromCategory || '首页'}
+                        </button>
+                    </div>
+
+                    {/* Left Sidebar: Author Info */}
+                    <AuthorSidebar
+                        post={post}
+                        currentUserId={userId}
+                    />
+                </div>
 
                 {/* Center: Article Content */}
                 <article className="article-main">

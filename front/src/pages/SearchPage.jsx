@@ -129,7 +129,7 @@ export default function SearchPage() {
                     {activeTab === 'articles' && (
                         <div className="articles-list">
                             {articles.map(post => (
-                                <ArticleCard key={post.id} post={post} />
+                                <ArticleCard key={post.id} post={post} mode="vertical" />
                             ))}
                             {articles.length === 0 && !loading && executedQuery && (
                                 <div style={{ textAlign: 'center', color: '#666', gridColumn: '1/-1', padding: '20px' }}>未找到相关文章</div>

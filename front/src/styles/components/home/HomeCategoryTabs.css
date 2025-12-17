@@ -1,6 +1,6 @@
 .home-category-bar {
   width: 100%;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(255, 255, 255, 0.3);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   padding: 12px 24px;
@@ -11,6 +11,11 @@
   position: sticky;
   top: var(--navH, 60px); /* Assuming nav height is around 60px */
   z-index: 90;
+  transition: top 0.3s ease;
+}
+
+body.navbar-hidden-mode .home-category-bar {
+  top: 0;
 }
 
 .home-category-list {

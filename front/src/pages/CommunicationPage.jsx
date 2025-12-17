@@ -9,6 +9,7 @@ import React, {
 } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import '@styles/message/ConversationDetail.css';
+import '@styles/home/HomeArticleList.css';
 import { useAuthState } from '@hooks/useAuthState';
 import { useGlobalUpload } from '@contexts/useGlobalUpload';
 import { fetchConversationDetail, fetchConversations } from '@utils/api/messageService';
@@ -16,6 +17,7 @@ import { fetchFriendsList } from '@utils/api/friendService';
 import SimpleEmojiPicker from '@components/common/SimpleEmojiPicker';
 import resolveUrl from '@utils/resolveUrl';
 import { getDefaultAvatar, isValidAvatar } from '@utils/avatarUtils';
+import ArticleCardFetcher from '@components/common/ArticleCardFetcher';
 
 // 本地缓存服务
 import {
@@ -93,6 +95,8 @@ export default function CommunicationPage() {
     const [initialSharedTextSent, setInitialSharedTextSent] = useState(false);
 
     const [showEmoji, setShowEmoji] = useState(false);
+
+    // 文章卡片拉取由通用 ArticleCardFetcher 处理
 
     /** ---------------- 工具方法 ---------------- */
 
@@ -1203,56 +1207,86 @@ export default function CommunicationPage() {
                     ref={leftScrollRef}
                     aria-label="会话列表"
                 >
-                    {conversations.map(c => (
-                        <button
-                            key={c.otherId}
-                            className={`conversation-sidebar-item${String(c.otherId) ===
-                                String(otherId)
-                                ? ' active'
-                                : ''}`}
-                            title={c.nickname || ''}
-                            onClick={() => gotoConversation(c.otherId)}
-                        >
-                            <img
-                                src={isValidAvatar(c.avatarUrl) ? resolveUrl(c.avatarUrl) : getDefaultAvatar(c.otherId)}
-                                alt="avatar"
-                                className="conversation-sidebar-avatar"
-                                onError={(ev) => {
-                                    const target = ev.target;
-                                    target.onerror = null;
-                                    target.src = getDefaultAvatar(c.otherId);
-                                }}
-                                onContextMenu={async (e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    const blocked = await checkBlockStatus(c.otherId);
-                                    setSidebarMenu({
-                                        visible: true,
-                                        x: e.clientX,
-                                        y: e.clientY,
-                                        user: c,
-                                        blocked
-                                    });
-                                }}
-                            />
-                            <span className="conversation-sidebar-name">
-                                {c.nickname || `用户${c.otherId}`}
-                            </span>
-                            {c.unreadCount > 0 && (
-                                <span
-                                    className="conversation-sidebar-badge"
-                                    title={`未读 ${c.unreadCount}`}
-                                >
-                                    {c.unreadCount > 99 ? '99+' : c.unreadCount}
-                                </span>
-                            )}
-                            {c.blocked && (
-                                <span className="conversation-sidebar-blocked" title="你已拉黑此用户">
-                                    已拉黑
-                                </span>
-                            )}
-                        </button>
-                    ))}
+                    <div className="conversation-sidebar-content">
+                        {/* Groups Section - Placeholder for now as backend might not support it yet */}
+                        {/* <div className="sidebar-section">
+                            <div className="sidebar-section-header">
+                                <span>Groups</span>
+                                <button className="sidebar-section-add">+</button>
+                            </div>
+                            ... groups list ...
+                        </div> */}
+
+                        <div className="sidebar-section">
+                            <div className="sidebar-section-header">
+                                <span>Persons</span>
+                            </div>
+                            <div className="sidebar-list">
+                                {conversations.map(c => (
+                                    <button
+                                        key={c.otherId}
+                                        className={`conversation-sidebar-item${String(c.otherId) ===
+                                            String(otherId)
+                                            ? ' active'
+                                            : ''}`}
+                                        onClick={() => gotoConversation(c.otherId)}
+                                    >
+                                        <div className="sidebar-avatar-container">
+                                            <img
+                                                src={isValidAvatar(c.avatarUrl) ? resolveUrl(c.avatarUrl) : getDefaultAvatar(c.otherId)}
+                                                alt="avatar"
+                                                className="conversation-sidebar-avatar"
+                                                onError={(ev) => {
+                                                    const target = ev.target;
+                                                    target.onerror = null;
+                                                    target.src = getDefaultAvatar(c.otherId);
+                                                }}
+                                                onContextMenu={async (e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    const blocked = await checkBlockStatus(c.otherId);
+                                                    setSidebarMenu({
+                                                        visible: true,
+                                                        x: e.clientX,
+                                                        y: e.clientY,
+                                                        user: c,
+                                                        blocked
+                                                    });
+                                                }}
+                                            />
+                                            {/* Online status indicator could go here */}
+                                        </div>
+                                        
+                                        <div className="sidebar-item-info">
+                                            <div className="sidebar-item-row-top">
+                                                <span className="conversation-sidebar-name">
+                                                    {c.nickname || `用户${c.otherId}`}
+                                                </span>
+                                                {c.unreadCount > 0 && (
+                                                    <span className="conversation-sidebar-badge">
+                                                        {c.unreadCount > 99 ? '99+' : c.unreadCount}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <div className="sidebar-item-row-bottom">
+                                                <span className="conversation-sidebar-lastmsg">
+                                                    {c.lastMessage || '暂无消息'}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        {c.blocked && (
+                                            <div className="sidebar-item-blocked-overlay" title="已拉黑">
+                                                🚫
+                                            </div>
+                                        )}
+                                        
+                                        {String(c.otherId) === String(otherId) && <div className="active-indicator"></div>}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
                 </aside>
 
                 {/* 右侧消息区 */}
@@ -1326,6 +1360,12 @@ export default function CommunicationPage() {
                                 }
 
                                 const hasPreview = msg.blogPreview && msg.blogPreview.blogId;
+                                // 如果文本里带有 /post/{id} 链接，也当作文章卡片展示
+                                let blogIdFromText = null;
+                                if (!hasPreview && msg.text) {
+                                    const m = msg.text.match(/\/post\/(\d+)/);
+                                    if (m) blogIdFromText = m[1];
+                                }
 
                                 return (
                                     <div
@@ -1357,85 +1397,63 @@ export default function CommunicationPage() {
                                             </span>
                                         </div>
 
-                                        <div className="conversation-detail-msgtext">
-                                            {/* 文本 / 媒体 */}
-                                            {msg?.type === 'IMAGE' && (msg?.mediaUrl || msg?.previewUrl) ? (
-                                                <img
-                                                    className="conversation-detail-msgmedia"
-                                                    src={msg.previewUrl || resolveMessageUrl(msg.mediaUrl)}
-                                                    alt="image"
-                                                    onError={(ev) => {
-                                                        const target = ev.target;
-                                                        target.onerror = null;
-                                                        target.src = '';
+                                        {hasPreview ? (
+                                            <div className="pm-blog-preview-wrapper" style={{ width: '100%', maxWidth: '500px' }}>
+                                                <ArticleCardFetcher
+                                                    blogId={msg.blogPreview.blogId}
+                                                    fallback={{
+                                                        id: msg.blogPreview.blogId,
+                                                        title: msg.blogPreview.title,
+                                                        coverImageUrl: msg.blogPreview.coverImageUrl,
+                                                        authorAvatarUrl: msg.blogPreview.authorAvatarUrl,
+                                                        authorNickname: msg.blogPreview.authorNickname,
+                                                        authorId: msg.blogPreview.authorId,
+                                                        likeCount: msg.blogPreview.likeCount,
+                                                        commentCount: msg.blogPreview.commentCount,
+                                                        viewCount: msg.blogPreview.viewCount,
+                                                        favoriteCount: msg.blogPreview.favoriteCount,
+                                                        shareCount: msg.blogPreview.shareCount,
+                                                        createdAt: msg.blogPreview.createdAt
                                                     }}
+                                                    mode="vertical"
+                                                    className="chat-article-card"
+                                                    style={{ margin: 0, background: '#fff', borderRadius: '12px' }}
                                                 />
-                                            ) : msg?.type === 'VIDEO' && (msg?.mediaUrl || msg?.previewUrl) ? (
-                                                <video
-                                                    className="conversation-detail-msgmedia"
-                                                    src={msg.previewUrl || resolveMessageUrl(msg.mediaUrl)}
-                                                    controls
-                                                    preload="metadata"
-                                                    playsInline
-                                                    controlsList="nodownload"
-                                                />
-                                            ) : (
-                                                // 如果有博客预览且文本是链接，则不显示文本（避免重复显示链接）
-                                                (!hasPreview || !/^https?:\/\//.test(msg?.text)) && (
-                                                    msg?.text ||
-                                                    (msg?.type === 'IMAGE'
-                                                        ? '[图片]'
-                                                        : msg?.type === 'VIDEO'
-                                                            ? '[视频]'
-                                                            : '')
-                                                )
-                                            )}
-
-                                            {/* 博客预览卡片 */}
-                                            {hasPreview && (
-                                                <div className="pm-blog-preview-card" onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    navigate(`/post/${msg.blogPreview.blogId}`);
-                                                }}>
-                                                    <div className="pm-blog-preview-cover">
-                                                        {msg.blogPreview.coverImageUrl ? (
-                                                            <img
-                                                                src={resolveUrl(msg.blogPreview.coverImageUrl)}
-                                                                alt={msg.blogPreview.title || '封面'}
-                                                                onError={e => { e.target.onerror = null; e.target.src = ''; }}
-                                                            />
-                                                        ) : (
-                                                            <div className="pm-blog-preview-cover-placeholder">
-                                                                博客
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                    <div className="pm-blog-preview-body">
-                                                        <h3 className="pm-blog-preview-title" title={msg.blogPreview.title}>
-                                                            {msg.blogPreview.title || '博客'}
-                                                        </h3>
-                                                        <div className="pm-blog-preview-meta">
-                                                            <div className="pm-blog-preview-author-info">
-                                                                <img
-                                                                    src={isValidAvatar(msg.blogPreview.authorAvatarUrl) ? resolveUrl(msg.blogPreview.authorAvatarUrl) : getDefaultAvatar(msg.blogPreview.authorId)}
-                                                                    alt=""
-                                                                    className="pm-blog-preview-avatar-small"
-                                                                    onError={(e) => { e.target.onerror = null; e.target.src = getDefaultAvatar(msg.blogPreview.authorId); }}
-                                                                />
-                                                                <span className="pm-blog-preview-author">
-                                                                    {msg.blogPreview.authorNickname || '匿名'}
-                                                                </span>
-                                                            </div>
-                                                            {msg.blogPreview.createdAt && (
-                                                                <span className="pm-blog-preview-time">
-                                                                    {new Date(msg.blogPreview.createdAt).toLocaleDateString()}
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </div>
+                                            </div>
+                                        ) : blogIdFromText ? (
+                                            <div className="pm-blog-preview-wrapper" style={{ width: '100%', maxWidth: '500px' }}>
+                                                <ArticleCardFetcher blogId={blogIdFromText} mode="vertical" className="chat-article-card" style={{ margin: 0, background: '#fff', borderRadius: '12px' }} />
+                                            </div>
+                                        ) : (
+                                            <div className="conversation-detail-msgtext">
+                                                {msg?.type === 'IMAGE' && (msg?.mediaUrl || msg?.previewUrl) ? (
+                                                    <img
+                                                        className="conversation-detail-msgmedia"
+                                                        src={msg.previewUrl || resolveMessageUrl(msg.mediaUrl)}
+                                                        alt="image"
+                                                        onError={(ev) => {
+                                                            const target = ev.target;
+                                                            target.onerror = null;
+                                                            target.src = '';
+                                                        }}
+                                                    />
+                                                ) : msg?.type === 'VIDEO' && (msg?.mediaUrl || msg?.previewUrl) ? (
+                                                    <video
+                                                        className="conversation-detail-msgmedia"
+                                                        src={msg.previewUrl || resolveMessageUrl(msg.mediaUrl)}
+                                                        controls
+                                                        preload="metadata"
+                                                        playsInline
+                                                        controlsList="nodownload"
+                                                    />
+                                                ) : (
+                                                    (!hasPreview || !/^https?:\/\//.test(msg?.text)) && (
+                                                        msg?.text ||
+                                                        (msg?.type === 'IMAGE' ? '[图片]' : msg?.type === 'VIDEO' ? '[视频]' : '')
+                                                    )
+                                                )}
+                                            </div>
+                                        )}
 
                                         <div className="conversation-detail-msgtime">
                                             {msg.createdAt

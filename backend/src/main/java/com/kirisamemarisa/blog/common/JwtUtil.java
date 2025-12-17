@@ -53,21 +53,14 @@ public class JwtUtil {
         try {
             Claims claims = parseToken(token);
             if (claims == null) {
-                logger.debug("[JWT] parseToken returned null claims for token={}", token);
                 return null;
             }
             Object userIdObj = claims.get("userId");
-            logger.debug("[JWT] token={}", token);
-            logger.debug("[JWT] claims={}", claims);
-            logger.debug("[JWT] userIdObj={}, type={}", userIdObj,
-                    userIdObj == null ? "null" : userIdObj.getClass().getName());
             if (userIdObj instanceof Number) {
                 Long val = ((Number) userIdObj).longValue();
-                logger.debug("[JWT] userId as Number: {}", val);
                 return val;
             } else if (userIdObj instanceof String) {
                 Long val = Long.parseLong((String) userIdObj);
-                logger.debug("[JWT] userId as String: {}", val);
                 return val;
             }
         } catch (Exception e) {
@@ -108,8 +101,7 @@ public class JwtUtil {
                     .parseClaimsJws(raw)// 解析、验证JWT
                     .getBody();// 获取JWT的主体部分（Claims）声明体
         } catch (Exception e) {
-            logger.error("[JWT] parseToken error for token (first 64 chars): {}",
-                    raw.length() > 64 ? raw.substring(0, 64) : raw, e);
+            logger.warn("[JWT] parseToken error", e);
             return null;
         }
     }

@@ -1,0 +1,117 @@
+.home-article-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* Fixed 5 columns for Bilibili style */
+    gap: 20px;
+    padding: 20px 0;
+}
+
+@media (max-width: 1400px) {
+    .home-article-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width: 1100px) {
+    .home-article-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 800px) {
+    .home-article-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 500px) {
+    .home-article-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Ensure vertical cards look good */
+.article-card-vertical {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.6);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border-radius: 16px; /* More rounded */
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.article-card-vertical:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+}
+
+.article-card-vertical .article-card-cover-wrapper {
+    width: 100%;
+    height: 160px; /* Slightly taller */
+    position: relative;
+    overflow: hidden;
+}
+
+.article-card-vertical .article-card-cover {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.article-card-vertical:hover .article-card-cover {
+    transform: scale(1.05);
+}
+
+.article-card-vertical .article-card-info {
+    padding: 10px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.article-card-vertical .article-card-title {
+    font-size: 1rem;
+    margin-bottom: 8px;
+    line-height: 1.4;
+    height: 2.8em; /* Limit to 2 lines */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.article-card-vertical .article-card-meta-top {
+    margin-bottom: 8px;
+}
+
+.article-card-vertical .article-card-stats {
+    justify-content: space-between;
+    font-size: 0.8rem;
+}
+
+/* Animation for card entry - Row by Row Slide In */
+@keyframes slideInRow {
+    0% {
+        opacity: 0;
+        transform: translateY(60px) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.home-article-card {
+    /* Use a spring-like bezier for smooth "Apple-like" feel */
+    animation: slideInRow 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+    /* Delay based primarily on row index, with slight column stagger */
+    animation-delay: calc(var(--row-index) * 0.15s + var(--col-index) * 0.04s);
+}

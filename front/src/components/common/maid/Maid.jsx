@@ -211,6 +211,19 @@ export default function Maid({ defaultCollapsed = true, onModelLoaded, onWidthCh
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
     const container = containerRef.current; if (!container) return undefined;
+
+    // 尝试清理页面上可能残留的重复 Maid DOM（防止出现两个看板娘）
+    try {
+      const allMaids = document.querySelectorAll('.maid-widget');
+      if (allMaids.length > 1) {
+        allMaids.forEach(el => {
+          if (el !== container && el.parentElement) {
+             el.parentElement.removeChild(el);
+          }
+        });
+      }
+    } catch { /* ignore */ }
+
     const canvasEl = container.querySelector('.maid-canvas-area .maid-canvas-wrap') || container.querySelector('.maid-canvas-wrap');
     if (!canvasEl) return undefined;
 
@@ -225,6 +238,10 @@ export default function Maid({ defaultCollapsed = true, onModelLoaded, onWidthCh
       powerPreference: 'high-performance',
     });
     appRef.current = app;
+    // 清理可能存在的旧 canvas，防止重复添加
+    while (canvasEl.firstChild) {
+      canvasEl.removeChild(canvasEl.firstChild);
+    }
     try { if (app.view && app.view.parentNode !== canvasEl) canvasEl.appendChild(app.view); } catch { /* ignore */ }
 
     const handleResize = () => {
@@ -418,7 +435,7 @@ export default function Maid({ defaultCollapsed = true, onModelLoaded, onWidthCh
       <div className="maid-resizer" role="separator" aria-orientation="vertical" onPointerDown={onResizerDown} />
 
       {/* 顶部栏：动作（设置/收起） */}
-      <Header settingsOpen={settingsOpen} onToggleSettings={toggleSettings} collapsed={collapsed} onToggleCollapsed={toggleCollapsed} />
+      <Header collapsed={collapsed} onToggleCollapsed={toggleCollapsed} />
 
       {/* 主体：上部聊天，下部看板娘，可拖拽分割；高度完全由 calcHeights 控制，保证拖拽条位置精确 */}
       <div className="maid-top" style={{ height: innerHeight ? topHeightPx + 'px' : undefined }}>
@@ -436,7 +453,13 @@ export default function Maid({ defaultCollapsed = true, onModelLoaded, onWidthCh
       />
       <div className="maid-bottom" style={{ height: innerHeight ? bottomHeightPx + 'px' : undefined }}>
         <CanvasArea heightPx={canvasAreaHeightPx} />
-        <ControlBar getCategorizedExpressions={getCategorizedExpressions} openPanel={openPanel} setOpenPanel={setOpenPanel} />
+        <ControlBar 
+          getCategorizedExpressions={getCategorizedExpressions} 
+          openPanel={openPanel} 
+          setOpenPanel={setOpenPanel}
+          settingsOpen={settingsOpen}
+          onToggleSettings={toggleSettings}
+        />
         {status && <div className="maid-status" role="status">{status}</div>}
         {error && !status && <div className="maid-error" role="alert">{error}</div>}
       </div>

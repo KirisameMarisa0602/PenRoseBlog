@@ -15,7 +15,7 @@ export default ({ mode }) => {
 
   // 开发环境默认后端端口与 docker-compose/backend 保持一致：8081
   // 如需调整请在 .env.development 设置 VITE_BACKEND_ORIGIN
-  const backendTarget = env.VITE_BACKEND_ORIGIN || 'http://localhost:8080';
+  const backendTarget = env.VITE_BACKEND_ORIGIN || 'http://localhost:8081';
 
   return defineConfig({
     plugins: [react()],
@@ -50,7 +50,7 @@ export default ({ mode }) => {
           changeOrigin: true,
           rewrite: path => path,
           bypass: (req) => {
-            if (req.url.includes('.mp4')) {
+            if (req.url.match(/\.(mp4|png|jpg|jpeg|gif|webp)$/i)) {
               return req.url;
             }
           }

@@ -9,6 +9,7 @@ import React, {
 } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import '@styles/message/ConversationDetail.css';
+import '@styles/home/HomeArticleList.css';
 import { useAuthState } from '@hooks/useAuthState';
 import { fetchConversationDetail, fetchConversations } from '@utils/api/messageService';
 import resolveUrl from '@utils/resolveUrl';
@@ -22,7 +23,7 @@ import {
     loadCachedConversationSummaries
 } from '@utils/localPmCacheService';
 
-import ArticleCard from '@components/common/ArticleCard';
+import ArticleCardFetcher from '@components/common/ArticleCardFetcher';
 
 export default function ConversationDetail({ embeddedOtherId, onConversationSelect }) {
     const { otherId: paramOtherId } = useParams();
@@ -38,6 +39,17 @@ export default function ConversationDetail({ embeddedOtherId, onConversationSele
     useEffect(() => { otherInfoRef.current = otherInfo; }, [otherInfo]);
 
     const [conversations, setConversations] = useState([]); // 左侧会话摘要列表
+    const [searchTerm, setSearchTerm] = useState('');
+    
+    const filteredConversations = useMemo(() => {
+        if (!searchTerm) return conversations;
+        const lower = searchTerm.toLowerCase();
+        return conversations.filter(c => 
+            (c.nickname || '').toLowerCase().includes(lower) ||
+            String(c.otherId).includes(lower)
+        );
+    }, [conversations, searchTerm]);
+
     const { user } = useAuthState();
     const userId = user?.id || null;
 
@@ -1266,10 +1278,24 @@ export default function ConversationDetail({ embeddedOtherId, onConversationSele
                 {/* 左侧会话列表 */}
                 <aside
                     className="conversation-sidebar"
-                    ref={leftScrollRef}
                     aria-label="会话列表"
                 >
-                    {conversations.map(c => (
+                    <div className="conversation-sidebar-header">
+                        <div className="sidebar-search-wrapper">
+                            <input 
+                                type="text" 
+                                className="sidebar-search-input" 
+                                placeholder="Search conversations..." 
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                            <button className="sidebar-search-btn" title="Search">
+                                🔍
+                            </button>
+                        </div>
+                    </div>
+                    <div className="conversation-sidebar-content" ref={leftScrollRef}>
+                        {filteredConversations.map(c => (
                         <button
                             key={c.otherId}
                             className={`conversation-sidebar-item${String(c.otherId) ===
@@ -1319,6 +1345,7 @@ export default function ConversationDetail({ embeddedOtherId, onConversationSele
                             )}
                         </button>
                     ))}
+                    </div>
                 </aside>
 
                 <div className="conversation-main-content">
@@ -1394,19 +1421,10 @@ export default function ConversationDetail({ embeddedOtherId, onConversationSele
                             }
 
                             const hasPreview = msg.blogPreview && msg.blogPreview.blogId;
-
-                            // 过滤掉纯博客链接的文本消息（如果它看起来像是自动发送的分享链接）
-                            // 避免在显示了卡片（或即将显示卡片）的同时显示冗余的 URL 文本
-                            if (!hasPreview && msg.text && (msg.text.includes('/post/') || msg.text.includes('/article/'))) {
-                                // 简单判断：如果是本站链接，且内容仅为链接，则隐藏
-                                const trimmed = msg.text.trim();
-                                // 匹配 http(s)://.../post/123 或 /post/123，允许末尾斜杠和参数
-                                // 使用更宽松的正则以确保匹配
-                                const isPostUrl = /^(https?:\/\/[^\s]+)?\/(post|article)\/\d+(\?.*)?\/?$/.test(trimmed);
-                                // 只要包含文章链接且长度接近链接长度（允许少量空白或标点），就隐藏
-                                if (isPostUrl || (trimmed.length < 100 && (trimmed.startsWith('http') || trimmed.startsWith('/')))) {
-                                    return null;
-                                }
+                            let blogIdFromText = null;
+                            if (!hasPreview && msg.text) {
+                                const match = msg.text.match(/\/post\/(\d+)/);
+                                if (match) blogIdFromText = match[1];
                             }
 
                             return (
@@ -1438,24 +1456,31 @@ export default function ConversationDetail({ embeddedOtherId, onConversationSele
                                     </div>
 
                                     {hasPreview ? (
-                                        <div className="pm-blog-preview-wrapper" style={{ width: '400px', maxWidth: '100%' }}>
-                                            <ArticleCard 
-                                                post={{
+                                        <div className="pm-blog-preview-wrapper" style={{ width: '100%', maxWidth: '500px' }}>
+                                            <ArticleCardFetcher
+                                                blogId={msg.blogPreview.blogId}
+                                                fallback={{
                                                     id: msg.blogPreview.blogId,
                                                     title: msg.blogPreview.title,
                                                     coverImageUrl: msg.blogPreview.coverImageUrl,
                                                     authorAvatarUrl: msg.blogPreview.authorAvatarUrl,
                                                     authorNickname: msg.blogPreview.authorNickname,
                                                     authorId: msg.blogPreview.authorId,
-                                                    // 转发卡片中可能缺少部分统计数据，可设为0或不显示
-                                                    likeCount: 0,
-                                                    commentCount: 0,
-                                                    viewCount: 0,
-                                                    createdAt: msg.blogPreview.createdAt || null // 显示时间
+                                                    likeCount: msg.blogPreview.likeCount,
+                                                    commentCount: msg.blogPreview.commentCount,
+                                                    viewCount: msg.blogPreview.viewCount,
+                                                    favoriteCount: msg.blogPreview.favoriteCount,
+                                                    shareCount: msg.blogPreview.shareCount,
+                                                    createdAt: msg.blogPreview.createdAt
                                                 }}
+                                                mode="vertical"
                                                 className="chat-article-card"
-                                                mode="horizontal"
+                                                style={{ margin: 0, background: '#fff', borderRadius: '12px' }}
                                             />
+                                        </div>
+                                    ) : blogIdFromText ? (
+                                        <div className="pm-blog-preview-wrapper" style={{ width: '100%', maxWidth: '500px' }}>
+                                            <ArticleCardFetcher blogId={blogIdFromText} mode="vertical" className="chat-article-card" style={{ margin: 0, background: '#fff', borderRadius: '12px' }} />
                                         </div>
                                     ) : (
                                         <div className="conversation-detail-msgtext">

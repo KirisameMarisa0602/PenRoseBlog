@@ -43,8 +43,12 @@ public interface BlogPostService {
                         String categoryName,
                         List<String> tags, String status, MultipartFile cover);
 
-        ApiResponse<Boolean> updateWithCover(Long id, String content, String directory, String categoryName,
+        ApiResponse<Boolean> updateWithCover(Long id, String title, String content, String directory,
+                        String categoryName,
                         List<String> tags, String status, MultipartFile cover, Boolean removeCover);
+
+        // 获取每个分类下点赞最多的文章
+        List<BlogPostDTO> getTopPostPerCategory();
 
         // 新增：删除博客接口（只能作者删除）
         ApiResponse<Boolean> delete(Long blogPostId, Long userId);

@@ -52,6 +52,11 @@ export async function sharePost(id, userId) {
   return response.data;
 }
 
+export async function fetchTopPostsPerCategory() {
+  const response = await httpClient.get('/blogpost/top-per-category');
+  return response.data;
+}
+
 export async function deletePost(id, userId) {
   const response = await httpClient.delete(`/blogpost/${id}`, {
     params: { userId },

@@ -9,7 +9,6 @@ import com.kirisamemarisa.blog.service.NotificationService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -26,21 +25,23 @@ public class NotificationController {
         this.currentUserResolver = currentUserResolver;
     }
 
-    @GetMapping("/subscribe/{userId}")
-    public SseEmitter subscribe(@PathVariable Long userId) {
-        // Note: Ideally we should verify if userId matches the authenticated user
-        return notificationService.subscribe(userId, "Connected");
+    @GetMapping("/subscribe")
+    public SseEmitter subscribe(@AuthenticationPrincipal Object principal) {
+        User currentUser = currentUserResolver.resolve(principal);
+        if (currentUser == null) {
+            return null; // Or handle error appropriately
+        }
+        return notificationService.subscribe(currentUser.getId(), "Connected");
     }
 
     @GetMapping
     public ApiResponse<PageResult<NotificationDTO>> getNotifications(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @RequestHeader(value = "X-User-Id", required = false) Long headerUserId,
+            @AuthenticationPrincipal Object principal,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(required = false) java.util.List<String> types) {
 
-        User currentUser = currentUserResolver.resolve(userDetails, headerUserId);
+        User currentUser = currentUserResolver.resolve(principal);
         if (currentUser == null) {
             return new ApiResponse<>(401, "Unauthorized", null);
         }
@@ -63,10 +64,9 @@ public class NotificationController {
 
     @GetMapping("/unread-count")
     public ApiResponse<Long> getUnreadCount(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @RequestHeader(value = "X-User-Id", required = false) Long headerUserId) {
+            @AuthenticationPrincipal Object principal) {
 
-        User currentUser = currentUserResolver.resolve(userDetails, headerUserId);
+        User currentUser = currentUserResolver.resolve(principal);
         if (currentUser == null) {
             return new ApiResponse<>(401, "Unauthorized", null);
         }
@@ -77,10 +77,9 @@ public class NotificationController {
 
     @GetMapping("/unread-stats")
     public ApiResponse<java.util.Map<String, Long>> getUnreadStats(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @RequestHeader(value = "X-User-Id", required = false) Long headerUserId) {
+            @AuthenticationPrincipal Object principal) {
 
-        User currentUser = currentUserResolver.resolve(userDetails, headerUserId);
+        User currentUser = currentUserResolver.resolve(principal);
         if (currentUser == null) {
             return new ApiResponse<>(401, "Unauthorized", null);
         }
@@ -97,11 +96,10 @@ public class NotificationController {
 
     @PutMapping("/read-all")
     public ApiResponse<Void> markAllAsRead(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @RequestHeader(value = "X-User-Id", required = false) Long headerUserId,
+            @AuthenticationPrincipal Object principal,
             @RequestBody(required = false) java.util.List<String> types) {
 
-        User currentUser = currentUserResolver.resolve(userDetails, headerUserId);
+        User currentUser = currentUserResolver.resolve(principal);
         if (currentUser == null) {
             return new ApiResponse<>(401, "Unauthorized", null);
         }

@@ -3,7 +3,7 @@ const iconTop = '/icons/blogpost/回顶部.svg';
 const iconComment = '/icons/blogpost/评论区.svg';
 import '@styles/common/ScrollControls.css';
 
-export default function ScrollControls() {
+export default function ScrollControls({ showComments = true }) {
     const [show, setShow] = useState(false);
 
     useEffect(() => {
@@ -43,9 +43,11 @@ export default function ScrollControls() {
             <button className="scroll-btn" onClick={scrollToTop} title="回到顶部">
                 <img src={iconTop} alt="Top" />
             </button>
-            <button className="scroll-btn" onClick={scrollToComments} title="去评论区">
-                <img src={iconComment} alt="Comments" />
-            </button>
+            {showComments && (
+                <button className="scroll-btn" onClick={scrollToComments} title="去评论区">
+                    <img src={iconComment} alt="Comments" />
+                </button>
+            )}
         </div>
     );
 }

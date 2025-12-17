@@ -1,32 +1,31 @@
 .search-page-container {
-    padding-top: var(--navH);
     height: 100vh;
     width: 100vw;
     box-sizing: border-box;
+    padding-top: 15vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     overflow: hidden;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
 }
 
 .search-header {
     width: 100%;
     max-width: 900px;
-    background: rgba(255, 255, 255, 0.6);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
-    padding: 30px 40px;
+    background: rgba(255, 255, 255, 0.7);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    padding: 40px 50px;
     border-radius: 24px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.5);
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    flex-shrink: 0; /* Prevent header from shrinking */
-    animation: slideDown 0.5s ease-out;
+    margin-top: 40px;
+    margin-bottom: 30px;
+    flex-shrink: 0;
+    animation: slideDown 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 @keyframes slideDown {
@@ -140,16 +139,16 @@
     flex: 1;
     width: 100%;
     overflow-y: auto;
-    padding: 0 20px 40px 20px;
+    padding: 20px 40px 40px 40px;
     display: flex;
     justify-content: center;
     /* Custom Scrollbar */
     scrollbar-width: thin;
-    scrollbar-color: rgba(0,0,0,0.2) transparent;
+    scrollbar-color: rgba(255,255,255,0.5) transparent;
 }
 
 .search-results-scroll-area::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
 }
 
 .search-results-scroll-area::-webkit-scrollbar-track {
@@ -157,21 +156,116 @@
 }
 
 .search-results-scroll-area::-webkit-scrollbar-thumb {
-    background-color: rgba(0,0,0,0.2);
+    background-color: rgba(255,255,255,0.5);
     border-radius: 4px;
 }
 
 .search-results-content {
     width: 100%;
-    max-width: 1000px;
+    max-width: 1200px;
     animation: fadeInUp 0.6s ease-out;
 }
 
+/* Grid Layout for Articles - Responsive Grid */
 .articles-list {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+    width: 100%;
+    padding-bottom: 40px;
+}
+
+@media (max-width: 1400px) {
+    .articles-list {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width: 1100px) {
+    .articles-list {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 800px) {
+    .articles-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 500px) {
+    .articles-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Ensure vertical cards look good in search page */
+.articles-list .article-card-vertical {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    height: 100%;
+    margin: 0; /* Reset margin for grid layout */
+    background: rgba(255, 255, 255, 0.6);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.articles-list .article-card-vertical:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+}
+
+.articles-list .article-card-vertical .article-card-cover-wrapper {
     width: 100%;
+    height: 160px;
+    position: relative;
+    overflow: hidden;
+}
+
+.articles-list .article-card-vertical .article-card-cover {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.articles-list .article-card-vertical:hover .article-card-cover {
+    transform: scale(1.05);
+}
+
+.articles-list .article-card-vertical .article-card-info {
+    padding: 10px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.articles-list .article-card-vertical .article-card-title {
+    font-size: 1rem;
+    margin-bottom: 8px;
+    line-height: 1.4;
+    height: 2.8em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.articles-list .article-card-vertical .article-card-meta-top {
+    margin-bottom: 8px;
+}
+
+.articles-list .article-card-vertical .article-card-stats {
+    justify-content: space-between;
+    font-size: 0.8rem;
 }
 
 .load-more-btn {

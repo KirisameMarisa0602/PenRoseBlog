@@ -23,12 +23,7 @@
 .article-detail-container {
   position: relative;
   z-index: 1;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 40px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+  /* Layout handled by ArticleSidebars.css */
 }
 
 .article-main {
@@ -790,4 +785,14 @@ html.banner-is-hidden .article-cover-wrapper {
 @keyframes highlight-pulse {
   0% { background-color: rgba(255, 215, 0, 0.3); }
   100% { background-color: transparent; }
+}
+
+/* Fix anchor scrolling overlap */
+.article-content h1,
+.article-content h2,
+.article-content h3,
+.article-content h4,
+.article-content h5,
+.article-content h6 {
+  scroll-margin-top: calc(15vh + 20px);
 }

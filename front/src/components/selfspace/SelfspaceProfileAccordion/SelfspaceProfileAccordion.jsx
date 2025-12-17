@@ -704,7 +704,7 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                           style={{ maxWidth: '100%', width: '100%', display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}
                         >
                           {activeTab === 'profile' && (
-                            <>
+                            <div style={{ flex: 1, overflowY: 'auto', paddingRight: '5px', paddingBottom: '10px' }}>
                               <div className="form-group">
                                 <label className="profile-form-label">昵称</label>
                                 <input type="text" name="nickname" value={profile.nickname || ''} onChange={handleProfileChange} className="profile-form-input" placeholder="请输入昵称" />
@@ -747,7 +747,7 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                                 <textarea name="bio" maxLength={300} value={profile.bio || ''} onChange={handleProfileChange} placeholder="详细介绍一下自己吧（最多300字）" className="profile-form-textarea" style={{ minHeight: '120px', resize: 'vertical' }} />
                               </div>
                               {editMsg && <div className="form-msg" style={{ marginTop: 15, color: editMsg.includes('成功') ? '#52c41a' : '#ff4d4f', textAlign: 'center', fontWeight: '500' }}>{editMsg}</div>}
-                            </>
+                            </div>
                           )}
 
                           {activeTab === 'tags' && (
@@ -863,19 +863,20 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                           )}
 
                           {activeTab === 'media' && (
-                            <>
-                              <div className="form-group">
-                                <label className="profile-form-label" style={{ marginBottom: '15px', display: 'block' }}>头像设置</label>
-                                <div style={{ display: 'flex', justifyContent: 'center', padding: '20px 0' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflowY: 'hidden', paddingRight: '5px' }}>
+                              <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
+                                {/* Avatar Section */}
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                  <label className="profile-form-label" style={{ marginBottom: '15px', display: 'block', width: '100%', textAlign: 'left' }}>头像设置</label>
                                   <div
                                     className="avatar-upload-preview"
                                     style={{
                                       position: 'relative',
-                                      width: '200px',
-                                      height: '200px',
-                                      borderRadius: '4px',
+                                      width: '160px',
+                                      height: '160px',
+                                      borderRadius: '50%',
                                       cursor: 'pointer',
-                                      boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                                      boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
                                       border: '4px solid #fff',
                                       overflow: 'hidden',
                                       transition: 'transform 0.3s',
@@ -883,7 +884,7 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                                     }}
                                     onClick={() => document.getElementById('avatar-upload-hidden').click()}
                                     onMouseEnter={e => {
-                                      e.currentTarget.style.transform = 'scale(1.02)';
+                                      e.currentTarget.style.transform = 'scale(1.05)';
                                       e.currentTarget.querySelector('.avatar-overlay').style.opacity = 1;
                                     }}
                                     onMouseLeave={e => {
@@ -894,7 +895,7 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                                     <img
                                       src={avatarPreview || (profile.avatarUrl ? resolveUrl(profile.avatarUrl) : resolveUrl(getDefaultAvatar(profile.id || userId)))}
                                       alt="Avatar"
-                                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                     />
                                     <div className="avatar-overlay" style={{
                                       position: 'absolute',
@@ -919,82 +920,89 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                                       style={{ display: 'none' }}
                                     />
                                   </div>
-                                </div>
-                              </div>
-
-                              <div className="form-group" style={{ marginTop: '10px' }}>
-                                <label className="profile-form-label" style={{ marginBottom: '1px', display: 'block' }}>背景设置</label>
-                                <div
-                                  className="bg-upload-preview"
-                                  style={{
-                                    position: 'relative',
-                                    width: '100%',
-                                    height: '240px',
-                                    borderRadius: '8px',
-                                    overflow: 'hidden',
-                                    cursor: 'pointer',
-                                    boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
-                                    border: '1px solid #eee',
-                                    transition: 'all 0.3s',
-                                    background: '#f0f0f0'
-                                  }}
-                                  onClick={() => document.getElementById('bg-upload-hidden').click()}
-                                  onMouseEnter={e => {
-                                    e.currentTarget.style.boxShadow = '0 12px 32px rgba(0,0,0,0.15)';
-                                    e.currentTarget.querySelector('.bg-overlay').style.opacity = 1;
-                                  }}
-                                  onMouseLeave={e => {
-                                    e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.1)';
-                                    e.currentTarget.querySelector('.bg-overlay').style.opacity = 0;
-                                  }}
-                                >
-                                  {(() => {
-                                    const url = backgroundPreview || profile.backgroundUrl;
-                                    if (url) {
-                                      if (/\.(mp4|webm)$/i.test(url)) {
-                                        return <video src={resolveUrl(url)} className="profilepanel-bg-video" style={{ width: '100%', height: '100%', objectFit: 'contain', backgroundColor: '#000' }} muted loop autoPlay />;
-                                      } else {
-                                        return <img src={resolveUrl(url)} alt="Background" className="profilepanel-bg-img" style={{ width: '100%', height: '100%', objectFit: 'contain', backgroundColor: '#f8f8f8' }} />;
-                                      }
-                                    } else {
-                                      return (
-                                        <div style={{
-                                          width: '100%',
-                                          height: '100%',
-                                          background: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)'
-                                        }} />
-                                      );
-                                    }
-                                  })()}
-
-                                  <div className="bg-overlay" style={{
-                                    position: 'absolute',
-                                    top: 0, left: 0, width: '100%', height: '100%',
-                                    background: 'rgba(0,0,0,0.4)',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    color: '#fff',
-                                    opacity: 0,
-                                    transition: 'opacity 0.3s',
-                                    backdropFilter: 'blur(2px)'
-                                  }}>
-                                    <span style={{ fontSize: '32px', marginBottom: '10px' }}>🖼️</span>
-                                    <span style={{ fontSize: '14px', fontWeight: 'bold', letterSpacing: '1px' }}>点击更换背景</span>
-                                    <span style={{ fontSize: '12px', opacity: 0.8, marginTop: '5px' }}>支持图片与视频</span>
+                                  <div style={{ marginTop: '10px', fontSize: '0.85rem', color: '#999' }}>
+                                    点击上方图片更换头像
                                   </div>
-                                  <input
-                                    type="file"
-                                    id="bg-upload-hidden"
-                                    accept="image/*,image/gif,video/mp4,video/webm"
-                                    onChange={handleBackgroundSelect}
-                                    style={{ display: 'none' }}
-                                  />
+                                </div>
+
+                                {/* Background Section */}
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                  <label className="profile-form-label" style={{ marginBottom: '15px', display: 'block' }}>背景设置</label>
+                                  <div
+                                    className="bg-upload-preview"
+                                    style={{
+                                      position: 'relative',
+                                      width: '100%',
+                                      aspectRatio: '16/9',
+                                      borderRadius: '12px',
+                                      overflow: 'hidden',
+                                      cursor: 'pointer',
+                                      boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+                                      border: '1px solid #eee',
+                                      transition: 'all 0.3s',
+                                      background: '#f0f0f0'
+                                    }}
+                                    onClick={() => document.getElementById('bg-upload-hidden').click()}
+                                    onMouseEnter={e => {
+                                      e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.12)';
+                                      e.currentTarget.querySelector('.bg-overlay').style.opacity = 1;
+                                    }}
+                                    onMouseLeave={e => {
+                                      e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.08)';
+                                      e.currentTarget.querySelector('.bg-overlay').style.opacity = 0;
+                                    }}
+                                  >
+                                    {(() => {
+                                      const url = backgroundPreview || profile.backgroundUrl;
+                                      if (url) {
+                                        if (/\.(mp4|webm)$/i.test(url)) {
+                                          return <video src={resolveUrl(url)} className="profilepanel-bg-video" style={{ width: '100%', height: '100%', objectFit: 'cover', backgroundColor: '#000' }} muted loop autoPlay />;
+                                        } else {
+                                          return <img src={resolveUrl(url)} alt="Background" className="profilepanel-bg-img" style={{ width: '100%', height: '100%', objectFit: 'cover', backgroundColor: '#f8f8f8' }} />;
+                                        }
+                                      } else {
+                                        return (
+                                          <div style={{
+                                            width: '100%',
+                                            height: '100%',
+                                            background: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)'
+                                          }} />
+                                        );
+                                      }
+                                    })()}
+
+                                    <div className="bg-overlay" style={{
+                                      position: 'absolute',
+                                      top: 0, left: 0, width: '100%', height: '100%',
+                                      background: 'rgba(0,0,0,0.4)',
+                                      display: 'flex',
+                                      flexDirection: 'column',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      color: '#fff',
+                                      opacity: 0,
+                                      transition: 'opacity 0.3s',
+                                      backdropFilter: 'blur(2px)'
+                                    }}>
+                                      <span style={{ fontSize: '32px', marginBottom: '10px' }}>🖼️</span>
+                                      <span style={{ fontSize: '14px', fontWeight: 'bold', letterSpacing: '1px' }}>点击更换背景</span>
+                                      <span style={{ fontSize: '12px', opacity: 0.8, marginTop: '5px' }}>支持图片与视频</span>
+                                    </div>
+                                    <input
+                                      type="file"
+                                      id="bg-upload-hidden"
+                                      accept="image/*,image/gif,video/mp4,video/webm"
+                                      onChange={handleBackgroundSelect}
+                                      style={{ display: 'none' }}
+                                    />
+                                  </div>
+                                  <div style={{ marginTop: '10px', fontSize: '0.85rem', color: '#999', textAlign: 'center' }}>
+                                    点击上方区域更换背景
+                                  </div>
                                 </div>
                               </div>
                               {editMsg && <div className="form-msg" style={{ marginTop: 15, color: editMsg.includes('成功') ? '#52c41a' : '#ff4d4f', textAlign: 'center', fontWeight: '500' }}>{editMsg}</div>}
-                            </>
+                            </div>
                           )}
 
                           {activeTab === 'contact' && (
@@ -1227,13 +1235,13 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                 }
               >
                 {isActive ? (
-                  <div className="profilepanel-info-panel" style={{ padding: '30px', width: '100%', height: '100%', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
+                  <div className="profilepanel-info-panel" style={{ padding: '30px', width: '100%', height: '100%', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                     <h3 style={{ marginTop: 0, marginBottom: '20px', color: '#333', borderBottom: '2px solid #f0f0f0', paddingBottom: '15px', fontSize: '1.4rem', flexShrink: 0 }}>关于我</h3>
 
-                    <div className="profile-about-content">
+                    <div className="profile-about-content" style={{ display: 'flex', flex: 1, overflow: 'hidden', gap: '20px' }}>
                       {/* Left: Matchbox (Fixed width) */}
-                      <div className="profile-tags-section">
-                        <div className="profile-tags-display">
+                      <div className="profile-tags-section" style={{ flex: '0 0 200px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <div className="profile-tags-display" style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           {tagsList && tagsList.length > 0 ? (
                             <div className="matchbox-scale-wrapper">
                               <MatchboxTagEditor tags={tagsList} readOnly={true} />
@@ -1247,12 +1255,12 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                       </div>
 
                       {/* Right: Bio (Flexible) */}
-                      <div className="profile-bio-section">
-                        <h4 className="profile-bio-title">
+                      <div className="profile-bio-section" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'rgba(255,255,255,0.5)', borderRadius: '16px', padding: '20px' }}>
+                        <h4 className="profile-bio-title" style={{ marginTop: 0 }}>
                           <span className="title-accent"></span>
                           个人简介
                         </h4>
-                        <div className="profile-bio-text-area">
+                        <div className="profile-bio-text-area" style={{ flex: 1, overflowY: 'auto', lineHeight: '1.6', fontSize: '1.05rem' }}>
                           {profile.bio || '这个人很懒，什么都没有写~'}
                         </div>
                       </div>
@@ -1307,63 +1315,43 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                 }
               >
                 {isActive ? (
-                  <div className="profilepanel-contact-panel" style={{ padding: '25px', height: '100%', overflowY: 'auto', boxSizing: 'border-box', display: 'flex', flexDirection: 'column' }}>
-                    <h3 style={{ marginTop: 0, marginBottom: '20px', color: '#333', borderBottom: '2px solid #f0f0f0', paddingBottom: '15px', fontSize: '1.3rem', letterSpacing: '1px' }}>联系方式</h3>
+                  <div className="profilepanel-contact-panel" style={{ padding: '25px', height: '100%', overflow: 'hidden', boxSizing: 'border-box', display: 'flex', flexDirection: 'column' }}>
+                    <h3 style={{ marginTop: 0, marginBottom: '20px', color: '#333', borderBottom: '2px solid #f0f0f0', paddingBottom: '15px', fontSize: '1.3rem', letterSpacing: '1px', flexShrink: 0 }}>联系方式</h3>
 
-                    <div className="profile-contact-list" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <div className="profile-contact-list" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px', overflowY: 'auto', paddingBottom: '10px' }}>
                       {/* QQ */}
                       {(profile.qq || profile.qqQrCode) && (
                         <div className="contact-item" style={{
                           display: 'flex',
-                          alignItems: 'center',
+                          flexDirection: 'column',
                           background: '#fff',
-                          padding: '16px 20px',
+                          padding: '16px',
                           borderRadius: '16px',
                           boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
                           border: '1px solid #f5f5f5',
                           transition: 'all 0.3s ease',
-                          position: 'relative'
+                          position: 'relative',
+                          height: 'fit-content'
                         }}
                           onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.08)'; }}
                           onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.04)'; }}
                         >
-                          <div style={{
-                            width: '48px', height: '48px', borderRadius: '12px', background: '#e6f7ff',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '16px', flexShrink: 0
-                          }}>
-                            <img src={resolveUrl('/icons/contect/qq.svg')} alt="QQ" style={{ width: '28px', height: '28px' }} />
+                          <div style={{ display: 'flex', alignItems: 'center', width: '100%', marginBottom: profile.qqQrCode ? '12px' : '0' }}>
+                            <div style={{
+                              width: '40px', height: '40px', borderRadius: '10px', background: '#e6f7ff',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '12px', flexShrink: 0
+                            }}>
+                              <img src={resolveUrl('/icons/contect/qq.svg')} alt="QQ" style={{ width: '24px', height: '24px' }} />
+                            </div>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ fontSize: '1rem', fontWeight: 'bold', color: '#333', marginBottom: '2px' }}>QQ</div>
+                              {profile.qq && <div style={{ fontSize: '0.85rem', color: '#888', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{profile.qq}</div>}
+                            </div>
                           </div>
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ fontSize: '1.05rem', fontWeight: 'bold', color: '#333', marginBottom: '4px' }}>QQ</div>
-                            {profile.qq && <div style={{ fontSize: '0.9rem', color: '#888', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{profile.qq}</div>}
-                          </div>
+                          
                           {profile.qqQrCode && (
-                            <div className="qr-preview-hover" style={{ position: 'relative', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '5px' }}>
-                              <img src={resolveUrl('/icons/profile/qrcode_icon.svg')} alt="QR" style={{ width: '24px', height: '24px', opacity: 0.6 }} 
-                                onError={(e) => { e.target.onerror = null; e.target.src = resolveUrl(profile.qqQrCode); e.target.style.borderRadius = '4px'; }}
-                              />
-                              <div className="qr-popup" style={{
-                                position: 'fixed',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                background: '#fff',
-                                padding: '15px',
-                                borderRadius: '16px',
-                                boxShadow: '0 12px 48px rgba(0,0,0,0.25)',
-                                zIndex: 9999,
-                                display: 'none',
-                                border: '1px solid #eee',
-                                flexDirection: 'column',
-                                alignItems: 'center'
-                              }}>
-                                <div style={{ marginBottom: '10px', fontWeight: 'bold', color: '#555', fontSize: '1rem' }}>QQ 二维码</div>
-                                <img src={resolveUrl(profile.qqQrCode)} alt="QQ QR" style={{ width: '320px', height: '320px', objectFit: 'contain', display: 'block', borderRadius: '8px' }} />
-                              </div>
-                              <style>{`
-                                 .qr-preview-hover:hover .qr-popup { display: flex !important; animation: popIn 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28); }
-                                 @keyframes popIn { from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
-                               `}</style>
+                            <div style={{ width: '100%', display: 'flex', justifyContent: 'center', background: '#f9f9f9', padding: '10px', borderRadius: '8px' }}>
+                                <img src={resolveUrl(profile.qqQrCode)} alt="QQ QR" style={{ maxWidth: '100%', maxHeight: '150px', objectFit: 'contain', borderRadius: '4px' }} />
                             </div>
                           )}
                         </div>
@@ -1373,51 +1361,35 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                       {(profile.wechat || profile.wechatQrCode) && (
                         <div className="contact-item" style={{
                           display: 'flex',
-                          alignItems: 'center',
+                          flexDirection: 'column',
                           background: '#fff',
-                          padding: '16px 20px',
+                          padding: '16px',
                           borderRadius: '16px',
                           boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
                           border: '1px solid #f5f5f5',
                           transition: 'all 0.3s ease',
-                          position: 'relative'
+                          position: 'relative',
+                          height: 'fit-content'
                         }}
                           onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.08)'; }}
                           onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.04)'; }}
                         >
-                          <div style={{
-                            width: '48px', height: '48px', borderRadius: '12px', background: '#e9f7ef',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '16px', flexShrink: 0
-                          }}>
-                            <img src={resolveUrl('/icons/contect/微信.svg')} alt="WeChat" style={{ width: '28px', height: '28px' }} />
+                          <div style={{ display: 'flex', alignItems: 'center', width: '100%', marginBottom: profile.wechatQrCode ? '12px' : '0' }}>
+                            <div style={{
+                              width: '40px', height: '40px', borderRadius: '10px', background: '#e9f7ef',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '12px', flexShrink: 0
+                            }}>
+                              <img src={resolveUrl('/icons/contect/微信.svg')} alt="WeChat" style={{ width: '24px', height: '24px' }} />
+                            </div>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ fontSize: '1rem', fontWeight: 'bold', color: '#333', marginBottom: '2px' }}>微信</div>
+                              {profile.wechat && <div style={{ fontSize: '0.85rem', color: '#888', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{profile.wechat}</div>}
+                            </div>
                           </div>
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ fontSize: '1.05rem', fontWeight: 'bold', color: '#333', marginBottom: '4px' }}>微信</div>
-                            {profile.wechat && <div style={{ fontSize: '0.9rem', color: '#888', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{profile.wechat}</div>}
-                          </div>
+                          
                           {profile.wechatQrCode && (
-                            <div className="qr-preview-hover" style={{ position: 'relative', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '5px' }}>
-                              <img src={resolveUrl('/icons/profile/qrcode_icon.svg')} alt="QR" style={{ width: '24px', height: '24px', opacity: 0.6 }} 
-                                onError={(e) => { e.target.onerror = null; e.target.src = resolveUrl(profile.wechatQrCode); e.target.style.borderRadius = '4px'; }}
-                              />
-                              <div className="qr-popup" style={{
-                                position: 'fixed',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                background: '#fff',
-                                padding: '15px',
-                                borderRadius: '16px',
-                                boxShadow: '0 12px 48px rgba(0,0,0,0.25)',
-                                zIndex: 9999,
-                                display: 'none',
-                                border: '1px solid #eee',
-                                flexDirection: 'column',
-                                alignItems: 'center'
-                              }}>
-                                <div style={{ marginBottom: '10px', fontWeight: 'bold', color: '#555', fontSize: '1rem' }}>微信 二维码</div>
-                                <img src={resolveUrl(profile.wechatQrCode)} alt="WeChat QR" style={{ width: '320px', height: '320px', objectFit: 'contain', display: 'block', borderRadius: '8px' }} />
-                              </div>
+                            <div style={{ width: '100%', display: 'flex', justifyContent: 'center', background: '#f9f9f9', padding: '10px', borderRadius: '8px' }}>
+                                <img src={resolveUrl(profile.wechatQrCode)} alt="WeChat QR" style={{ maxWidth: '100%', maxHeight: '150px', objectFit: 'contain', borderRadius: '4px' }} />
                             </div>
                           )}
                         </div>

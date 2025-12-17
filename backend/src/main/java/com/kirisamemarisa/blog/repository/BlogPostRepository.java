@@ -43,4 +43,7 @@ public interface BlogPostRepository extends JpaRepository<BlogPost, Long> {
         List<String> findFavoriteCategories(@Param("userId") Long userId);
 
         long countByUserId(Long userId);
+
+        // 获取某分类下点赞最多的文章
+        BlogPost findFirstByCategoryOrderByLikeCountDesc(com.kirisamemarisa.blog.model.Category category);
 }

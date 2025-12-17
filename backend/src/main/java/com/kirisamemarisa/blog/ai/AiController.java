@@ -84,11 +84,18 @@ public class AiController {
     /**
      * True SSE endpoint that proxies upstream streaming tokens.
      * It forwards OpenAI-compatible streaming and emits text chunks to the client.
+     * Supports POST for larger payloads.
      */
-    @org.springframework.web.bind.annotation.GetMapping(path = "/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter chatStream(@org.springframework.web.bind.annotation.RequestParam("message") String message,
-            @org.springframework.web.bind.annotation.RequestParam(value = "model", required = false) String model) {
+    @PostMapping(path = "/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter chatStreamPost(@RequestBody Map<String, Object> payload) {
         SseEmitter emitter = new SseEmitter(0L);
+        Object m = payload.get("message");
+        String message = m == null ? null : String.valueOf(m);
+        String model = null;
+        Object md = payload.get("model");
+        if (md != null)
+            model = String.valueOf(md);
+
         if (message == null || message.isBlank()) {
             try {
                 emitter.send(SseEmitter.event().data("{" + "\"error\":\"message is required\"" + "}"));
@@ -99,28 +106,23 @@ public class AiController {
             return emitter;
         }
 
-        // Subscribe and keep a handle to dispose when client disconnects
-        final reactor.core.Disposable subscription = aiClientService.chatStream(message, model)
-                .subscribe(
-                        chunk -> {
-                            try {
-                                emitter.send(SseEmitter.event().data(chunk));
-                            } catch (Exception sendEx) {
-                                emitter.completeWithError(sendEx);
-                            }
-                        },
-                        err -> {
-                            try {
-                                emitter.send(SseEmitter.event().data("[error] " + err.getMessage()));
-                            } catch (Exception ignored) {
-                            }
-                            emitter.completeWithError(err);
-                        },
-                        emitter::complete);
-
-        emitter.onCompletion(subscription::dispose);
-        emitter.onTimeout(subscription::dispose);
+        // Use a separate thread to avoid blocking the servlet thread
+        String finalModel = model;
+        new Thread(() -> {
+            try {
+                aiClientService.streamChat(message, finalModel, emitter);
+            } catch (Exception e) {
+                emitter.completeWithError(e);
+            }
+        }).start();
 
         return emitter;
+    }
+
+    @org.springframework.web.bind.annotation.GetMapping(path = "/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter chatStream(@org.springframework.web.bind.annotation.RequestParam("message") String message,
+            @org.springframework.web.bind.annotation.RequestParam(value = "model", required = false) String model) {
+        // Forward to POST logic for consistency, or keep as legacy
+        return chatStreamPost(Map.of("message", message, "model", model != null ? model : ""));
     }
 }

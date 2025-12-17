@@ -9,18 +9,17 @@ import com.kirisamemarisa.blog.mapper.UserSimpleMapper;
 import com.kirisamemarisa.blog.repository.UserProfileRepository;
 import com.kirisamemarisa.blog.model.User;
 import com.kirisamemarisa.blog.model.UserProfile;
-// 分层：控制器不直接依赖仓库，改为依赖服务
 import com.kirisamemarisa.blog.service.UserService;
 import com.kirisamemarisa.blog.service.FollowService;
+import com.kirisamemarisa.blog.service.CurrentUserResolver;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 /**
- * 关注相关接口：兼容未登录测试（通过 X-User-Id 头传当前用户ID）。
+ * 关注相关接口
  */
 @RestController
 @RequestMapping("/api/follow")
@@ -28,28 +27,24 @@ public class FollowController {
 
     private final UserService userService;
     private final FollowService followService;
+    private final CurrentUserResolver currentUserResolver;
 
     public FollowController(UserService userService, FollowService followService,
-            UserProfileRepository userProfileRepository) {
+            UserProfileRepository userProfileRepository,
+            CurrentUserResolver currentUserResolver) {
         this.userService = userService;
         this.followService = followService;
+        this.currentUserResolver = currentUserResolver;
     }
 
-    private User resolveCurrentUser(UserDetails principal, Long headerUserId) {
-        if (principal != null) {
-            return userService.getUserByUsername(principal.getUsername());
-        }
-        if (headerUserId != null) {
-            return userService.getUserById(headerUserId);
-        }
-        return null;
+    private User resolveCurrentUser(Object principal) {
+        return currentUserResolver.resolve(principal);
     }
 
     @PostMapping("/{targetId}")
     public ApiResponse<Void> follow(@PathVariable Long targetId,
-            @RequestHeader(name = "X-User-Id", required = false) Long headerUserId,
-            @AuthenticationPrincipal UserDetails principal) {
-        User me = resolveCurrentUser(principal, headerUserId);
+            @AuthenticationPrincipal Object principal) {
+        User me = resolveCurrentUser(principal);
         if (me == null) {
             return new ApiResponse<>(401, "未认证", null);
         }
@@ -69,9 +64,8 @@ public class FollowController {
 
     @DeleteMapping("/{targetId}")
     public ApiResponse<Void> unfollow(@PathVariable Long targetId,
-            @RequestHeader(name = "X-User-Id", required = false) Long headerUserId,
-            @AuthenticationPrincipal UserDetails principal) {
-        User me = resolveCurrentUser(principal, headerUserId);
+            @AuthenticationPrincipal Object principal) {
+        User me = resolveCurrentUser(principal);
         if (me == null) {
             return new ApiResponse<>(401, "未认证", null);
         }
@@ -90,9 +84,8 @@ public class FollowController {
     public ApiResponse<PageResult<UserSimpleDTO>> followers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestHeader(name = "X-User-Id", required = false) Long headerUserId,
-            @AuthenticationPrincipal UserDetails principal) {
-        User me = resolveCurrentUser(principal, headerUserId);
+            @AuthenticationPrincipal Object principal) {
+        User me = resolveCurrentUser(principal);
         if (me == null) {
             return new ApiResponse<>(401, "未认证", null);
         }
@@ -108,9 +101,8 @@ public class FollowController {
     public ApiResponse<PageResult<UserSimpleDTO>> following(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestHeader(name = "X-User-Id", required = false) Long headerUserId,
-            @AuthenticationPrincipal UserDetails principal) {
-        User me = resolveCurrentUser(principal, headerUserId);
+            @AuthenticationPrincipal Object principal) {
+        User me = resolveCurrentUser(principal);
         if (me == null) {
             return new ApiResponse<>(401, "未认证", null);
         }
@@ -121,6 +113,4 @@ public class FollowController {
                 .toList();
         return new ApiResponse<>(200, "获取成功", new PageResult<>(dtoList, total, page, size));
     }
-
-    // 移除好友相关接口：好友不再由互关推导
 }

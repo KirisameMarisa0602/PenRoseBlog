@@ -54,6 +54,18 @@ export default function BannerNavbar({ bannerId }) {
   const moveXRef = useRef(0);
   const animStateRef = useRef({ homing: false, startTime: 0, duration: 300 });
 
+  // Sync navHidden state to body class for other components to react
+  useEffect(() => {
+    if (navHidden) {
+      document.body.classList.add('navbar-hidden-mode');
+    } else {
+      document.body.classList.remove('navbar-hidden-mode');
+    }
+    return () => {
+      document.body.classList.remove('navbar-hidden-mode');
+    };
+  }, [navHidden]);
+
   useEffect(() => {
     let dead = false;
     setError(null);
@@ -510,7 +522,7 @@ export default function BannerNavbar({ bannerId }) {
         <SplitNavItem to="/notifications" text="系统通知" badge={sysUnread} />
 
         {/* 6. Publish */}
-        <SplitNavItem to="/blog-edit" text="发布文章" />
+        <SplitNavItem to="/blog-edit?new=true" text="发布文章" />
 
         {/* 7. Placeholder */}
         <SplitNavItem text="更多功能" />

@@ -14,75 +14,75 @@ position: relative;
 .maid-splitter::after { content: ""; position: absolute; left: 50%; transform: translateX(-50%); top: 2px; width: 40px; height: 4px; border-radius: 4px; background: rgba(99,102,241,0.3); }
 
 .maid-widget {
---maid-header-h: 52px; /* Slightly taller header */
---maid-bar-h: 64px;
---maid-stage-collapse: 300ms;
---maid-stage-expand: 300ms;
---maid-btn-collapse-duration: 260ms;
---maid-btn-expand-duration: 260ms;
---maid-btn-stagger: 100ms;
-position: fixed;
-top: var(--navH, 15vh);
-right: 0;
-height: calc(100vh - var(--navH, 15vh));
-width: 28vw;
-    min-width: 340px; /* Slightly wider min-width */
-display: flex;
-flex-direction: column;
-background: linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(240, 245, 255, 0.8)); /* Gradient background */
--webkit-backdrop-filter: blur(24px) saturate(180%);
-backdrop-filter: blur(24px) saturate(180%);
-box-shadow: -8px 0 32px rgba(0,0,0,0.12), inset 1px 0 0 rgba(255,255,255,0.4);
-z-index: 2000;
-color: #333;
--webkit-user-select: none;
-user-select: none;
-overflow: visible;
-transform: translateX(0);
-transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    border-left: 1px solid rgba(255,255,255,0.6);
-    border-radius: 24px 0 0 24px; /* Rounded corners on the left */
+  --maid-header-h: 56px;
+  --maid-bar-h: 72px;
+  --maid-stage-collapse: 300ms;
+  --maid-stage-expand: 300ms;
+  --maid-btn-collapse-duration: 260ms;
+  --maid-btn-expand-duration: 260ms;
+  --maid-btn-stagger: 100ms;
+  position: fixed;
+  top: var(--navH, 15vh);
+  right: 0;
+  height: calc(100vh - var(--navH, 15vh));
+  width: 28vw;
+  min-width: 360px;
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.75);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.08), inset 1px 0 0 rgba(255, 255, 255, 0.6);
+  z-index: 2000;
+  color: #333;
+  -webkit-user-select: none;
+  user-select: none;
+  overflow: visible;
+  transform: translateX(0);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  border-left: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 24px 0 0 24px;
 }
 
 .maid-resizer {
-position: absolute;
-left: -6px;
-top: 0;
-bottom: 0;
-width: 12px;
-cursor: ew-resize;
-z-index: 10020;
-background: transparent;
+  position: absolute;
+  left: -6px;
+  top: 0;
+  bottom: 0;
+  width: 12px;
+  cursor: ew-resize;
+  z-index: 10020;
+  background: transparent;
 }
-.maid-resizer:hover { background: rgba(99,102,241,0.1); }
+.maid-resizer:hover { background: rgba(99, 102, 241, 0.1); }
 
 .maid-header { 
-    height: var(--maid-header-h); 
-    display: flex; 
-    align-items: center; 
-    justify-content: flex-end; 
-    padding: 0 20px; 
-    border-bottom: 1px solid rgba(0,0,0,0.04); 
-    background: rgba(255,255,255,0.4); 
+  height: var(--maid-header-h); 
+  display: flex; 
+  align-items: center; 
+  justify-content: flex-end; 
+  padding: 0 24px; 
+  border-bottom: 1px solid rgba(0, 0, 0, 0.03); 
+  background: rgba(255, 255, 255, 0.3); 
 }
 .maid-header-actions { display: inline-flex; align-items: center; gap: 12px; }
 
 .maid-top {
-box-sizing: border-box;
-padding: 0;
-background: transparent;
-display: flex;
-flex-direction: column;
-min-height: 0;
-flex: 3 1 0;
+  box-sizing: border-box;
+  padding: 0;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 3 1 0;
 }
 .maid-bottom {
-min-height: 0;
-display: flex;
-flex-direction: column;
-background: rgba(255,255,255,0.3); /* Subtle separation */
-border-top: 1px solid rgba(0,0,0,0.04);
-flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.4);
+  border-top: 1px solid rgba(0, 0, 0, 0.03);
+  flex: 1 1 auto;
 }
 
 .maid-ai-chat-wrap { height: 100%; display: flex; flex-direction: column; }
@@ -116,68 +116,79 @@ background: transparent;
   border: none;
   cursor: pointer;
   padding: 8px;
-  border-radius: 12px; /* Softer radius */
-  transition: all 0.2s;
+  border-radius: 14px;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  overflow: hidden;
 }
 .maid-btn:hover {
-  background: rgba(0,0,0,0.05);
-  transform: scale(1.05);
+  background: rgba(255, 255, 255, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 .maid-btn:active {
   transform: scale(0.95);
 }
 
 .maid-toggle {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
-  color: #555;
-  background: rgba(255,255,255,0.6);
-  border: 1px solid rgba(0,0,0,0.08);
-  padding: 6px 12px;
-  height: 32px;
+  color: #666;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 6px 16px;
+  height: 36px;
+  border-radius: 18px;
 }
 .maid-toggle:hover {
   background: #fff;
   color: #6366f1;
-  border-color: rgba(99,102,241,0.3);
-  box-shadow: 0 2px 8px rgba(99,102,241,0.15);
+  border-color: rgba(99, 102, 241, 0.2);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
 }
 
 .maid-iconbtn {
-  width: 44px; /* Slightly larger touch target */
-  height: 44px;
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
 }
 .maid-iconbtn img {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   object-fit: contain;
-  opacity: 0.7;
-  transition: opacity 0.2s;
+  opacity: 0.6;
+  transition: all 0.3s;
+  filter: grayscale(100%);
 }
 .maid-iconbtn:hover img {
   opacity: 1;
+  filter: grayscale(0%);
+  transform: scale(1.1);
 }
 .maid-iconbtn-active {
-  background: rgba(99,102,241,0.1);
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.2);
 }
 .maid-iconbtn-active img {
   opacity: 1;
-  filter: drop-shadow(0 2px 4px rgba(99,102,241,0.3));
+  filter: grayscale(0%);
+  transform: scale(1.1);
 }
 
 .maid-controlbar {
-height: var(--maid-bar-h);
-display: flex;
-align-items: center;
-justify-content: center;
-gap: 16px;
-padding: 0 20px;
-z-index: 60;
-    background: rgba(255,255,255,0.6);
-    position: relative; /* Ensure z-index works */
+  height: var(--maid-bar-h);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 0 20px;
+  z-index: 60;
+  background: rgba(255, 255, 255, 0.4);
+  position: relative;
+  border-top: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 /* AI Chat Panel Styles */
@@ -363,53 +374,58 @@ html.banner-is-hidden .maid-widget { top: 0; height: 100vh; }
 
 /* Settings Panel */
 .maid-settings-panel {
-  padding: 16px 20px;
-  background: rgba(255, 255, 255, 0.4);
-  border-top: 1px solid rgba(0,0,0,0.05);
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.85);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  margin-bottom: 8px;
 }
 
 .maid-field {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 16px;
+  padding: 4px 0;
 }
 
 .maid-controls-label {
   font-size: 14px;
-  color: #555;
+  color: #444;
   font-weight: 600;
   min-width: 60px;
 }
 
 .maid-select {
   flex: 1;
-  padding: 8px 12px;
+  padding: 10px 16px;
   border-radius: 12px;
-  border: 1px solid rgba(0,0,0,0.1);
-  background: rgba(255,255,255,0.6);
-  font-size: 13px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #fff;
+  font-size: 14px;
   color: #333;
   outline: none;
   transition: all 0.2s;
   cursor: pointer;
-  appearance: none; /* Remove default arrow */
+  appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
-  padding-right: 32px;
+  padding-right: 36px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
 }
 .maid-select:hover {
-  border-color: rgba(99,102,241,0.3);
-  background-color: #fff;
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
 }
 .maid-select:focus {
   border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
-  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
 }
 
 /* Emotion/Action/Clothes Panel */

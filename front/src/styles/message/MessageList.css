@@ -1,16 +1,64 @@
 /* MessageList 样式 */
+@keyframes gradientFlow {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 100% 100%; }
+  100% { background-position: 0% 0%; }
+}
+
 .message-list-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #e3e8f0 0%, #c9d6ff 100%);
+  /* Cyberpunk/Miku Gradient Background */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding-top: 40px;
 }
+
 .message-list-container {
   max-width: 700px;
   margin: 0 auto;
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 4px 24px rgba(80,120,200,0.10);
+  /* Glassmorphism */
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   padding: 32px 28px;
+  
+  /* Glowing Border Setup */
+  position: relative;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
+
+.message-list-container::after {
+  content: "";
+  position: absolute;
+  top: -5px; left: -5px; right: -5px; bottom: -5px;
+  /* Extremely subtle, ethereal flow */
+  background: linear-gradient(120deg, 
+    rgba(255, 255, 255, 0.1), 
+    rgba(220, 230, 255, 0.15), 
+    rgba(255, 240, 250, 0.15), 
+    rgba(255, 255, 255, 0.1)
+  );
+  z-index: -1;
+  border-radius: 24px;
+  background-size: 300% 300%;
+  animation: gradientFlow 15s ease infinite;
+  filter: blur(25px);
+  opacity: 0.4;
+  transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+  pointer-events: none; /* Ensure it doesn't block clicks */
+}
+
+.message-list-container:hover::after {
+  opacity: 0.7;
+  filter: blur(30px);
+  background-size: 200% 200%;
+  animation-duration: 8s;
+  /* Slight expansion effect */
+  top: -8px; left: -8px; right: -8px; bottom: -8px;
+}
+
 .message-list-title {
   font-size: 26px;
   font-weight: 700;

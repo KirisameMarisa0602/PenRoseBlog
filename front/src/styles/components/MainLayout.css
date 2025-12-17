@@ -2,7 +2,19 @@
 .app-main--default {
   padding-top: var(--navH);
   /* Darker gradient using variables or darker hex codes */
-  background: linear-gradient(135deg, #f0f2f5 0%, #dbeafe 100%);
+  /* background: linear-gradient(135deg, #f0f2f5 0%, #dbeafe 100%); */
+  background: transparent;
   min-height: 100vh;
   box-sizing: border-box;
+}
+
+.app-main--home {
+  padding-top: 0;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.app-layout--home .banner-navbar {
+  background: transparent !important;
+  box-shadow: none !important;
 }

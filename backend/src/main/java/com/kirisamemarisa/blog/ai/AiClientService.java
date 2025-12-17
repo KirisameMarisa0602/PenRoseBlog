@@ -24,7 +24,6 @@ import org.xml.sax.ContentHandler;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-// JSON parsing for streaming chunks
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -42,84 +41,7 @@ public class AiClientService {
     }
 
     public String chat(String userMessage) {
-        String url = properties.getNormalizedApiBaseUrl() + "/chat/completions";
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
-        headers.add("User-Agent", "blog-ai-client/1.0");
-        String apiKey = properties.getEffectiveApiKey();
-        if (apiKey == null || apiKey.isBlank()) {
-            throw new IllegalStateException(
-                    "AI api key is not configured. Set spring.ai.openai.api-key or set env var.");
-        }
-        headers.setBearerAuth(apiKey);
-
-        Map<String, Object> body = Map.of(
-                "model", properties.getModelOrDefault(),
-                "messages", List.of(Map.of("role", "user", "content", userMessage)));
-
-        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
-
-        ResponseEntity<Map<String, Object>> response = null;
-        RuntimeException lastEx = null;
-        for (int attempt = 1; attempt <= 2; attempt++) {
-            try {
-                response = restTemplate.exchange(
-                        url,
-                        HttpMethod.POST,
-                        request,
-                        new ParameterizedTypeReference<>() {
-                        });
-                lastEx = null;
-                break;
-            } catch (org.springframework.web.client.RestClientResponseException ex) {
-                throw new RuntimeException(
-                        "AI Provider Error: " + ex.getRawStatusCode() + " " + ex.getResponseBodyAsString(), ex);
-            } catch (org.springframework.web.client.ResourceAccessException ex) {
-                lastEx = ex;
-                // quick backoff before a single retry
-                try {
-                    Thread.sleep(150L * attempt);
-                } catch (InterruptedException ignored) {
-                }
-            }
-        }
-        if (lastEx != null)
-            throw lastEx;
-
-        Map<String, Object> respBody = response != null ? response.getBody() : null;
-        if (respBody == null)
-            return null;
-
-        // Try to extract assistant content from response structure similar to OpenAI
-        Object choicesObj = respBody.get("choices");
-        if (choicesObj instanceof List<?> choices && !choices.isEmpty()) {
-            Object first = choices.get(0);
-            if (first instanceof Map<?, ?> firstMap) {
-                Object message = firstMap.get("message");
-                if (message instanceof Map<?, ?> msgMap) {
-                    Object content = msgMap.get("content");
-                    if (content != null)
-                        return content.toString();
-                }
-                // older OpenAI responses put text directly
-                Object text = firstMap.get("text");
-                if (text != null)
-                    return text.toString();
-            }
-        }
-
-        // Fallback: search for a 'message' in top-level keys
-        if (respBody.containsKey("message")) {
-            return String.valueOf(respBody.get("message"));
-        }
-
-        try {
-            return objectMapper.writeValueAsString(respBody);
-        } catch (Exception e) {
-            return respBody.toString();
-        }
+        return chat(userMessage, null);
     }
 
     public String chat(String userMessage, String overrideModel) {
@@ -155,41 +77,12 @@ public class AiClientService {
                     });
         } catch (org.springframework.web.client.RestClientResponseException ex) {
             throw new RuntimeException(
-                    "AI Provider Error: " + ex.getRawStatusCode() + " " + ex.getResponseBodyAsString(), ex);
+                    "AI Provider Error: " + ex.getStatusCode().value() + " " + ex.getResponseBodyAsString(), ex);
         }
 
-        Map<String, Object> respBody = response != null ? response.getBody() : null;
-        if (respBody == null)
-            return null;
-        Object choicesObj = respBody.get("choices");
-        if (choicesObj instanceof List<?> choices && !choices.isEmpty()) {
-            Object first = choices.get(0);
-            if (first instanceof Map<?, ?> firstMap) {
-                Object message = firstMap.get("message");
-                if (message instanceof Map<?, ?> msgMap) {
-                    Object content = msgMap.get("content");
-                    if (content != null)
-                        return content.toString();
-                }
-                Object text = firstMap.get("text");
-                if (text != null)
-                    return text.toString();
-            }
-        }
-        if (respBody.containsKey("message")) {
-            return String.valueOf(respBody.get("message"));
-        }
-        try {
-            return objectMapper.writeValueAsString(respBody);
-        } catch (Exception e) {
-            return respBody.toString();
-        }
+        return extractContentFromResponse(response);
     }
 
-    /**
-     * True upstream streaming using OpenAI-compatible SSE (data: {json} lines).
-     * Returns a Flux of text deltas (tokens/chunks) as they arrive.
-     */
     public Flux<String> chatStream(String userMessage, String overrideModel) {
         String base = getBaseUrlForModel(overrideModel);
         String url = base + "/chat/completions";
@@ -216,7 +109,6 @@ public class AiClientService {
                 })
                 .bodyValue(body)
                 .retrieve()
-                // For SSE, WebClient decodes each event's data as String by default
                 .bodyToFlux(String.class)
                 .onErrorResume(e -> {
                     if (e instanceof org.springframework.web.reactive.function.client.WebClientResponseException wcre) {
@@ -233,7 +125,6 @@ public class AiClientService {
 
     private Flux<String> extractDeltaTextSafely(String raw) {
         try {
-            // Accept either plain JSON or lines prefixed with "data:"
             String payload = raw;
             if (payload.startsWith("data:")) {
                 payload = payload.substring(5).trim();
@@ -245,17 +136,14 @@ public class AiClientService {
             if (choices.isArray()) {
                 java.util.List<String> tokens = new java.util.ArrayList<>();
                 for (JsonNode ch : choices) {
-                    // OpenAI streaming shape: choices[].delta.content
                     String piece = ch.path("delta").path("content").asText(null);
                     if (piece == null || piece.isEmpty()) {
-                        // Some providers use choices[].text
                         piece = ch.path("text").asText(null);
                     }
                     if (piece == null || piece.isEmpty()) {
-                        // Some use choices[].message.content (non-streaming chunk fallback)
                         piece = ch.path("message").path("content").asText(null);
                     }
-                    if (piece != null && !piece.isEmpty()) {
+                    if (piece != null && !piece.isEmpty() && !"null".equals(piece)) {
                         tokens.add(piece);
                     }
                 }
@@ -263,104 +151,12 @@ public class AiClientService {
             }
             return Flux.empty();
         } catch (Exception e) {
-            // In case the server sends plain text deltas (rare), fall back to raw
             return Flux.just(raw);
         }
     }
 
-    /**
-     * Send a multimodal chat with attachments.
-     * attachments entries may contain:
-     * - mime: e.g. image/png, text/plain
-     * - dataUrl: data URL for images (data:image/png;base64,...)
-     * - text: inline text content for textual attachments
-     * - name: optional filename
-     */
     public String chatWithAttachments(String userMessage, java.util.List<java.util.Map<String, Object>> attachments) {
-        String url = properties.getNormalizedApiBaseUrl() +
-                "/chat/completions";
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
-        headers.add("User-Agent", "blog-ai-client/1.0");
-        String apiKey = properties.getEffectiveApiKey();
-        if (apiKey == null || apiKey.isBlank()) {
-            throw new IllegalStateException(
-                    "AI api key is not configured. Set spring.ai.openai.api-key or set env var.");
-        }
-        headers.setBearerAuth(apiKey);
-
-        // Build OpenAI-compatible content array
-        java.util.List<java.util.Map<String, Object>> contentParts = new java.util.ArrayList<>();
-        contentParts.add(java.util.Map.of("type", "text", "text", userMessage));
-        if (attachments != null) {
-            for (java.util.Map<String, Object> att : attachments) {
-                String mime = String.valueOf(att.getOrDefault("mime", ""));
-                if (mime.startsWith("image/")) {
-                    // Prefer image_url with data URL (supported by many OpenAI-compatible APIs)
-                    String dataUrl = String.valueOf(att.getOrDefault("dataUrl", ""));
-                    if (!dataUrl.isBlank()) {
-                        contentParts.add(java.util.Map.of(
-                                "type", "image_url",
-                                "image_url", java.util.Map.of("url", dataUrl)));
-                    }
-                } else {
-                    Object textObj = att.get("text");
-                    String text = textObj == null ? null : String.valueOf(textObj);
-                    if (text == null || text.isBlank()) {
-                        // Try to extract text from dataUrl (PDF/DOCX/etc.)
-                        String dataUrl = String.valueOf(att.getOrDefault("dataUrl", ""));
-                        text = extractTextFromDataUrl(dataUrl, mime);
-                    }
-                    if (text != null && !text.isBlank()) {
-                        contentParts.add(java.util.Map.of("type", "text", "text", text));
-                    }
-                }
-            }
-        }
-
-        Map<String, Object> body = Map.of(
-                "model", properties.getModelOrDefault(),
-                "messages", List.of(Map.of("role", "user", "content", contentParts)));
-
-        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
-
-        ResponseEntity<Map<String, Object>> response;
-        try {
-            response = restTemplate.exchange(
-                    url,
-                    HttpMethod.POST,
-                    request,
-                    new ParameterizedTypeReference<>() {
-                    });
-        } catch (org.springframework.web.client.RestClientResponseException ex) {
-            throw new RuntimeException(
-                    "AI Provider Error: " + ex.getRawStatusCode() + " " + ex.getResponseBodyAsString(), ex);
-        }
-
-        Map<String, Object> respBody = response != null ? response.getBody() : null;
-        if (respBody == null)
-            return null;
-        Object choicesObj = respBody.get("choices");
-        if (choicesObj instanceof List<?> choices && !choices.isEmpty()) {
-            Object first = choices.get(0);
-            if (first instanceof Map<?, ?> firstMap) {
-                Object message = firstMap.get("message");
-                if (message instanceof Map<?, ?> msgMap) {
-                    Object content = msgMap.get("content");
-                    if (content != null)
-                        return content.toString();
-                }
-                Object text = firstMap.get("text");
-                if (text != null)
-                    return text.toString();
-            }
-        }
-        if (respBody.containsKey("message")) {
-            return String.valueOf(respBody.get("message"));
-        }
-        return respBody.toString();
+        return chatWithAttachments(userMessage, attachments, null);
     }
 
     public String chatWithAttachments(String userMessage, java.util.List<java.util.Map<String, Object>> attachments,
@@ -423,9 +219,13 @@ public class AiClientService {
                     });
         } catch (org.springframework.web.client.RestClientResponseException ex) {
             throw new RuntimeException(
-                    "AI Provider Error: " + ex.getRawStatusCode() + " " + ex.getResponseBodyAsString(), ex);
+                    "AI Provider Error: " + ex.getStatusCode().value() + " " + ex.getResponseBodyAsString(), ex);
         }
 
+        return extractContentFromResponse(response);
+    }
+
+    private String extractContentFromResponse(ResponseEntity<Map<String, Object>> response) {
         Map<String, Object> respBody = response != null ? response.getBody() : null;
         if (respBody == null)
             return null;
@@ -445,7 +245,8 @@ public class AiClientService {
             }
         }
         if (respBody.containsKey("message")) {
-            return String.valueOf(respBody.get("message"));
+            Object msg = respBody.get("message");
+            return msg == null ? "" : String.valueOf(msg);
         }
         try {
             return objectMapper.writeValueAsString(respBody);
@@ -468,12 +269,6 @@ public class AiClientService {
         return candidate;
     }
 
-    /**
-     * Pick API key based on the target model/provider.
-     * - If overrideModel starts with "gpt-": prefer OPENAI_API_KEY
-     * - If overrideModel starts with "deepseek": prefer DEEPSEEK_API_KEY
-     * - Otherwise: use configured spring.ai.openai.api-key or environment fallbacks
-     */
     private String getApiKeyForModel(String overrideModel) {
         String configured = properties.getEffectiveApiKey();
         String m = overrideModel == null ? null : overrideModel.toLowerCase();
@@ -482,7 +277,6 @@ public class AiClientService {
                 String openai = System.getenv("OPENAI_API_KEY");
                 if (openai != null && !openai.isBlank())
                     return openai;
-                // If configured key is actually an OpenAI key, use it; else fall back
                 return configured;
             }
             if (m.startsWith("deepseek")) {
@@ -516,16 +310,14 @@ public class AiClientService {
         try {
             if (dataUrl == null || dataUrl.isBlank())
                 return null;
-            // dataUrl format: data:<mime>;base64,<payload>
             int comma = dataUrl.indexOf(',');
             if (comma < 0)
                 return null;
             String base64 = dataUrl.substring(comma + 1);
             byte[] bytes = Base64.getDecoder().decode(base64.getBytes(StandardCharsets.UTF_8));
             try (InputStream is = new ByteArrayInputStream(bytes)) {
-                // Use Tika to detect and parse
                 AutoDetectParser parser = new AutoDetectParser();
-                ContentHandler handler = new BodyContentHandler(-1); // no length limit
+                ContentHandler handler = new BodyContentHandler(-1);
                 Metadata metadata = new Metadata();
                 if (mime != null && !mime.isBlank())
                     metadata.set(Metadata.CONTENT_TYPE, mime);
@@ -533,9 +325,8 @@ public class AiClientService {
                 parser.parse(is, handler, metadata, context);
                 String txt = handler.toString();
                 if (txt != null) {
-                    // Trim and cap to reasonable size to avoid overly long prompt
                     txt = txt.trim();
-                    int max = 8000; // characters cap
+                    int max = 8000;
                     if (txt.length() > max)
                         txt = txt.substring(0, max);
                 }
@@ -544,5 +335,70 @@ public class AiClientService {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public void streamChat(String userMessage, String overrideModel,
+            org.springframework.web.servlet.mvc.method.annotation.SseEmitter emitter) {
+        String url = properties.getNormalizedApiBaseUrl() + "/chat/completions";
+        String model = (overrideModel != null && !overrideModel.isBlank()) ? overrideModel
+                : properties.getModelOrDefault();
+        String apiKey = properties.getEffectiveApiKey();
+
+        Map<String, Object> body = Map.of(
+                "model", model,
+                "messages", List.of(Map.of("role", "user", "content", userMessage)),
+                "stream", true);
+
+        webClient.post()
+                .uri(url)
+                .header("Authorization", "Bearer " + apiKey)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(body)
+                .retrieve()
+                .bodyToFlux(String.class)
+                .subscribe(
+                        chunk -> {
+                            if (chunk == null)
+                                return;
+                            // Split by newline to handle multiple SSE events in one chunk
+                            String[] lines = chunk.split("\\r?\\n");
+                            for (String line : lines) {
+                                try {
+                                    String data = line.trim();
+                                    if (data.isEmpty())
+                                        continue;
+
+                                    if (data.startsWith("data:")) {
+                                        data = data.substring(5).trim();
+                                    }
+
+                                    if (data.equals("[DONE]")) {
+                                        emitter.send(org.springframework.web.servlet.mvc.method.annotation.SseEmitter
+                                                .event().data("[DONE]"));
+                                        continue;
+                                    }
+
+                                    JsonNode node = objectMapper.readTree(data);
+                                    if (node.has("choices") && node.get("choices").isArray()
+                                            && node.get("choices").size() > 0) {
+                                        JsonNode choice = node.get("choices").get(0);
+                                        if (choice.has("delta") && choice.get("delta").has("content")) {
+                                            String content = choice.get("delta").get("content").asText(null);
+                                            if (content != null && !"null".equals(content)) {
+                                                emitter.send(content);
+                                            }
+                                        }
+                                    }
+                                } catch (Exception e) {
+                                    // ignore parse errors for keep-alive or invalid lines
+                                }
+                            }
+                        },
+                        error -> {
+                            emitter.completeWithError(error);
+                        },
+                        () -> {
+                            emitter.complete();
+                        });
     }
 }

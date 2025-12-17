@@ -8,12 +8,12 @@
     --mb-match-stick: #f1d6bc;
     --mb-border: 6px;
 
-    /* Dimensions */
-    --mb-w: 240px;
+    /* Dimensions - Vertical Orientation */
+    --mb-w: 160px;
     /* Width of the box face */
-    --mb-h: 160px;
+    --mb-h: 240px;
     /* Height of the box face */
-    --mb-d: 80px;
+    --mb-d: 60px;
     /* Depth of the box */
 
     font-family: "BenchNine", "Microsoft YaHei", "SimHei", "Heiti SC", sans-serif;
@@ -21,7 +21,7 @@
     justify-content: center;
     align-items: center;
     width: 100%;
-    height: 320px;
+    height: 100%; /* Fill container */
     /* Reserve space for rotation and perspective */
     perspective: 1000px;
     overflow: visible;
@@ -29,39 +29,40 @@
 
 /* Read-only mode (Display mode) adjustments - Compact Size */
 .matchbox-wrapper.readonly {
-    --mb-w: 240px;
-    --mb-h: 150px;
-    --mb-d: 60px;
-    height: 280px;
+    --mb-w: 140px;
+    --mb-h: 220px;
+    --mb-d: 50px;
+    height: 100%;
     margin-top: 0;
     margin-bottom: 0;
 }
 
 .matchbox-wrapper.readonly .mb-label-circle {
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
 }
 
 .matchbox-wrapper.readonly .mb-label-text {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
 }
 
 .matchbox-wrapper.readonly .mb-subtext {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
 }
 
 .matchbox-wrapper.readonly .mb-match {
     height: 22px;
-    padding-left: 28px;
+    padding-left: 10px;
 }
 
 .matchbox-wrapper.readonly .mb-match::before {
-    width: 18px;
-    height: 14px;
+    width: 14px;
+    height: 12px;
 }
 
 .matchbox-wrapper.readonly .mb-match-text {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+    margin-left: 35px;
 }
 
 .matchbox-container {
@@ -70,15 +71,15 @@
     position: relative;
     transform-style: preserve-3d;
     transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-    /* Initial view angle - Rotated counter-clockwise and scaled down slightly */
-    transform: scale(0.85) rotate(-15deg) rotateX(20deg) rotateZ(-5deg);
+    /* Initial view angle - Standing up */
+    transform: rotateY(-25deg) rotateX(10deg);
     cursor: pointer;
-    margin-left: -60px; /* Move left */
+    margin-left: 0;
 }
 
 /* Hover state for the whole box */
 .matchbox-wrapper:hover .matchbox-container {
-    transform: scale(0.85) rotate(-25deg) rotateX(35deg) rotateZ(-10deg);
+    transform: rotateY(-35deg) rotateX(5deg) translateY(10px);
 }
 
 /* Common face styles */
@@ -129,6 +130,8 @@
 
 .mb-outer .top {
     transform: rotateX(90deg) translateZ(calc(var(--mb-h) / 2));
+    /* Show top face again */
+    display: flex;
 }
 
 .mb-outer .bottom {
@@ -150,6 +153,8 @@
 
 .mb-outer .right {
     transform: rotateY(90deg) translateZ(calc(var(--mb-w) / 2));
+    /* Hide right face to allow drawer to slide out horizontally */
+    display: none;
 }
 
 .mb-outer .left {
@@ -185,6 +190,8 @@
     z-index: 21; /* Ensure text is above the circle */
     font-family: "Microsoft YaHei", "SimHei", sans-serif; /* Ensure Chinese font support */
     font-weight: bold;
+    writing-mode: vertical-rl; /* Vertical text for vertical box */
+    text-orientation: upright;
 }
 
 .mb-subtext {
@@ -208,15 +215,13 @@
     transform: translateZ(0);
 }
 
-/* Slide out on hover */
+/* Slide out on hover - Slide RIGHT */
 .matchbox-wrapper:hover .mb-inner {
-    transform: translateX(calc(var(--mb-w) * 0.95)); /* Slide out almost completely */
+    transform: translateX(calc(var(--mb-w) * 0.8)); /* Slide right 80% */
 }
 
 /* Hide the right face of the outer box so the drawer can slide out */
-.mb-outer .right {
-    display: none;
-}
+/* .mb-outer .right { display: none; } - Handled above */
 
 /* Inner Drawer Styling */
 .floor {

@@ -303,15 +303,31 @@ const BlogEditor = () => {
   };
 
   useEffect(() => {
-    try {
-      const t = localStorage.getItem('blog.editor.title');
-      const c = localStorage.getItem('blog.editor.content');
-      const tg = localStorage.getItem('blog.editor.tags');
-      if (t != null) setTitle(t);
-      if (c != null) setContent(c);
-      if (tg != null) setTags(JSON.parse(tg));
-    } catch { /* ignore */ }
-  }, []);
+    const isNew = searchParams.get('new') === 'true';
+    if (isNew) {
+      try {
+        localStorage.removeItem('blog.editor.title');
+        localStorage.removeItem('blog.editor.content');
+        localStorage.removeItem('blog.editor.tags');
+      } catch { /* ignore */ }
+      setTitle('');
+      setContent('');
+      setTags([]);
+      setCover(null);
+      setCoverPreview(null);
+      // Remove param to avoid clearing on refresh if user wants to keep it
+      navigate('/blog-edit', { replace: true });
+    } else {
+      try {
+        const t = localStorage.getItem('blog.editor.title');
+        const c = localStorage.getItem('blog.editor.content');
+        const tg = localStorage.getItem('blog.editor.tags');
+        if (t != null) setTitle(t);
+        if (c != null) setContent(c);
+        if (tg != null) setTags(JSON.parse(tg));
+      } catch { /* ignore */ }
+    }
+  }, [searchParams, navigate]);
 
   useEffect(() => {
     const beforeUnload = (ev) => {
@@ -548,11 +564,21 @@ const BlogEditor = () => {
     }
   };
 
+  const handleDirectoryChange = (e) => {
+    let val = e.target.value;
+    // 限制层级：最多允许3级目录
+    const parts = val.split('/');
+    if (parts.length > 3) {
+        val = parts.slice(0, 3).join('/');
+    }
+    setDirectory(val);
+  };
+
   return (
     <div className="blog-editor-container">
       {/* Top Header: Title & Main Actions */}
       <div className="blog-editor-header">
-        <button className="blog-editor-back-btn" onClick={() => navigate('/')} title="返回首页">
+        <button className="blog-editor-back-btn" onClick={() => navigate('/', { state: { scrollToCarousel: true } })} title="返回首页">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
         </button>
         
@@ -707,15 +733,19 @@ const BlogEditor = () => {
                 <div className="directory-input-wrapper full-width">
                    <input
                       type="text"
-                      placeholder="输入或选择目录"
+                      placeholder="目录1/目录2/目录3"
                       value={directory}
-                      onChange={e => setDirectory(e.target.value)}
+                      onChange={handleDirectoryChange}
                       list="directory-options"
                       className="blog-editor-input full-width"
+                      title="最多支持三级目录"
                    />
                    <datalist id="directory-options">
                       {existingDirectories.map((dir, idx) => <option key={idx} value={dir} />)}
                    </datalist>
+                </div>
+                <div style={{ fontSize: '12px', color: '#999', marginTop: '4px' }}>
+                  最多支持三级目录，使用 / 分隔
                 </div>
               </div>
 
