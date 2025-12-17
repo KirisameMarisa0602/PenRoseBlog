@@ -17,8 +17,7 @@ import { fetchFriendsList } from '@utils/api/friendService';
 import SimpleEmojiPicker from '@components/common/SimpleEmojiPicker';
 import resolveUrl from '@utils/resolveUrl';
 import { getDefaultAvatar, isValidAvatar } from '@utils/avatarUtils';
-import ArticleCard from '@components/common/ArticleCard';
-import { fetchPostDetail } from '@utils/api/postService';
+import ArticleCardFetcher from '@components/common/ArticleCardFetcher';
 
 // 本地缓存服务
 import {
@@ -97,29 +96,7 @@ export default function CommunicationPage() {
 
     const [showEmoji, setShowEmoji] = useState(false);
 
-    // 在仅有链接文本时按需拉取文章详情以渲染卡片
-    const FetchedArticleCard = ({ blogId }) => {
-        const [post, setPost] = useState(null);
-        useEffect(() => {
-            let mounted = true;
-            fetchPostDetail(blogId).then(res => {
-                if (mounted && res && res.code === 200) {
-                    setPost(res.data);
-                }
-            });
-            return () => { mounted = false; };
-        }, [blogId]);
-
-        if (!post) return <div style={{padding: 10, color: '#999', fontSize: '12px'}}>加载文章预览...</div>;
-        return (
-            <ArticleCard
-                post={post}
-                mode="vertical"
-                className="chat-article-card"
-                style={{ margin: 0, background: '#fff', borderRadius: '12px' }}
-            />
-        );
-    };
+    // 文章卡片拉取由通用 ArticleCardFetcher 处理
 
     /** ---------------- 工具方法 ---------------- */
 
@@ -1422,20 +1399,21 @@ export default function CommunicationPage() {
 
                                         {hasPreview ? (
                                             <div className="pm-blog-preview-wrapper" style={{ width: '100%', maxWidth: '500px' }}>
-                                                <ArticleCard
-                                                    post={{
+                                                <ArticleCardFetcher
+                                                    blogId={msg.blogPreview.blogId}
+                                                    fallback={{
                                                         id: msg.blogPreview.blogId,
                                                         title: msg.blogPreview.title,
                                                         coverImageUrl: msg.blogPreview.coverImageUrl,
                                                         authorAvatarUrl: msg.blogPreview.authorAvatarUrl,
                                                         authorNickname: msg.blogPreview.authorNickname,
                                                         authorId: msg.blogPreview.authorId,
-                                                        likeCount: msg.blogPreview.likeCount || 0,
-                                                        commentCount: msg.blogPreview.commentCount || 0,
-                                                        viewCount: msg.blogPreview.viewCount || 0,
-                                                        favoriteCount: msg.blogPreview.favoriteCount || 0,
-                                                        shareCount: msg.blogPreview.shareCount || 0,
-                                                        createdAt: msg.blogPreview.createdAt || null
+                                                        likeCount: msg.blogPreview.likeCount,
+                                                        commentCount: msg.blogPreview.commentCount,
+                                                        viewCount: msg.blogPreview.viewCount,
+                                                        favoriteCount: msg.blogPreview.favoriteCount,
+                                                        shareCount: msg.blogPreview.shareCount,
+                                                        createdAt: msg.blogPreview.createdAt
                                                     }}
                                                     mode="vertical"
                                                     className="chat-article-card"
@@ -1444,7 +1422,7 @@ export default function CommunicationPage() {
                                             </div>
                                         ) : blogIdFromText ? (
                                             <div className="pm-blog-preview-wrapper" style={{ width: '100%', maxWidth: '500px' }}>
-                                                <FetchedArticleCard blogId={blogIdFromText} />
+                                                <ArticleCardFetcher blogId={blogIdFromText} mode="vertical" className="chat-article-card" style={{ margin: 0, background: '#fff', borderRadius: '12px' }} />
                                             </div>
                                         ) : (
                                             <div className="conversation-detail-msgtext">

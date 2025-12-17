@@ -12,7 +12,6 @@ import '@styles/message/ConversationDetail.css';
 import '@styles/home/HomeArticleList.css';
 import { useAuthState } from '@hooks/useAuthState';
 import { fetchConversationDetail, fetchConversations } from '@utils/api/messageService';
-import { fetchPostDetail } from '@utils/api/postService';
 import resolveUrl from '@utils/resolveUrl';
 import { getDefaultAvatar, isValidAvatar } from '@utils/avatarUtils';
 
@@ -24,31 +23,7 @@ import {
     loadCachedConversationSummaries
 } from '@utils/localPmCacheService';
 
-import ArticleCard from '@components/common/ArticleCard';
-
-const FetchedArticleCard = ({ blogId }) => {
-    const [post, setPost] = useState(null);
-    useEffect(() => {
-        let mounted = true;
-        fetchPostDetail(blogId).then(res => {
-            if (mounted && res && res.code === 200) {
-                setPost(res.data);
-            }
-        });
-        return () => { mounted = false; };
-    }, [blogId]);
-
-    if (!post) return <div style={{padding: 10, color: '#999', fontSize: '12px'}}>加载文章预览...</div>;
-    
-    return (
-        <ArticleCard 
-            post={post}
-            mode="vertical"
-            className="chat-article-card"
-            style={{ margin: 0, background: '#fff', borderRadius: '12px' }}
-        />
-    );
-};
+import ArticleCardFetcher from '@components/common/ArticleCardFetcher';
 
 export default function ConversationDetail({ embeddedOtherId, onConversationSelect }) {
     const { otherId: paramOtherId } = useParams();
@@ -1482,21 +1457,21 @@ export default function ConversationDetail({ embeddedOtherId, onConversationSele
 
                                     {hasPreview ? (
                                         <div className="pm-blog-preview-wrapper" style={{ width: '100%', maxWidth: '500px' }}>
-                                            <ArticleCard 
-                                                post={{
+                                            <ArticleCardFetcher
+                                                blogId={msg.blogPreview.blogId}
+                                                fallback={{
                                                     id: msg.blogPreview.blogId,
                                                     title: msg.blogPreview.title,
                                                     coverImageUrl: msg.blogPreview.coverImageUrl,
                                                     authorAvatarUrl: msg.blogPreview.authorAvatarUrl,
                                                     authorNickname: msg.blogPreview.authorNickname,
                                                     authorId: msg.blogPreview.authorId,
-                                                    // 转发卡片中可能缺少部分统计数据，可设为0或不显示
-                                                    likeCount: msg.blogPreview.likeCount || 0,
-                                                    commentCount: msg.blogPreview.commentCount || 0,
-                                                    viewCount: msg.blogPreview.viewCount || 0,
-                                                    favoriteCount: msg.blogPreview.favoriteCount || 0,
-                                                    shareCount: msg.blogPreview.shareCount || 0,
-                                                    createdAt: msg.blogPreview.createdAt || null // 显示时间
+                                                    likeCount: msg.blogPreview.likeCount,
+                                                    commentCount: msg.blogPreview.commentCount,
+                                                    viewCount: msg.blogPreview.viewCount,
+                                                    favoriteCount: msg.blogPreview.favoriteCount,
+                                                    shareCount: msg.blogPreview.shareCount,
+                                                    createdAt: msg.blogPreview.createdAt
                                                 }}
                                                 mode="vertical"
                                                 className="chat-article-card"
@@ -1505,7 +1480,7 @@ export default function ConversationDetail({ embeddedOtherId, onConversationSele
                                         </div>
                                     ) : blogIdFromText ? (
                                         <div className="pm-blog-preview-wrapper" style={{ width: '100%', maxWidth: '500px' }}>
-                                            <FetchedArticleCard blogId={blogIdFromText} />
+                                            <ArticleCardFetcher blogId={blogIdFromText} mode="vertical" className="chat-article-card" style={{ margin: 0, background: '#fff', borderRadius: '12px' }} />
                                         </div>
                                     ) : (
                                         <div className="conversation-detail-msgtext">
