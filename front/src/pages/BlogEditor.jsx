@@ -564,6 +564,16 @@ const BlogEditor = () => {
     }
   };
 
+  const handleDirectoryChange = (e) => {
+    let val = e.target.value;
+    // 限制层级：最多允许3级目录
+    const parts = val.split('/');
+    if (parts.length > 3) {
+        val = parts.slice(0, 3).join('/');
+    }
+    setDirectory(val);
+  };
+
   return (
     <div className="blog-editor-container">
       {/* Top Header: Title & Main Actions */}
@@ -723,15 +733,19 @@ const BlogEditor = () => {
                 <div className="directory-input-wrapper full-width">
                    <input
                       type="text"
-                      placeholder="输入或选择目录"
+                      placeholder="目录1/目录2/目录3"
                       value={directory}
-                      onChange={e => setDirectory(e.target.value)}
+                      onChange={handleDirectoryChange}
                       list="directory-options"
                       className="blog-editor-input full-width"
+                      title="最多支持三级目录"
                    />
                    <datalist id="directory-options">
                       {existingDirectories.map((dir, idx) => <option key={idx} value={dir} />)}
                    </datalist>
+                </div>
+                <div style={{ fontSize: '12px', color: '#999', marginTop: '4px' }}>
+                  最多支持三级目录，使用 / 分隔
                 </div>
               </div>
 

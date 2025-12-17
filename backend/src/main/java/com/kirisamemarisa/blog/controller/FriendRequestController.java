@@ -3,22 +3,20 @@ package com.kirisamemarisa.blog.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.kirisamemarisa.blog.common.ApiResponse;
 import com.kirisamemarisa.blog.dto.FriendRequestDTO;
 import com.kirisamemarisa.blog.model.User;
-// 分层：控制器不直接依赖仓库，改为依赖服务
 import com.kirisamemarisa.blog.service.UserService;
 import com.kirisamemarisa.blog.service.FriendRequestService;
 import com.kirisamemarisa.blog.service.NotificationService;
 import com.kirisamemarisa.blog.service.FriendService;
+import com.kirisamemarisa.blog.service.CurrentUserResolver;
+import com.kirisamemarisa.blog.dto.PageResult;
 
 import java.util.List;
-import com.kirisamemarisa.blog.service.FriendService;
-import com.kirisamemarisa.blog.dto.PageResult;
 
 @RestController
 @RequestMapping("/api/friends")
@@ -29,37 +27,28 @@ public class FriendRequestController {
     private final FriendRequestService friendRequestService;
     private final NotificationService notificationService;
     private final FriendService friendService;
+    private final CurrentUserResolver currentUserResolver;
 
     public FriendRequestController(UserService userService, FriendRequestService friendRequestService,
             NotificationService notificationService,
-            FriendService friendService) {
+            FriendService friendService,
+            CurrentUserResolver currentUserResolver) {
         this.userService = userService;
         this.friendRequestService = friendRequestService;
         this.notificationService = notificationService;
         this.friendService = friendService;
+        this.currentUserResolver = currentUserResolver;
     }
 
-    private User resolveCurrentUser(UserDetails principal, Long headerUserId, String authorizationHeader) {
-        if (principal != null)
-            return userService.getUserByUsername(principal.getUsername());
-        if (headerUserId != null)
-            return userService.getUserById(headerUserId);
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            String token = authorizationHeader.substring("Bearer ".length()).trim();
-            Long uid = com.kirisamemarisa.blog.common.JwtUtil.getUserIdFromToken(token);
-            if (uid != null)
-                return userService.getUserById(uid);
-        }
-        return null;
+    private User resolveCurrentUser(Object principal) {
+        return currentUserResolver.resolve(principal);
     }
 
     @PostMapping("/request/{targetId}")
     public ApiResponse<FriendRequestDTO> sendRequest(@PathVariable Long targetId,
             @RequestBody(required = false) FriendRequestDTO body,
-            @RequestHeader(name = "X-User-Id", required = false) Long headerUserId,
-            @RequestHeader(name = "Authorization", required = false) String authorization,
-            @AuthenticationPrincipal UserDetails principal) {
-        User me = resolveCurrentUser(principal, headerUserId, authorization);
+            @AuthenticationPrincipal Object principal) {
+        User me = resolveCurrentUser(principal);
         if (me == null) {
             logger.info("Unauthenticated request to send friend request to {}", targetId);
             return new ApiResponse<>(401, "未认证", null);
@@ -79,10 +68,8 @@ public class FriendRequestController {
 
     @DeleteMapping("/{targetId}")
     public ApiResponse<Void> deleteFriend(@PathVariable Long targetId,
-            @RequestHeader(name = "X-User-Id", required = false) Long headerUserId,
-            @RequestHeader(name = "Authorization", required = false) String authorization,
-            @AuthenticationPrincipal UserDetails principal) {
-        User me = resolveCurrentUser(principal, headerUserId, authorization);
+            @AuthenticationPrincipal Object principal) {
+        User me = resolveCurrentUser(principal);
         if (me == null) {
             return new ApiResponse<>(401, "未认证", null);
         }
@@ -97,10 +84,8 @@ public class FriendRequestController {
 
     @GetMapping("/pending")
     public ApiResponse<List<FriendRequestDTO>> pending(
-            @RequestHeader(name = "X-User-Id", required = false) Long headerUserId,
-            @RequestHeader(name = "Authorization", required = false) String authorization,
-            @AuthenticationPrincipal UserDetails principal) {
-        User me = resolveCurrentUser(principal, headerUserId, authorization);
+            @AuthenticationPrincipal Object principal) {
+        User me = resolveCurrentUser(principal);
         if (me == null) {
             logger.info("Unauthenticated request to get pending friend requests");
             return new ApiResponse<>(401, "未认证", null);
@@ -113,10 +98,8 @@ public class FriendRequestController {
     @PostMapping("/respond/{requestId}")
     public ApiResponse<FriendRequestDTO> respond(@PathVariable Long requestId,
             @RequestParam boolean accept,
-            @RequestHeader(name = "X-User-Id", required = false) Long headerUserId,
-            @RequestHeader(name = "Authorization", required = false) String authorization,
-            @AuthenticationPrincipal UserDetails principal) {
-        User me = resolveCurrentUser(principal, headerUserId, authorization);
+            @AuthenticationPrincipal Object principal) {
+        User me = resolveCurrentUser(principal);
         if (me == null) {
             logger.info("Unauthenticated request to respond friend request {}", requestId);
             return new ApiResponse<>(401, "未认证", null);
@@ -127,17 +110,9 @@ public class FriendRequestController {
     }
 
     @GetMapping("/subscribe")
-    public SseEmitter subscribe(@RequestHeader(name = "X-User-Id", required = false) Long headerUserId,
-            @RequestParam(name = "token", required = false) String token,
-            @RequestHeader(name = "Authorization", required = false) String authorization,
-            @AuthenticationPrincipal UserDetails principal) {
-        User me = resolveCurrentUser(principal, headerUserId, authorization);
-        // also accept token - try parse if not resolved
-        if (me == null && token != null && !token.isEmpty()) {
-            Long uid = com.kirisamemarisa.blog.common.JwtUtil.getUserIdFromToken(token);
-            if (uid != null)
-                me = userService.getUserById(uid);
-        }
+    public SseEmitter subscribe(
+            @AuthenticationPrincipal Object principal) {
+        User me = resolveCurrentUser(principal);
         if (me == null) {
             logger.info("Unauthenticated SSE subscribe attempt");
             return null;
@@ -150,10 +125,8 @@ public class FriendRequestController {
 
     @GetMapping("/list")
     public ApiResponse<java.util.List<com.kirisamemarisa.blog.dto.UserSimpleDTO>> listFriends(
-            @RequestHeader(name = "X-User-Id", required = false) Long headerUserId,
-            @RequestHeader(name = "Authorization", required = false) String authorization,
-            @AuthenticationPrincipal UserDetails principal) {
-        User me = resolveCurrentUser(principal, headerUserId, authorization);
+            @AuthenticationPrincipal Object principal) {
+        User me = resolveCurrentUser(principal);
         if (me == null) {
             return new ApiResponse<>(401, "未认证", null);
         }
@@ -165,10 +138,8 @@ public class FriendRequestController {
     public ApiResponse<PageResult<com.kirisamemarisa.blog.dto.UserSimpleDTO>> listFriendsPage(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
-            @RequestHeader(name = "X-User-Id", required = false) Long headerUserId,
-            @RequestHeader(name = "Authorization", required = false) String authorization,
-            @AuthenticationPrincipal UserDetails principal) {
-        User me = resolveCurrentUser(principal, headerUserId, authorization);
+            @AuthenticationPrincipal Object principal) {
+        User me = resolveCurrentUser(principal);
         if (me == null) {
             return new ApiResponse<>(401, "未认证", null);
         }
@@ -178,10 +149,8 @@ public class FriendRequestController {
 
     @GetMapping("/ids")
     public ApiResponse<java.util.List<Long>> friendIds(
-            @RequestHeader(name = "X-User-Id", required = false) Long headerUserId,
-            @RequestHeader(name = "Authorization", required = false) String authorization,
-            @AuthenticationPrincipal UserDetails principal) {
-        User me = resolveCurrentUser(principal, headerUserId, authorization);
+            @AuthenticationPrincipal Object principal) {
+        User me = resolveCurrentUser(principal);
         if (me == null) {
             return new ApiResponse<>(401, "未认证", null);
         }
@@ -191,10 +160,8 @@ public class FriendRequestController {
 
     @GetMapping("/isFriend/{otherId}")
     public ApiResponse<Boolean> isFriend(@PathVariable Long otherId,
-            @RequestHeader(name = "X-User-Id", required = false) Long headerUserId,
-            @RequestHeader(name = "Authorization", required = false) String authorization,
-            @AuthenticationPrincipal UserDetails principal) {
-        User me = resolveCurrentUser(principal, headerUserId, authorization);
+            @AuthenticationPrincipal Object principal) {
+        User me = resolveCurrentUser(principal);
         if (me == null) {
             return new ApiResponse<>(401, "未认证", null);
         }

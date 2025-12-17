@@ -9,8 +9,10 @@ import React, {
 } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import '@styles/message/ConversationDetail.css';
+import '@styles/home/HomeArticleList.css';
 import { useAuthState } from '@hooks/useAuthState';
 import { fetchConversationDetail, fetchConversations } from '@utils/api/messageService';
+import { fetchPostDetail } from '@utils/api/postService';
 import resolveUrl from '@utils/resolveUrl';
 import { getDefaultAvatar, isValidAvatar } from '@utils/avatarUtils';
 
@@ -23,6 +25,30 @@ import {
 } from '@utils/localPmCacheService';
 
 import ArticleCard from '@components/common/ArticleCard';
+
+const FetchedArticleCard = ({ blogId }) => {
+    const [post, setPost] = useState(null);
+    useEffect(() => {
+        let mounted = true;
+        fetchPostDetail(blogId).then(res => {
+            if (mounted && res && res.code === 200) {
+                setPost(res.data);
+            }
+        });
+        return () => { mounted = false; };
+    }, [blogId]);
+
+    if (!post) return <div style={{padding: 10, color: '#999', fontSize: '12px'}}>加载文章预览...</div>;
+    
+    return (
+        <ArticleCard 
+            post={post}
+            mode="vertical"
+            className="chat-article-card"
+            style={{ margin: 0, background: '#fff', borderRadius: '12px' }}
+        />
+    );
+};
 
 export default function ConversationDetail({ embeddedOtherId, onConversationSelect }) {
     const { otherId: paramOtherId } = useParams();
@@ -1420,19 +1446,10 @@ export default function ConversationDetail({ embeddedOtherId, onConversationSele
                             }
 
                             const hasPreview = msg.blogPreview && msg.blogPreview.blogId;
-
-                            // 过滤掉纯博客链接的文本消息（如果它看起来像是自动发送的分享链接）
-                            // 避免在显示了卡片（或即将显示卡片）的同时显示冗余的 URL 文本
-                            if (!hasPreview && msg.text && (msg.text.includes('/post/') || msg.text.includes('/article/'))) {
-                                // 简单判断：如果是本站链接，且内容仅为链接，则隐藏
-                                const trimmed = msg.text.trim();
-                                // 匹配 http(s)://.../post/123 或 /post/123，允许末尾斜杠和参数
-                                // 使用更宽松的正则以确保匹配
-                                const isPostUrl = /^(https?:\/\/[^\s]+)?\/(post|article)\/\d+(\?.*)?\/?$/.test(trimmed);
-                                // 只要包含文章链接且长度接近链接长度（允许少量空白或标点），就隐藏
-                                if (isPostUrl || (trimmed.length < 100 && (trimmed.startsWith('http') || trimmed.startsWith('/')))) {
-                                    return null;
-                                }
+                            let blogIdFromText = null;
+                            if (!hasPreview && msg.text) {
+                                const match = msg.text.match(/\/post\/(\d+)/);
+                                if (match) blogIdFromText = match[1];
                             }
 
                             return (
@@ -1464,7 +1481,7 @@ export default function ConversationDetail({ embeddedOtherId, onConversationSele
                                     </div>
 
                                     {hasPreview ? (
-                                        <div className="pm-blog-preview-wrapper" style={{ width: '400px', maxWidth: '100%' }}>
+                                        <div className="pm-blog-preview-wrapper" style={{ width: '100%', maxWidth: '500px' }}>
                                             <ArticleCard 
                                                 post={{
                                                     id: msg.blogPreview.blogId,
@@ -1474,14 +1491,21 @@ export default function ConversationDetail({ embeddedOtherId, onConversationSele
                                                     authorNickname: msg.blogPreview.authorNickname,
                                                     authorId: msg.blogPreview.authorId,
                                                     // 转发卡片中可能缺少部分统计数据，可设为0或不显示
-                                                    likeCount: 0,
-                                                    commentCount: 0,
-                                                    viewCount: 0,
+                                                    likeCount: msg.blogPreview.likeCount || 0,
+                                                    commentCount: msg.blogPreview.commentCount || 0,
+                                                    viewCount: msg.blogPreview.viewCount || 0,
+                                                    favoriteCount: msg.blogPreview.favoriteCount || 0,
+                                                    shareCount: msg.blogPreview.shareCount || 0,
                                                     createdAt: msg.blogPreview.createdAt || null // 显示时间
                                                 }}
+                                                mode="vertical"
                                                 className="chat-article-card"
-                                                mode="horizontal"
+                                                style={{ margin: 0, background: '#fff', borderRadius: '12px' }}
                                             />
+                                        </div>
+                                    ) : blogIdFromText ? (
+                                        <div className="pm-blog-preview-wrapper" style={{ width: '100%', maxWidth: '500px' }}>
+                                            <FetchedArticleCard blogId={blogIdFromText} />
                                         </div>
                                     ) : (
                                         <div className="conversation-detail-msgtext">

@@ -67,9 +67,8 @@
 /* Sidebar Common Styles */
 .article-sidebar, .author-sidebar {
     position: sticky;
-    top: calc(15vh + 20px); /* Fixed top offset adjusted for navbar */
-    height: fit-content;
-    max-height: calc(100vh - 100px); /* Prevent cutoff */
+    top: 80px; /* Fixed top offset adjusted for navbar */
+    height: calc(100vh - 100px); /* Fill viewport minus header/padding */
     overflow-y: auto; /* Allow scrolling if content is too long */
     z-index: 10;
     scrollbar-width: none; /* Firefox */

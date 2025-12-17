@@ -16,12 +16,12 @@ public class CurrentUserResolverImpl implements CurrentUserResolver {
     }
 
     @Override
-    public User resolve(UserDetails principal, Long headerUserId) {
-        if (principal != null) {
-            return userRepository.findByUsername(principal.getUsername());
+    public User resolve(Object principal) {
+        if (principal instanceof Long userId) {
+            return userRepository.findById(userId).orElse(null);
         }
-        if (headerUserId != null) {
-            return userRepository.findById(headerUserId).orElse(null);
+        if (principal instanceof UserDetails userDetails) {
+            return userRepository.findByUsername(userDetails.getUsername());
         }
         return null;
     }

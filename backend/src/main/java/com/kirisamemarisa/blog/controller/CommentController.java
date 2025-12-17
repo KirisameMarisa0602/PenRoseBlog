@@ -8,6 +8,7 @@ import com.kirisamemarisa.blog.dto.CommentDTO;
 import com.kirisamemarisa.blog.dto.PageResult;
 import com.kirisamemarisa.blog.service.CommentService;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 @RestController
 @RequestMapping("/api/comment")
@@ -33,12 +34,26 @@ public class CommentController {
     }
 
     @DeleteMapping("/{commentId}")
-    public ApiResponse<Boolean> deleteComment(@PathVariable Long commentId, @RequestParam Long userId) {
+    public ApiResponse<Boolean> deleteComment(@PathVariable Long commentId, @AuthenticationPrincipal Object principal) {
+        Long userId = null;
+        if (principal instanceof Long) {
+            userId = (Long) principal;
+        } else if (principal instanceof org.springframework.security.core.userdetails.UserDetails) {
+            // Handle UserDetails if needed, or just rely on ID
+        }
+        if (userId == null)
+            return new ApiResponse<>(401, "未认证", false);
         return commentService.deleteComment(commentId, userId);
     }
 
     @PostMapping("/{commentId}/like")
-    public ApiResponse<Boolean> toggleLike(@PathVariable Long commentId, @RequestParam Long userId) {
+    public ApiResponse<Boolean> toggleLike(@PathVariable Long commentId, @AuthenticationPrincipal Object principal) {
+        Long userId = null;
+        if (principal instanceof Long) {
+            userId = (Long) principal;
+        }
+        if (userId == null)
+            return new ApiResponse<>(401, "未认证", false);
         return commentService.toggleLike(commentId, userId);
     }
 

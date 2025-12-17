@@ -84,14 +84,16 @@ public class GlobalExceptionHandler {
             // Can't write JSON into an SSE response. The client likely disconnected or
             // the response is an SSE stream — set status and stop.
             try {
-                response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-            } catch (IllegalStateException ise) {
+                if (!response.isCommitted()) {
+                    response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+                }
+            } catch (Exception e) {
                 logger.debug("Response already committed, cannot set status for SSE response");
             }
             return null;
         }
-        logger.error("服务器内部错误", ex);
-        return new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "服务器内部错误", null);
+        logger.error("服务器内部错误: URL=" + request.getRequestURL(), ex);
+        return new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "服务器内部错误: " + ex.getMessage(), null);
     }
 
     private boolean isSseRequest(HttpServletRequest request, HttpServletResponse response) {
@@ -99,15 +101,11 @@ public class GlobalExceptionHandler {
             String ct = response != null ? response.getContentType() : null;
             if (ct != null && ct.contains("text/event-stream"))
                 return true;
-        } catch (Exception ignore) {
+            String accept = request.getHeader("Accept");
+            return accept != null && accept.contains("text/event-stream");
+        } catch (Exception e) {
+            return false;
         }
-        try {
-            String accept = request != null ? request.getHeader("Accept") : null;
-            if (accept != null && accept.contains("text/event-stream"))
-                return true;
-        } catch (Exception ignore) {
-        }
-        return false;
     }
 
     private boolean isClientAbort(Throwable ex) {

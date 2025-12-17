@@ -7,7 +7,6 @@ import com.kirisamemarisa.blog.events.MessageEventPublisher;
 import com.kirisamemarisa.blog.model.PrivateMessage;
 import com.kirisamemarisa.blog.model.User;
 import com.kirisamemarisa.blog.service.PrivateMessageService;
-// 分层：控制器避免直接依赖仓库
 import com.kirisamemarisa.blog.service.UserService;
 import com.kirisamemarisa.blog.dto.PrivateMessageOperationDTO;
 import com.kirisamemarisa.blog.dto.ConversationSummaryDTO;
@@ -20,7 +19,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -53,21 +51,14 @@ public class PrivateMessageController {
         this.privateMessageDtoService = privateMessageDtoService;
     }
 
-    private User resolveCurrent(UserDetails principal, Long headerUserId) {
-        return currentUserResolver.resolve(principal, headerUserId);
+    private User resolveCurrent(Object principal) {
+        return currentUserResolver.resolve(principal);
     }
 
-    // DTO 转换、会话摘要与通知逻辑已下沉到 PrivateMessageDtoService
-
-    /**
-     * SSE 订阅接口
-     * 前端：/api/messages/subscribe/{otherId}?userId={当前用户ID}&_={timestamp}
-     */
     @PostMapping("/recall/{id}")
     public ApiResponse<Boolean> recallMessage(@PathVariable Long id,
-            @RequestHeader(name = "X-User-Id", required = false) Long headerUserId,
-            @AuthenticationPrincipal UserDetails principal) {
-        User me = resolveCurrent(principal, headerUserId);
+            @AuthenticationPrincipal Object principal) {
+        User me = resolveCurrent(principal);
         if (me == null) {
             return new ApiResponse<>(401, "未登录", false);
         }
@@ -81,19 +72,17 @@ public class PrivateMessageController {
 
     @PostMapping("/recall")
     public ApiResponse<Boolean> recallMessageBody(@RequestBody PrivateMessageOperationDTO body,
-            @RequestHeader(name = "X-User-Id", required = false) Long headerUserId,
-            @AuthenticationPrincipal UserDetails principal) {
+            @AuthenticationPrincipal Object principal) {
         if (body == null || body.getMessageId() == null) {
             return new ApiResponse<>(400, "messageId不能为空", false);
         }
-        return recallMessage(body.getMessageId(), headerUserId, principal);
+        return recallMessage(body.getMessageId(), principal);
     }
 
     @PostMapping("/delete/{id}")
     public ApiResponse<Boolean> deleteMessage(@PathVariable Long id,
-            @RequestHeader(name = "X-User-Id", required = false) Long headerUserId,
-            @AuthenticationPrincipal UserDetails principal) {
-        User me = resolveCurrent(principal, headerUserId);
+            @AuthenticationPrincipal Object principal) {
+        User me = resolveCurrent(principal);
         if (me == null) {
             return new ApiResponse<>(401, "未登录", false);
         }
@@ -107,21 +96,18 @@ public class PrivateMessageController {
 
     @PostMapping("/delete")
     public ApiResponse<Boolean> deleteMessageBody(@RequestBody PrivateMessageOperationDTO body,
-            @RequestHeader(name = "X-User-Id", required = false) Long headerUserId,
-            @AuthenticationPrincipal UserDetails principal) {
+            @AuthenticationPrincipal Object principal) {
         if (body == null || body.getMessageId() == null) {
             return new ApiResponse<>(400, "messageId不能为空", false);
         }
-        return deleteMessage(body.getMessageId(), headerUserId, principal);
+        return deleteMessage(body.getMessageId(), principal);
     }
 
     @GetMapping(value = "/subscribe/{otherId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribeConversation(@PathVariable Long otherId,
             @RequestParam("userId") Long userId,
-            @RequestHeader(name = "X-User-Id", required = false) Long headerUserId,
-            @AuthenticationPrincipal UserDetails principal) {
-        // 简单鉴权：userId 必须等于当前登录的用户
-        User me = resolveCurrent(principal, headerUserId);
+            @AuthenticationPrincipal Object principal) {
+        User me = resolveCurrent(principal);
         if (me == null || !Objects.equals(me.getId(), userId)) {
             SseEmitter emitter = new SseEmitter(0L);
             emitter.complete();
@@ -145,11 +131,11 @@ public class PrivateMessageController {
     public ApiResponse<PageResult<PrivateMessageDTO>> conversation(@PathVariable Long otherId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
-            @RequestHeader(name = "X-User-Id", required = false) Long headerUserId,
-            @AuthenticationPrincipal UserDetails principal) {
-        User me = resolveCurrent(principal, headerUserId);
+            @AuthenticationPrincipal Object principal) {
+        User me = resolveCurrent(principal);
         if (me == null)
             return new ApiResponse<>(401, "未认证", null);
+
         User other = userService.getUserById(otherId);
         if (other == null)
             return new ApiResponse<>(404, "用户不存在", null);
@@ -162,9 +148,8 @@ public class PrivateMessageController {
 
     @GetMapping("/conversation/list")
     public ApiResponse<PageResult<ConversationSummaryDTO>> listConversations(
-            @RequestHeader(name = "X-User-Id", required = false) Long headerUserId,
-            @AuthenticationPrincipal org.springframework.security.core.userdetails.UserDetails principal) {
-        User me = resolveCurrent(principal, headerUserId);
+            @AuthenticationPrincipal Object principal) {
+        User me = resolveCurrent(principal);
         if (me == null)
             return new ApiResponse<>(401, "未认证", null);
 
@@ -174,9 +159,8 @@ public class PrivateMessageController {
 
     @GetMapping("/unread/total")
     public ApiResponse<Long> unreadTotal(
-            @RequestHeader(name = "X-User-Id", required = false) Long headerUserId,
-            @AuthenticationPrincipal UserDetails principal) {
-        User me = resolveCurrent(principal, headerUserId);
+            @AuthenticationPrincipal Object principal) {
+        User me = resolveCurrent(principal);
         if (me == null)
             return new ApiResponse<>(401, "未认证", null);
         long total = privateMessageService.countUnreadTotal(me.getId());
@@ -186,9 +170,8 @@ public class PrivateMessageController {
     @PostMapping("/conversation/{otherId}/read")
     @Transactional
     public ApiResponse<Integer> markRead(@PathVariable Long otherId,
-            @RequestHeader(name = "X-User-Id", required = false) Long headerUserId,
-            @AuthenticationPrincipal UserDetails principal) {
-        User me = resolveCurrent(principal, headerUserId);
+            @AuthenticationPrincipal Object principal) {
+        User me = resolveCurrent(principal);
         if (me == null)
             return new ApiResponse<>(401, "未认证", null);
         int updated = privateMessageService.markConversationRead(otherId, me.getId());
@@ -202,9 +185,8 @@ public class PrivateMessageController {
     @PostMapping
     public ApiResponse<PrivateMessageDTO> sendMessageUnified(
             @RequestBody Map<String, Object> body,
-            @RequestHeader(name = "X-User-Id", required = false) Long headerUserId,
-            @AuthenticationPrincipal UserDetails principal) {
-        User me = resolveCurrent(principal, headerUserId);
+            @AuthenticationPrincipal Object principal) {
+        User me = resolveCurrent(principal);
         if (me == null)
             return new ApiResponse<>(401, "未认证", null);
 
@@ -232,11 +214,11 @@ public class PrivateMessageController {
     @PostMapping("/text/{otherId}")
     public ApiResponse<PrivateMessageDTO> sendText(@PathVariable Long otherId,
             @RequestBody PrivateMessageDTO body,
-            @RequestHeader(name = "X-User-Id", required = false) Long headerUserId,
-            @AuthenticationPrincipal UserDetails principal) {
-        User me = resolveCurrent(principal, headerUserId);
+            @AuthenticationPrincipal Object principal) {
+        User me = resolveCurrent(principal);
         if (me == null)
             return new ApiResponse<>(401, "未认证", null);
+
         User other = userService.getUserById(otherId);
         if (other == null)
             return new ApiResponse<>(404, "用户不存在", null);
@@ -244,12 +226,7 @@ public class PrivateMessageController {
         try {
             PrivateMessage msg = privateMessageService.sendText(me, other, body.getText());
             PrivateMessageDTO dto = privateMessageDtoService.toDtoSingle(msg);
-
-            // 系统级通知
             sendPmNotification(msg);
-
-            // SSE broadcast is now handled in PrivateMessageServiceImpl
-
             return new ApiResponse<>(200, "发送成功", dto);
         } catch (IllegalStateException ex) {
             return new ApiResponse<>(400, ex.getMessage(), null);
@@ -259,11 +236,11 @@ public class PrivateMessageController {
     @PostMapping("/media/{otherId}")
     public ApiResponse<PrivateMessageDTO> sendMedia(@PathVariable Long otherId,
             @RequestBody PrivateMessageDTO body,
-            @RequestHeader(name = "X-User-Id", required = false) Long headerUserId,
-            @AuthenticationPrincipal UserDetails principal) {
-        User me = resolveCurrent(principal, headerUserId);
+            @AuthenticationPrincipal Object principal) {
+        User me = resolveCurrent(principal);
         if (me == null)
             return new ApiResponse<>(401, "未认证", null);
+
         User other = userService.getUserById(otherId);
         if (other == null)
             return new ApiResponse<>(404, "用户不存在", null);
@@ -272,11 +249,7 @@ public class PrivateMessageController {
             PrivateMessage msg = privateMessageService.sendMedia(me, other, body.getType(), body.getMediaUrl(),
                     body.getText());
             PrivateMessageDTO dto = privateMessageDtoService.toDtoSingle(msg);
-
             sendPmNotification(msg);
-
-            // SSE broadcast is now handled in PrivateMessageServiceImpl
-
             return new ApiResponse<>(200, "发送成功", dto);
         } catch (IllegalStateException ex) {
             return new ApiResponse<>(400, ex.getMessage(), null);
@@ -287,12 +260,11 @@ public class PrivateMessageController {
     public ApiResponse<String> uploadMessageMedia(
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "otherId", required = false) Long otherId,
-            @RequestHeader(name = "X-User-Id", required = false) Long headerUserId,
-            @AuthenticationPrincipal UserDetails principal) {
-
-        User me = resolveCurrent(principal, headerUserId);
+            @AuthenticationPrincipal Object principal) {
+        User me = resolveCurrent(principal);
         if (me == null)
             return new ApiResponse<>(401, "未认证", null);
+
         String contentType = file.getContentType();
         if (contentType == null || (!contentType.startsWith("image/") && !contentType.startsWith("video/"))) {
             return new ApiResponse<>(400, "仅支持图片或视频文件", null);
@@ -306,16 +278,12 @@ public class PrivateMessageController {
         }
     }
 
-    /**
-     * 获取私信媒体的预签名上传 URL (加速上传)
-     */
     @GetMapping("/presigned-url")
     public ApiResponse<Map<String, String>> getMessagePresignedUrl(
             @RequestParam("fileName") String fileName,
             @RequestParam("otherId") Long otherId,
-            @RequestHeader(name = "X-User-Id", required = false) Long headerUserId,
-            @AuthenticationPrincipal UserDetails principal) {
-        User me = resolveCurrent(principal, headerUserId);
+            @AuthenticationPrincipal Object principal) {
+        User me = resolveCurrent(principal);
         if (me == null)
             return new ApiResponse<>(401, "未认证", null);
 
@@ -325,9 +293,6 @@ public class PrivateMessageController {
                 fileName.toLowerCase().endsWith(".avi") ||
                 fileName.toLowerCase().endsWith(".webm") ||
                 fileName.toLowerCase().endsWith(".mkv"));
-
-        // 视频权限检查 (可选，保持与博客一致)
-        // if (isVideo && !userService.isVip(me.getId())) { ... }
 
         return new ApiResponse<>(200, "获取成功",
                 fileStorageService.generateMessagePresignedUrl(fileName, me.getId(), otherId));

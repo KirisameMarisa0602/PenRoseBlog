@@ -104,14 +104,12 @@ export default function SelfSpace() {
         </aside>
 
         <main className="selfspace-right-panel" aria-label="个人空间内容区">
-          <div className="selfspace-articles-wrap">
-            {/* 文章目录树 (包含文章卡片) */}
-            <div className="selfspace-tree-full">
-               <ArticleFolderTree 
-                  posts={allPosts}
-                  onFilterChange={() => {}} // No longer needed for filtering right side
-                />
-            </div>
+          {/* 文章目录树 (包含文章卡片) */}
+          <div className="selfspace-tree-full" style={{ width: '100%' }}>
+            <ArticleFolderTree
+              posts={allPosts}
+              onFilterChange={() => { }} // No longer needed for filtering right side
+            />
           </div>
         </main>
       </div>

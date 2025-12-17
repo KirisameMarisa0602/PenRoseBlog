@@ -5,5 +5,5 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public interface CurrentUserResolver {
 
-    User resolve(UserDetails principal, Long headerUserId);
+    User resolve(Object principal);
 }

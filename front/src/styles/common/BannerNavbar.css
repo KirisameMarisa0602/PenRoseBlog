@@ -55,7 +55,7 @@ html, body, #root {
   width: 100%;
   --navH: 15vh;
   height: var(--navH);
-  z-index: 100;
+  z-index: 2001;
   transform: translateY(0);
   transition: transform .2s ease;
   background-color: transparent;

@@ -1053,7 +1053,8 @@ export default function ArticleDetail() {
 
     const handleChooseFriendToForward = async (targetUserId) => {
         if (!targetUserId) return;
-        const url = await ensureShareUrl();
+        // Use getCopyableUrl to ensure a clean URL format (e.g. /post/123) that the backend can recognize
+        const url = getCopyableUrl(); 
         if (!url) {
             alert('暂时无法获取文章链接');
             return;
@@ -1112,7 +1113,7 @@ export default function ArticleDetail() {
             )}
             <div className="article-detail-container">
                 {/* Left Column: Back Button + Author Info */}
-                <div className="article-left-column" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <div className="article-left-column" style={{ display: 'flex', flexDirection: 'column', gap: '20px', position: 'sticky', top: '80px', height: 'fit-content' }}>
                     <div className="article-back-nav-container">
                         <button 
                             onClick={handleBack} 

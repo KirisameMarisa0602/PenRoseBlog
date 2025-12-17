@@ -1,19 +1,16 @@
 package com.kirisamemarisa.blog.controller;
 
-// removed unused logger imports
 import com.kirisamemarisa.blog.common.ApiResponse;
 import com.kirisamemarisa.blog.dto.PrivateMessageDTO;
 import com.kirisamemarisa.blog.events.MessageEventPublisher;
 import com.kirisamemarisa.blog.model.PrivateMessage;
 import com.kirisamemarisa.blog.model.User;
-// 分层：控制器避免直接依赖仓库
 import com.kirisamemarisa.blog.service.UserService;
-import com.kirisamemarisa.blog.common.JwtUtil;
 import com.kirisamemarisa.blog.repository.UserProfileRepository;
 import com.kirisamemarisa.blog.service.PrivateMessageService;
-import com.kirisamemarisa.blog.service.BlogUrlPreviewService; // NEW
+import com.kirisamemarisa.blog.service.BlogUrlPreviewService;
+import com.kirisamemarisa.blog.service.CurrentUserResolver;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -30,31 +27,25 @@ public class PrivateMessageStreamController {
     private final PrivateMessageService privateMessageService;
     private final MessageEventPublisher publisher;
     private final UserProfileRepository userProfileRepository;
-    private final BlogUrlPreviewService blogUrlPreviewService; // NEW
+    private final BlogUrlPreviewService blogUrlPreviewService;
+    private final CurrentUserResolver currentUserResolver;
 
     public PrivateMessageStreamController(UserService userService,
-                                          PrivateMessageService privateMessageService,
-                                          MessageEventPublisher publisher,
-                                          UserProfileRepository userProfileRepository,
-                                          BlogUrlPreviewService blogUrlPreviewService) { // CHANGED
+            PrivateMessageService privateMessageService,
+            MessageEventPublisher publisher,
+            UserProfileRepository userProfileRepository,
+            BlogUrlPreviewService blogUrlPreviewService,
+            CurrentUserResolver currentUserResolver) {
         this.userService = userService;
         this.privateMessageService = privateMessageService;
         this.publisher = publisher;
         this.userProfileRepository = userProfileRepository;
-        this.blogUrlPreviewService = blogUrlPreviewService; // NEW
+        this.blogUrlPreviewService = blogUrlPreviewService;
+        this.currentUserResolver = currentUserResolver;
     }
 
-    private User resolveCurrent(UserDetails principal, Long headerUserId, String token) {
-        if (principal != null)
-            return userService.getUserByUsername(principal.getUsername());
-        if (headerUserId != null)
-            return userService.getUserById(headerUserId);
-        if (token != null && !token.isEmpty()) {
-            Long uid = JwtUtil.getUserIdFromToken(token);
-            if (uid != null)
-                return userService.getUserById(uid);
-        }
-        return null;
+    private User resolveCurrent(Object principal) {
+        return currentUserResolver.resolve(principal);
     }
 
     private PrivateMessageDTO toDTO(PrivateMessage msg) {
@@ -98,10 +89,8 @@ public class PrivateMessageStreamController {
 
     @GetMapping("/stream/{otherId}")
     public SseEmitter stream(@PathVariable Long otherId,
-                             @RequestHeader(name = "X-User-Id", required = false) Long headerUserId,
-                             @RequestParam(name = "token", required = false) String token,
-                             @AuthenticationPrincipal UserDetails principal) {
-        User me = resolveCurrent(principal, headerUserId, token);
+            @AuthenticationPrincipal Object principal) {
+        User me = resolveCurrent(principal);
         if (me == null) {
             // 返回一个立即结束的 emitter（前端识别失败回退轮询）
             SseEmitter failed = new SseEmitter();
