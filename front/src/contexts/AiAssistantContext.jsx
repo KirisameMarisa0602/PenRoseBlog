@@ -100,6 +100,11 @@ export function AiAssistantProvider({ children }) {
       }
       return acc;
     } catch (e) {
+      // If we have some content, return it instead of failing or retrying
+      if (acc && acc.length > 0) {
+        return acc;
+      }
+
       // Fallback to non-streaming if streaming fails
       try {
         const full = await sendMessage(message, { model });

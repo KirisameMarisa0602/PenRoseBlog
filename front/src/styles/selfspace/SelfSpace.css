@@ -1,13 +1,16 @@
 .selfspace-page {
   width: 100%;
   display: flex;
-  flex-direction: row; /* 左侧手风琴 + 右侧内容并列 */
+  flex-direction: row;
+  /* 左侧手风琴 + 右侧内容并列 */
   position: relative;
   /* 页面背景由全局 `index.css` 管理，避免局部覆盖引起左右空白 */
   /* 顶部导航占位已由全局 `index.css` 的 `padding-top: var(--navH)` 提供 */
   box-sizing: border-box;
-  height: calc(100vh - var(--navH)); /* 限制高度以适应视口 */
-  overflow: hidden; /* 禁止页面级滚动 */
+  height: calc(100vh - var(--navH));
+  /* 限制高度以适应视口 */
+  overflow: hidden;
+  /* 禁止页面级滚动 */
 }
 
 /* 左侧面板：固定在最左侧，宽度 25vw */
@@ -15,7 +18,8 @@
   /* 固定在视口左侧，始终悬浮在页面左边 */
   position: fixed;
   left: 0;
-  top: var(--navH); /* Explicitly set top to start below navbar */
+  top: var(--navH);
+  /* Explicitly set top to start below navbar */
   width: 25vw;
   min-width: 260px;
   max-width: 420px;
@@ -24,13 +28,16 @@
   align-items: stretch;
   justify-content: stretch;
   z-index: 50;
-  overflow: auto; /* 若内容超高则左右侧独立滚动 */
+  overflow: auto;
+  /* 若内容超高则左右侧独立滚动 */
 }
 
 /* 当导航栏收起时，使左侧面板延伸至整页高度（从顶端到页底） */
 .banner-is-hidden .selfspace-left-panel {
-  top: 0; /* 拉到视口顶端 */
-  height: 100vh; /* 占满整个视口高度 */
+  top: 0;
+  /* 拉到视口顶端 */
+  height: 100vh;
+  /* 占满整个视口高度 */
 }
 
 /* 左侧内部：信息条在上，手风琴占满剩余高度 */
@@ -42,7 +49,8 @@
   flex-direction: column;
   align-items: stretch;
   justify-content: stretch;
-  gap: 0; /* 信息条与手风琴贴紧 */
+  gap: 0;
+  /* 信息条与手风琴贴紧 */
 }
 
 /* 手风琴容器填满左侧剩余空间，使第三块能顶到页面下方 */
@@ -50,22 +58,36 @@
   display: block;
   width: 100%;
   height: auto;
-  flex: 1;       /* 关键：无信息条时也能占满剩余高度 */
-  min-height: 0; /* 允许内部滚动 */
+  flex: 1;
+  /* 关键：无信息条时也能占满剩余高度 */
+  min-height: 0;
+  /* 允许内部滚动 */
 }
 
 /* 右侧内容区：占据剩余空间 */
 .selfspace-right-panel {
   /* 给主内容区留出左侧固定面板的空间，避免重叠 */
   margin-left: 25vw;
+  flex: 1;
+  /* 关键：自动占据剩余宽度 */
   min-width: 0;
-  height: 100%; /* 占满父容器高度 */
-  overflow-y: auto; /* 内部滚动 */
+  height: 100%;
+  /* 占满父容器高度 */
+  overflow-y: auto;
+  /* 内部滚动 */
   display: flex;
   flex-direction: column;
   padding: 24px;
-  padding-top: 24px; /* 修正顶部内边距，不再需要叠加 navH */
+  padding-top: 24px;
+  /* 修正顶部内边距，不再需要叠加 navH */
   box-sizing: border-box;
+  align-items: stretch;
+  /* Ensure children stretch to full width */
+}
+
+.selfspace-tree-full {
+  width: 100%;
+  flex: 1;
 }
 
 /* 新增：查看他人主页时，左侧手风琴上方的简要信息条 */
@@ -74,25 +96,30 @@
   align-items: center;
   gap: 12px;
   padding: 10px 12px;
-  margin: 0;        /* 顶到横幅、与手风琴无缝连接 */
+  margin: 0;
+  /* 顶到横幅、与手风琴无缝连接 */
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(80,120,200,0.10);
-  position: sticky; /* 仍保持吸顶 */
+  box-shadow: 0 4px 20px rgba(80, 120, 200, 0.10);
+  position: sticky;
+  /* 仍保持吸顶 */
   top: 0;
   z-index: 2;
 }
+
 .selfspace-user-brief-avatar {
   width: 48px;
   height: 48px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid rgba(191,200,218,0.6);
+  border: 2px solid rgba(191, 200, 218, 0.6);
 }
+
 .selfspace-user-brief-info .nick {
   font-weight: 700;
   color: #2a3550;
 }
+
 .selfspace-user-brief-info .uname {
   font-size: 12px;
   color: #6b7280;
@@ -106,15 +133,18 @@
   padding: 18px 0 18px 0;
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
   width: 880px;
   /* min-height: calc(100vh - var(--navH, 15vh) - 100px); Removed to allow auto-sizing */
-  height: fit-content; /* Adapt to content height */
-  min-height: 100px; /* Minimum height just to look like a container */
+  height: fit-content;
+  /* Adapt to content height */
+  min-height: 100px;
+  /* Minimum height just to look like a container */
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  transition: height 0.3s ease; /* Smooth transition if height changes */
+  transition: height 0.3s ease;
+  /* Smooth transition if height changes */
 }
 
 /* 顶部：标题 + 排序按钮（按钮在右侧） */
@@ -126,6 +156,7 @@
   margin-left: 40px;
   width: 800px;
 }
+
 .selfspace-articles-title h2 {
   margin: 0;
   font-size: 1.25rem;
@@ -133,20 +164,25 @@
 }
 
 /* 排序按钮组 */
-.selfspace-sort-group { display: flex; gap: 10px; }
+.selfspace-sort-group {
+  display: flex;
+  gap: 10px;
+}
+
 .selfspace-sort-btn {
   background: #f3f6fb;
-  border: 1px solid rgba(0,0,0,0.06);
+  border: 1px solid rgba(0, 0, 0, 0.06);
   color: #334;
   padding: 8px 12px;
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
 }
+
 .selfspace-sort-btn.active {
-  background: linear-gradient(180deg,#3b65e6,#2f4fd8);
+  background: linear-gradient(180deg, #3b65e6, #2f4fd8);
   color: #fff;
-  box-shadow: 0 4px 12px rgba(59,101,230,0.14);
+  box-shadow: 0 4px 12px rgba(59, 101, 230, 0.14);
 }
 
 /* 文章列表：改为竖直排列，和首页一致（每条占一行） */
@@ -169,7 +205,7 @@
   margin-bottom: 0;
   overflow: hidden;
   background: #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 }
 
 /* 内容区为列布局，footer 保持在底部 */
@@ -239,7 +275,7 @@
 
 /* 保证链接包裹时块级尺寸占满列（若 ArticleCard 被 Link 包裹） */
 .home-article-card.selfspace-article-card a,
-.home-article-card.selfspace-article-card > a {
+.home-article-card.selfspace-article-card>a {
   display: block;
   width: 100%;
   height: 100%;
@@ -256,7 +292,8 @@
 .selfspace-pagination {
   display: flex;
   justify-content: center;
-  gap: 32px;               /* 按钮与页码间距更大，参考图示 */
+  gap: 32px;
+  /* 按钮与页码间距更大，参考图示 */
   align-items: center;
   margin-top: 10px;
   margin-bottom: 0;
@@ -266,14 +303,15 @@
   padding: 10px 20px;
   border-radius: 12px;
   border: none;
-  background: linear-gradient(180deg,#4c79ff,#3b65e6);
+  background: linear-gradient(180deg, #4c79ff, #3b65e6);
   color: #fff;
   cursor: pointer;
-  box-shadow: 0 8px 20px rgba(59,101,230,0.18);
+  box-shadow: 0 8px 20px rgba(59, 101, 230, 0.18);
   font-weight: 700;
   font-size: 16px;
   line-height: 1;
-  min-width: 92px;        /* 保持按钮宽度一致 */
+  min-width: 92px;
+  /* 保持按钮宽度一致 */
   transition: transform .12s ease, box-shadow .12s ease, filter .08s ease;
 }
 
@@ -302,7 +340,10 @@
 
 /* 在窄屏下退回为单列（兼容手机） */
 @media (max-width: 900px) {
-  .selfspace-articles-grid { gap: 14px; }
+  .selfspace-articles-grid {
+    gap: 14px;
+  }
+
   .home-article-card.selfspace-article-card .home-article-cover,
   .home-article-card.selfspace-article-card .home-article-cover img {
     width: 80px;
@@ -310,7 +351,11 @@
     flex: 0 0 80px;
     margin-right: 8px;
   }
-  .selfspace-articles-top { padding: 0 8px; }
+
+  .selfspace-articles-top {
+    padding: 0 8px;
+  }
+
   .selfspace-articles-wrap {
     width: 98vw;
     min-width: 0;
@@ -431,7 +476,8 @@
 .selfspace-tabs {
   display: flex;
   gap: 30px;
-  margin-right: auto; /* Push search box to right */
+  margin-right: auto;
+  /* Push search box to right */
 }
 
 .selfspace-tab-btn {
@@ -482,4 +528,3 @@
 .selfspace-search-box {
   margin-left: 20px;
 }
-

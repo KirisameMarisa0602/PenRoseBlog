@@ -336,21 +336,21 @@ export default function NotificationCenter() {
 
             <div className="notification-content-wrapper">
                 <div className="notification-center-container">
-                    {activeTab === 'REQUESTS' && <PendingFriendRequests />}
-
                     <div className="notification-center-header">
                         <h2>
                             {activeTab === 'ALL' && '全部通知'}
                             {activeTab === 'LIKES' && '赞与收藏'}
                             {activeTab === 'COMMENTS' && '评论与回复'}
                             {activeTab === 'FOLLOW' && '关注通知'}
-                            {activeTab === 'REQUESTS' && '申请记录'}
+                            {activeTab === 'REQUESTS' && '好友申请'}
                         </h2>
                         <button className="mark-read-btn" onClick={markAllRead}>
                             {/* <img src={resolveUrl('/icons/message/read.svg')} alt="" style={{ width: 16, height: 16 }} onError={(e) => { e.target.style.display = 'none'; }} /> */}
                             全部已读
                         </button>
                     </div>
+
+                    {activeTab === 'REQUESTS' && <PendingFriendRequests />}
 
                     <div className="notification-list">
                         {notifications.length === 0 && !loading ? (

@@ -4,11 +4,14 @@
     width: 100%;
     margin: 0 auto;
     font-family: 'Space Mono', monospace;
+    box-sizing: border-box;
 }
 
 .folder-node {
+    width: 100%;
     margin-bottom: 10px;
     transition: all 0.3s ease;
+    box-sizing: border-box;
 }
 
 /* =========================================
@@ -173,7 +176,7 @@
     background-color: #f8f9fa;
     border-color: #ddd;
     transform: translateX(4px);
-    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 /* Enhanced Cross Control for deeper levels */

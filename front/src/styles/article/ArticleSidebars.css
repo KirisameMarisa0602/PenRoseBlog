@@ -1,21 +1,26 @@
 /* Layout Grid */
 .article-detail-page {
-    background-color: #ebedf0; /* Slightly darker for better contrast */
+    background-color: #ebedf0;
+    /* Slightly darker for better contrast */
     min-height: 100vh;
 }
 
 .article-detail-container {
-    max-width: 1600px; /* Increased max-width */
+    max-width: 1600px;
+    /* Increased max-width */
     margin: 0 auto;
     padding: 20px;
     display: grid;
-    grid-template-columns: 250px 1fr 260px; /* Reduced sidebar widths to widen center */
-    gap: 24px; /* Increased gap */
+    grid-template-columns: 250px 1fr 260px;
+    /* Reduced sidebar widths to widen center */
+    gap: 24px;
+    /* Increased gap */
     align-items: start;
 }
 
 .article-detail-container.has-cover {
-    margin-top: -60px; /* Pull up over cover if needed */
+    margin-top: -60px;
+    /* Pull up over cover if needed */
     position: relative;
     z-index: 2;
 }
@@ -37,10 +42,13 @@
 
 @media (max-width: 1000px) {
     .article-detail-container {
-        grid-template-columns: 1fr 280px;
+        grid-template-columns: 220px 1fr;
+        /* Left sidebar + Main content */
     }
-    .author-sidebar {
-        display: none; /* Hide author sidebar on smaller screens or move it */
+
+    .article-right-column {
+        display: none;
+        /* Hide right sidebar on smaller screens */
     }
 }
 
@@ -49,40 +57,62 @@
         grid-template-columns: 1fr;
         padding: 10px;
     }
+
     .article-sidebar {
-        display: none; /* Hide right sidebar on mobile */
+        display: none;
+        /* Hide right sidebar on mobile */
     }
 }
 
 /* Main Content Area */
 .article-main {
     background: #fff;
-    border-radius: 12px; /* Increased radius */
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); /* Stronger shadow */
-    border: 1px solid rgba(0, 0, 0, 0.05); /* Added border */
+    border-radius: 12px;
+    /* Increased radius */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    /* Stronger shadow */
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    /* Added border */
     padding: 30px 40px;
-    min-width: 0; /* Prevent overflow in grid */
+    min-width: 0;
+    /* Prevent overflow in grid */
 }
 
 /* Sidebar Common Styles */
-.article-sidebar, .author-sidebar {
+.article-sidebar {
     position: sticky;
-    top: 80px; /* Fixed top offset adjusted for navbar */
-    height: calc(100vh - 100px); /* Fill viewport minus header/padding */
-    overflow-y: auto; /* Allow scrolling if content is too long */
+    top: 100px;
+    /* Fixed top offset adjusted for navbar */
+    height: calc(100vh - 120px);
+    /* Fill viewport minus header/padding */
+    overflow-y: auto;
+    /* Allow scrolling if content is too long */
     z-index: 10;
-    scrollbar-width: none; /* Firefox */
+    scrollbar-width: none;
+    /* Firefox */
 }
 
-.article-sidebar::-webkit-scrollbar, .author-sidebar::-webkit-scrollbar {
-    display: none; /* Chrome/Safari */
+.author-sidebar {
+    /* Author sidebar is inside a sticky container, so it doesn't need to be sticky itself */
+    /* And it shouldn't have fixed height to allow AI summary to be visible below it */
+    position: relative;
+    height: auto;
+    z-index: 10;
+}
+
+.article-sidebar::-webkit-scrollbar {
+    display: none;
+    /* Chrome/Safari */
 }
 
 .sidebar-card {
     background: #fff;
-    border-radius: 12px; /* Increased radius */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Stronger shadow */
-    border: 1px solid rgba(0, 0, 0, 0.05); /* Added border */
+    border-radius: 12px;
+    /* Increased radius */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    /* Stronger shadow */
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    /* Added border */
     padding: 16px;
     margin-bottom: 16px;
 }
@@ -103,7 +133,8 @@
 }
 
 .author-card {
-    background: transparent; /* Transparent to show bg */
+    background: transparent;
+    /* Transparent to show bg */
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     padding: 0;
@@ -123,7 +154,8 @@
 }
 
 .author-card-bg {
-    height: 100%; /* Cover full card */
+    height: 100%;
+    /* Cover full card */
     width: 100%;
     background-size: cover;
     background-position: center;
@@ -131,12 +163,14 @@
     top: 0;
     left: 0;
     z-index: 0;
-    filter: blur(10px); /* Default blurred */
+    filter: blur(10px);
+    /* Default blurred */
     transition: filter 0.5s ease;
 }
 
 .author-card:hover .author-card-bg {
-    filter: blur(0); /* Clear on hover */
+    filter: blur(0);
+    /* Clear on hover */
 }
 
 .author-content-wrapper {
@@ -147,15 +181,18 @@
     flex-direction: column;
     align-items: center;
     width: 100%;
-    background: rgba(255, 255, 255, 0.6); /* Semi-transparent overlay */
+    background: rgba(255, 255, 255, 0.6);
+    /* Semi-transparent overlay */
     -webkit-backdrop-filter: blur(5px);
-    backdrop-filter: blur(5px); /* Additional glass effect */
+    backdrop-filter: blur(5px);
+    /* Additional glass effect */
     height: 100%;
     transition: background 0.5s ease;
 }
 
 .author-card:hover .author-content-wrapper {
-    background: rgba(255, 255, 255, 0.2); /* More transparent on hover */
+    background: rgba(255, 255, 255, 0.2);
+    /* More transparent on hover */
     -webkit-backdrop-filter: blur(0);
     backdrop-filter: blur(0);
 }
@@ -167,7 +204,7 @@
     margin-bottom: 20px;
     width: 100%;
     /* Ensure text is readable */
-    text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
 }
 
 .author-avatar {
@@ -176,7 +213,7 @@
     border-radius: 20px;
     object-fit: cover;
     border: 4px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s;
     margin-bottom: 12px;
     background: #fff;
@@ -252,7 +289,8 @@
 }
 
 .follow-btn {
-    background: #ff4785; /* Pinkish red from image */
+    background: #ff4785;
+    /* Pinkish red from image */
     color: #fff;
     box-shadow: 0 4px 10px rgba(255, 71, 133, 0.3);
 }
@@ -327,7 +365,8 @@
     list-style: none;
     padding: 0;
     margin: 0;
-    max-height: 300px; /* Reduced height */
+    max-height: 300px;
+    /* Reduced height */
     overflow-y: auto;
 }
 
@@ -354,9 +393,18 @@
     background: #f0f7ff;
 }
 
-.toc-item.level-1 { padding-left: 12px; font-weight: 600; }
-.toc-item.level-2 { padding-left: 24px; }
-.toc-item.level-3 { padding-left: 36px; }
+.toc-item.level-1 {
+    padding-left: 12px;
+    font-weight: 600;
+}
+
+.toc-item.level-2 {
+    padding-left: 24px;
+}
+
+.toc-item.level-3 {
+    padding-left: 36px;
+}
 
 /* Info Card */
 .info-group {
@@ -388,7 +436,7 @@
     font-size: 12px;
     font-weight: 500;
     transition: all 0.2s ease;
-    border: 1px solid rgba(0,0,0,0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
     display: inline-flex;
     align-items: center;
 }
@@ -397,7 +445,7 @@
     background: #e9ecef;
     color: #212529;
     transform: translateY(-1px);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .date-text {
@@ -412,7 +460,8 @@
     letter-spacing: 0.5px;
 }
 
-.directory-tag, .category-tag {
+.directory-tag,
+.category-tag {
     display: inline-block;
     background: #e8f3ff;
     color: #1e80ff;

@@ -6,6 +6,7 @@ import 'highlight.js/styles/atom-one-dark.css';
 import '@styles/article/ArticleDetail.css';
 import '@styles/article/ArticleSidebars.css';
 import AuthorSidebar from '@components/article/AuthorSidebar';
+import AiSummarySidebar from '@components/article/AiSummarySidebar';
 import ArticleSidebar from '@components/article/ArticleSidebar';
 import ArticleActions from '@components/article/ArticleActions';
 import CommentsSection from '@components/article/CommentsSection';
@@ -33,11 +34,9 @@ export default function ArticleDetail() {
     const { summarizeArticle } = useAiAssistant();
     const [aiSummary, setAiSummary] = useState('');
     const [aiLoading, setAiLoading] = useState(false);
-    const [showAiSummary, setShowAiSummary] = useState(false);
 
     const handleAiSummarize = async () => {
         if (!post?.content) return;
-        setShowAiSummary(true);
         if (aiSummary) return; // Already summarized
 
         setAiLoading(true);
@@ -1051,28 +1050,6 @@ export default function ArticleDetail() {
         }
     };
 
-    // AI Summary Modal
-    const renderAiSummaryModal = () => {
-        if (!showAiSummary) return null;
-        return (
-            <div className="ai-summary-modal-overlay" onClick={() => setShowAiSummary(false)}>
-                <div className="ai-summary-modal" onClick={e => e.stopPropagation()}>
-                    <div className="ai-summary-header">
-                        <h3>AI 智能摘要</h3>
-                        <button onClick={() => setShowAiSummary(false)}>×</button>
-                    </div>
-                    <div className="ai-summary-content">
-                        {aiLoading && !aiSummary ? (
-                            <div className="ai-loading">正在生成摘要...</div>
-                        ) : (
-                            <div className="ai-text">{aiSummary}</div>
-                        )}
-                    </div>
-                </div>
-            </div>
-        );
-    };
-
     const openForwardFriendsDialog = async () => {
         if (!userId) {
             alert('请先登录后再转发到私信');
@@ -1155,13 +1132,12 @@ export default function ArticleDetail() {
 
     return (
         <div className="article-detail-page">
-            {renderAiSummaryModal()}
             {coverUrl && (
                 <div className="page-blur-background" style={{ backgroundImage: `url(${coverUrl})` }}></div>
             )}
             <div className="article-detail-container">
                 {/* Left Column: Back Button + Author Info */}
-                <div className="article-left-column" style={{ display: 'flex', flexDirection: 'column', gap: '20px', position: 'sticky', top: '80px', height: 'fit-content' }}>
+                <div className="article-left-column" style={{ display: 'flex', flexDirection: 'column', gap: '20px', position: 'sticky', top: '100px', height: 'fit-content' }}>
                     <div className="article-back-nav-container">
                         <button
                             onClick={handleBack}
@@ -1199,39 +1175,18 @@ export default function ArticleDetail() {
                             </svg>
                             返回 {fromCategory || '首页'}
                         </button>
-
-                        {/* AI Summary Button */}
-                        <button
-                            onClick={handleAiSummarize}
-                            style={{
-                                marginTop: '10px',
-                                background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-                                color: 'white',
-                                border: 'none',
-                                padding: '8px 16px',
-                                borderRadius: '20px',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                fontSize: '14px',
-                                fontWeight: '600',
-                                boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)',
-                                transition: 'all 0.3s ease'
-                            }}
-                            onMouseEnter={e => e.target.style.transform = 'scale(1.05)'}
-                            onMouseLeave={e => e.target.style.transform = 'scale(1)'}
-                        >
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
-                                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
-                            </svg>
-                            AI 摘要
-                        </button>
                     </div>
 
                     {/* Left Sidebar: Author Info */}
                     <AuthorSidebar
                         post={post}
                         currentUserId={userId}
+                    />
+
+                    <AiSummarySidebar
+                        summary={aiSummary}
+                        loading={aiLoading}
+                        onSummarize={handleAiSummarize}
                     />
                 </div>
 

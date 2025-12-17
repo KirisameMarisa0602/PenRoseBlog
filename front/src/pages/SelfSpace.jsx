@@ -57,9 +57,12 @@ export default function SelfSpace() {
           let list = j.data && j.data.list ? j.data.list : (j.data || []);
           if (!Array.isArray(list) && Array.isArray(j.data)) list = j.data;
 
-          // 只保留当前用户的文章
-          list = list.filter(p => String(p.userId) === String(effectiveUserId));
-          
+          // Filter by user ID (handle userId, authorId, uid and type mismatch)
+          list = list.filter(p => {
+            const pUserId = p.userId || p.authorId || p.uid;
+            return String(pUserId) === String(effectiveUserId);
+          });
+
           // 存储全量数据
           setAllPosts(list);
         } else {

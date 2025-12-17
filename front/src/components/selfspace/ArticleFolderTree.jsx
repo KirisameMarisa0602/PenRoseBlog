@@ -25,7 +25,7 @@ const buildTree = (posts) => {
   };
 
   posts.forEach(post => {
-    const isDraft = post.status === 'DRAFT';
+    const isDraft = post.status && post.status.toUpperCase() === 'DRAFT';
     const statusNode = isDraft ? root.children.drafts : root.children.published;
 
     const category = post.categoryName || '未分类';
