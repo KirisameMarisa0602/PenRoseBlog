@@ -237,3 +237,26 @@ body.hide-scrollbar::-webkit-scrollbar {
   width: 0;
   height: 0;
 }
+
+@media (max-width: 768px) {
+  .home-article-card {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .home-article-cover {
+    height: 180px;
+    width: 100%;
+    order: -1;
+    /* Move image to top */
+  }
+
+  .home-article-title {
+    font-size: 17px;
+  }
+
+  .home-article-preview {
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+  }
+}

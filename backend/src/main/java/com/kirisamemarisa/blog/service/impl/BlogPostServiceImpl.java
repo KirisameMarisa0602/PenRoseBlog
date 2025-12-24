@@ -15,6 +15,7 @@ import com.kirisamemarisa.blog.service.CommentService;
 import com.kirisamemarisa.blog.service.NotificationService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.JpaSort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -313,15 +314,26 @@ public class BlogPostServiceImpl implements BlogPostService {
 
     @Override
     public PageResult<BlogPostDTO> pageList(int page, int size, Long currentUserId) {
-        return search(null, null, null, null, "PUBLISHED", page, size, currentUserId);
+        return search(null, null, null, null, "PUBLISHED", page, size, currentUserId, null);
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public PageResult<BlogPostDTO> search(String keyword, Long userId, String directory, String categoryName,
             String status, int page,
             int size,
-            Long currentUserId) {
+            Long currentUserId, String sortMode) {
+
+        // Ensure view-count ordering is based on up-to-date numbers.
+        // View counts are tracked as DB + Redis delta; ordering in SQL uses DB view_stats,
+        // so we flush pending deltas before executing view-based sorts.
+        if (sortMode != null && ("mostViews".equals(sortMode) || "hot".equals(sortMode))) {
+            try {
+                blogViewService.flushPendingViewCounts();
+            } catch (Exception e) {
+                logger.warn("Failed to flush pending view counts before sorting", e);
+            }
+        }
 
         String statusFilter = "PUBLISHED";
         if (userId != null && currentUserId != null && userId.longValue() == currentUserId.longValue()) {
@@ -333,7 +345,36 @@ public class BlogPostServiceImpl implements BlogPostService {
             }
         }
 
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Sort sort;
+        if (sortMode != null) {
+            switch (sortMode) {
+                case "mostLikes":
+                    sort = Sort.by(Sort.Direction.DESC, "likeCount")
+                            .and(JpaSort.unsafe(Sort.Direction.DESC, "COALESCE(s.viewCount, 0)"))
+                            .and(Sort.by(Sort.Direction.DESC, "favoriteCount"))
+                            .and(Sort.by(Sort.Direction.DESC, "id"));
+                    break;
+                case "mostFavorites":
+                    sort = Sort.by(Sort.Direction.DESC, "favoriteCount")
+                            .and(Sort.by(Sort.Direction.DESC, "likeCount"))
+                            .and(JpaSort.unsafe(Sort.Direction.DESC, "COALESCE(s.viewCount, 0)"))
+                            .and(Sort.by(Sort.Direction.DESC, "id"));
+                    break;
+                case "mostViews":
+                case "hot":
+                    sort = JpaSort.unsafe(Sort.Direction.DESC, "COALESCE(s.viewCount, 0)")
+                            .and(Sort.by(Sort.Direction.DESC, "likeCount"))
+                            .and(Sort.by(Sort.Direction.DESC, "favoriteCount"))
+                            .and(Sort.by(Sort.Direction.DESC, "id"));
+                    break;
+                default:
+                    sort = Sort.by(Sort.Direction.DESC, "createdAt");
+            }
+        } else {
+            sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        }
+
+        PageRequest pageRequest = PageRequest.of(page, size, sort);
         Page<BlogPost> blogPage = blogPostRepository.search(keyword, userId, directory, categoryName, statusFilter,
                 pageRequest);
         List<BlogPost> posts = blogPage.getContent();
@@ -820,15 +861,47 @@ public class BlogPostServiceImpl implements BlogPostService {
 
     @Override
     public List<BlogPostDTO> getTopPostPerCategory() {
-        List<Category> categories = categoryRepository.findAll();
+        // Define the fixed list of 12 categories
+        String[] categoryNames = {
+            "知识", "生活", "游戏", "动漫", "动画", "娱乐", 
+            "美食", "旅行", "电影", "音乐", "绘画", "随笔"
+        };
+        
         List<BlogPostDTO> result = new java.util.ArrayList<>();
-        for (Category category : categories) {
-            BlogPost post = blogPostRepository.findFirstByCategoryOrderByLikeCountDesc(category);
-            if (post != null) {
-                UserProfile profile = userProfileRepository.findById(post.getUser().getId()).orElse(null);
-                result.add(blogpostMapper.toDTOWithProfile(post, profile));
+        
+        for (String catName : categoryNames) {
+            Optional<Category> catOpt = categoryRepository.findByName(catName);
+            
+            if (catOpt.isPresent()) {
+                Category category = catOpt.get();
+                List<BlogPost> posts = blogPostRepository.findTopByCategory(category, PageRequest.of(0, 1));
+                
+                if (!posts.isEmpty()) {
+                    BlogPost post = posts.get(0);
+                    UserProfile profile = userProfileRepository.findById(post.getUser().getId()).orElse(null);
+                    BlogPostDTO dto = blogpostMapper.toDTOWithProfile(post, profile);
+                    setViewCount(dto, post.getId());
+                    result.add(dto);
+                } else {
+                    // Category exists but no posts
+                    result.add(createPlaceholder(catName, -1L * category.getId()));
+                }
+            } else {
+                // Category does not exist in DB
+                result.add(createPlaceholder(catName, -1L * (long)catName.hashCode()));
             }
         }
         return result;
+    }
+
+    private BlogPostDTO createPlaceholder(String categoryName, Long id) {
+        BlogPostDTO dummy = new BlogPostDTO();
+        dummy.setId(id); 
+        dummy.setTitle("虚位以待");
+        dummy.setCategoryName(categoryName);
+        dummy.setCoverImageUrl(""); 
+        dummy.setAuthorNickname("系统");
+        dummy.setLikeCount(0L);
+        return dummy;
     }
 }

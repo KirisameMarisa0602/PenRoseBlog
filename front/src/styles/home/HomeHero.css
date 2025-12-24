@@ -283,3 +283,24 @@
         grid-auto-rows: 200px;
     }
 }
+@media (max-width: 992px) {
+    .home-hero-section {
+        grid-template-columns: 1fr;
+        height: auto;
+        gap: 24px;
+    }
+    
+    .home-hero-carousel {
+        height: 300px;
+    }
+    
+    .home-hero-grid-container {
+        height: auto;
+    }
+}
+
+@media (max-width: 768px) {
+    .home-hero-carousel {
+        height: 240px;
+    }
+}

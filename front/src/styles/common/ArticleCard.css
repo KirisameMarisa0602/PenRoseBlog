@@ -1,20 +1,52 @@
 /* ArticleCard styles */
-.article-card{
-  display:flex;
-  background:#fff;
-  border-radius:8px;
-  box-shadow:0 1px 4px rgba(0,0,0,0.06);
-  overflow:hidden;
-  cursor:pointer;
-  transition:transform .12s ease,box-shadow .12s ease;
-  margin:12px 0;
+.article-card {
+    display: flex;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform .12s ease, box-shadow .12s ease;
+    margin: 12px 0;
 }
-.article-card:hover{ transform:translateY(-4px); box-shadow:0 6px 18px rgba(0,0,0,0.08); }
-.article-card-cover{ width:180px; flex:0 0 180px; overflow:hidden; }
-.article-card-cover img{ width:100%; height:100%; object-fit:cover; display:block; }
-.article-card-body{ padding:14px; display:flex; flex-direction:column; justify-content:center; }
-.article-card-title{ margin:0 0 8px 0; font-size:18px; color:#222; }
-.article-card-excerpt{ margin:0; color:#666; font-size:14px; line-height:1.5; }
+
+.article-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+.article-card-cover {
+    width: 180px;
+    flex: 0 0 180px;
+    overflow: hidden;
+}
+
+.article-card-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.article-card-body {
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.article-card-title {
+    margin: 0 0 8px 0;
+    font-size: 18px;
+    color: #222;
+}
+
+.article-card-excerpt {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+    line-height: 1.5;
+}
 
 /* New Article Card Styles */
 .article-card-new {
@@ -35,7 +67,9 @@
     display: flex;
     text-decoration: none;
     color: inherit;
-    height: 140px; /* Fixed height for consistency */
+    min-height: 140px;
+    /* Use min-height to allow expansion */
+    height: auto;
 }
 
 .article-card-cover-wrapper {
@@ -75,6 +109,7 @@
     overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
 }
 
@@ -152,6 +187,7 @@
     font-size: 16px;
     margin-bottom: 8px;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
 }
 
 .article-card-vertical .article-card-meta-top {
@@ -166,11 +202,13 @@
 /* Chat Article Card - Optimized for Conversation Detail (Vertical Style) */
 .chat-article-card {
     width: 100%;
-    max-width: 320px; /* Limit width */
+    max-width: 320px;
+    /* Limit width */
     background: rgba(255, 255, 255, 0.95);
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
-    border-radius: 16px; /* More rounded */
+    border-radius: 16px;
+    /* More rounded */
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.6);
     margin: 0;
@@ -192,7 +230,8 @@
 /* Cover Image */
 .chat-article-card .article-card-cover-wrapper {
     width: 100%;
-    height: 180px; /* Taller image */
+    height: 180px;
+    /* Taller image */
     position: relative;
 }
 
@@ -203,7 +242,7 @@
     left: 0;
     width: 100%;
     height: 40px;
-    background: linear-gradient(to top, rgba(0,0,0,0.05), transparent);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.05), transparent);
     pointer-events: none;
 }
 
@@ -220,6 +259,7 @@
     line-height: 1.4;
     margin-bottom: 12px;
     color: #1a1a1a;
+    line-clamp: 2;
     -webkit-line-clamp: 2;
 }
 
@@ -227,7 +267,7 @@
 .chat-article-card .article-card-meta-top {
     margin-top: 0;
     padding-top: 12px;
-    border-top: 1px solid rgba(0,0,0,0.06);
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -241,7 +281,7 @@
     width: 24px;
     height: 24px;
     border: 1px solid #fff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .chat-article-card .article-card-nickname {
@@ -262,7 +302,7 @@
     display: flex;
     margin-top: 12px;
     padding-top: 8px;
-    border-top: 1px solid rgba(0,0,0,0.05);
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .chat-article-card .stat-item {
@@ -276,4 +316,26 @@
 
 .chat-article-card .stat-item span {
     font-size: 11px;
+}
+
+@media (max-width: 768px) {
+    .article-card-link {
+        flex-direction: column;
+        min-height: auto;
+    }
+
+    .article-card-cover-wrapper {
+        width: 100%;
+        height: 180px;
+    }
+
+    .article-card-info {
+        padding: 12px;
+    }
+
+    .article-card-title {
+        font-size: 15px;
+        line-clamp: 2;
+        -webkit-line-clamp: 2;
+    }
 }

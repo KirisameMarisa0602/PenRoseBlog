@@ -20,8 +20,8 @@ export default function ArticleActions({
                 <span className="count">{post.viewCount || 0}</span>
             </div>
 
-            <button 
-                type="button" 
+            <button
+                type="button"
                 onClick={onToggleLike}
                 className={`action-btn like-btn ${post.likedByCurrentUser ? 'liked' : ''}`}
             >
@@ -30,8 +30,8 @@ export default function ArticleActions({
                 <span className="count">{post.likeCount || 0}</span>
             </button>
 
-            <button 
-                type="button" 
+            <button
+                type="button"
                 onClick={onToggleFavorite}
                 className={`action-btn favorite-btn ${post.favoritedByCurrentUser ? 'favorited' : ''}`}
             >
@@ -41,25 +41,15 @@ export default function ArticleActions({
             </button>
 
             <div className="share-wrapper">
-                <button type="button" onClick={onShareClick} className="action-btn share-btn">
+                <button type="button" onClick={onOpenForwardFriends} className="action-btn share-btn">
                     <img src="/icons/blogpost/转发.svg" alt="转发" className="icon" />
                     <span>转发</span>
                     <span className="count">{post.shareCount || 0}</span>
                 </button>
-                {showShareMenu && (
-                    <div className="share-menu">
-                        <button onClick={onOpenForwardFriends} className="share-menu-item">
-                            转发给好友
-                        </button>
-                        <button onClick={onCopyLink} className="share-menu-item">
-                            {copying ? '复制中...' : '复制链接'}
-                        </button>
-                    </div>
-                )}
             </div>
 
-            <button 
-                type="button" 
+            <button
+                type="button"
                 onClick={onScrollToComments}
                 className="action-btn comment-btn"
             >

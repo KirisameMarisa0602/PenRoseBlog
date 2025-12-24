@@ -211,6 +211,11 @@ public class BlogViewServiceImpl implements BlogViewService {
         redisTemplate.opsForSet().remove(KEY_PENDING_SYNC_POSTS, blogPostId.toString());
     }
 
+    @Override
+    public void flushPendingViewCounts() {
+        syncViewCounts();
+    }
+
     // 定时任务：同步浏览量和记录到数据库
     @Scheduled(fixedDelay = 5000) // 每5秒同步一次
     public void syncViewsToDatabase() {

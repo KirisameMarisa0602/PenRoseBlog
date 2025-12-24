@@ -81,6 +81,9 @@ public class BlogPost {
     @OneToMany(mappedBy = "blogPost", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
+    @OneToOne(mappedBy = "blogPost", fetch = FetchType.LAZY)
+    private BlogViewStats viewStats;
+
     @PrePersist
     protected void prePersist() {
         createdAt = LocalDateTime.now();

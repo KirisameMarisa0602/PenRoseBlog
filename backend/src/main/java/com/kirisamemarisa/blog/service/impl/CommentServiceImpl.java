@@ -16,6 +16,7 @@ import com.kirisamemarisa.blog.model.UserProfile;
 import com.kirisamemarisa.blog.repository.BlogPostRepository;
 import com.kirisamemarisa.blog.repository.CommentLikeRepository;
 import com.kirisamemarisa.blog.repository.CommentRepository;
+import com.kirisamemarisa.blog.repository.CommentReplyRepository;
 import com.kirisamemarisa.blog.repository.UserProfileRepository;
 import com.kirisamemarisa.blog.repository.UserRepository;
 import com.kirisamemarisa.blog.service.CommentService;
@@ -26,7 +27,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -44,6 +47,8 @@ public class CommentServiceImpl implements CommentService {
     private CommentMapper commentMapper;
     @Autowired
     private UserProfileRepository userProfileRepository;
+    @Autowired
+    private CommentReplyRepository commentReplyRepository;
     @Autowired(required = false)
     private NotificationService notificationService;
 
@@ -104,6 +109,17 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public List<CommentDTO> listComments(Long blogPostId, Long currentUserId) {
         List<Comment> comments = commentRepository.findByBlogPostIdOrderByCreatedAtDesc(blogPostId);
+
+        List<Long> commentIds = comments.stream().map(Comment::getId).distinct().toList();
+        Map<Long, Long> replyCountMap = new HashMap<>();
+        if (!commentIds.isEmpty()) {
+            List<Object[]> rows = commentReplyRepository.countRepliesByCommentIds(commentIds);
+            for (Object[] row : rows) {
+                if (row == null || row.length < 2) continue;
+                replyCountMap.put((Long) row[0], (Long) row[1]);
+            }
+        }
+
         // 批量获取所有 userId
         List<Long> userIds = comments.stream()
                 .map(comment -> comment.getUser().getId())
@@ -116,6 +132,7 @@ public class CommentServiceImpl implements CommentService {
         }
         return comments.stream().map(comment -> {
             CommentDTO dto = commentMapper.toDTO(comment);
+            dto.setReplyCount(replyCountMap.getOrDefault(comment.getId(), 0L));
             if (currentUserId != null) {
                 dto.setLikedByCurrentUser(
                         commentLikeRepository.findByCommentIdAndUserId(comment.getId(), currentUserId).isPresent());
@@ -137,6 +154,17 @@ public class CommentServiceImpl implements CommentService {
                 .findByBlogPostIdOrderByCreatedAtDesc(blogPostId,
                         org.springframework.data.domain.PageRequest.of(page, size));
         List<Comment> comments = commentPage.getContent();
+
+        List<Long> commentIds = comments.stream().map(Comment::getId).distinct().toList();
+        Map<Long, Long> replyCountMap = new HashMap<>();
+        if (!commentIds.isEmpty()) {
+            List<Object[]> rows = commentReplyRepository.countRepliesByCommentIds(commentIds);
+            for (Object[] row : rows) {
+                if (row == null || row.length < 2) continue;
+                replyCountMap.put((Long) row[0], (Long) row[1]);
+            }
+        }
+
         List<Long> userIds = comments.stream()
                 .map(comment -> comment.getUser().getId())
                 .distinct()
@@ -148,6 +176,7 @@ public class CommentServiceImpl implements CommentService {
         }
         List<CommentDTO> dtoList = comments.stream().map(comment -> {
             CommentDTO dto = commentMapper.toDTO(comment);
+            dto.setReplyCount(replyCountMap.getOrDefault(comment.getId(), 0L));
             if (currentUserId != null) {
                 dto.setLikedByCurrentUser(
                         commentLikeRepository.findByCommentIdAndUserId(comment.getId(), currentUserId).isPresent());
@@ -248,6 +277,18 @@ public class CommentServiceImpl implements CommentService {
         if (opt.isEmpty()) return null;
         Comment comment = opt.get();
         CommentDTO dto = commentMapper.toDTO(comment);
+
+        try {
+            List<Object[]> rows = commentReplyRepository.countRepliesByCommentIds(List.of(comment.getId()));
+            if (rows != null && !rows.isEmpty() && rows.get(0) != null && rows.get(0).length >= 2) {
+                dto.setReplyCount((Long) rows.get(0)[1]);
+            } else {
+                dto.setReplyCount(0L);
+            }
+        } catch (Exception ignored) {
+            dto.setReplyCount(0L);
+        }
+
         // 填充用户信息
         UserProfile profile = userProfileRepository.findById(comment.getUser().getId()).orElse(null);
         if (profile != null) {

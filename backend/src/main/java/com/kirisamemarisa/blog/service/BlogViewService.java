@@ -22,6 +22,12 @@ public interface BlogViewService {
     ApiResponse<java.util.Map<Long, Long>> getBatchStats(java.util.List<Long> blogPostIds);
 
     /**
+     * 强制将 Redis 中待同步的浏览增量落库。
+     * 需要依赖浏览量进行排序时调用，保证排序与返回的 viewCount 一致。
+     */
+    void flushPendingViewCounts();
+
+    /**
      * 删除指定博客的所有浏览相关数据（明细 + 统计）
      */
     void deleteByBlogPostId(Long blogPostId);

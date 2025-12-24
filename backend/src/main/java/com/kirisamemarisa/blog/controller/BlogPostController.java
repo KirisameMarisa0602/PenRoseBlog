@@ -15,6 +15,8 @@ import com.kirisamemarisa.blog.service.UserService;
 @RequestMapping("/api/blogpost")
 public class BlogPostController {
 
+    private static final Logger logger = LoggerFactory.getLogger(BlogPostController.class);
+
     private final BlogPostService blogPostService;
     private final FileStorageService fileStorageService;
     private final UserService userService;
@@ -53,11 +55,14 @@ public class BlogPostController {
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) String directory,
             @RequestParam(required = false) String categoryName,
-            @RequestParam(required = false) String status) {
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String sortMode) {
+        logger.info("[GET /api/blogpost] page={} size={} sortMode={} keyword={} userId={} directory={} categoryName={} status={}",
+            page, size, sortMode, keyword, userId, directory, categoryName, status);
         Long currentUserId = com.kirisamemarisa.blog.common.JwtUtil.getCurrentUserId();
         PageResult<BlogPostDTO> result = blogPostService.search(keyword, userId, directory, categoryName, status, page,
                 size,
-                currentUserId);
+                currentUserId, sortMode);
         return new ApiResponse<>(200, "获取成功", result);
     }
 

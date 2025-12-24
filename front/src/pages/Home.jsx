@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import '@styles/home/Home.css';
 import '@styles/home/HomeHero.css';
@@ -23,9 +23,12 @@ const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState('首页');
   const size = 15; // 每页 15 篇，适应 5 列网格布局 (3行)
   const { user } = useAuthState();
-  const userId = user?.id || null;
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const sortTabsRef = useRef(null);
+
+  // Hot 模式一次性拉取过多会导致首页白屏/卡顿；限制最大拉取数量（可按数据规模调整）
+  const HOT_MODE_MAX_FETCH = 600;
 
   // Initialize category from location state if available
   useEffect(() => {
@@ -40,7 +43,15 @@ const Home = () => {
     }
   }, [location.state]);
 
-  const handleSortChange = (mode) => { setSortMode(mode); setPage(0); setPosts([]); setHasMore(true); };
+  const handleSortChange = (mode) => {
+    setSortMode(mode);
+    setPage(0);
+    setPosts([]);
+    setHasMore(true);
+    if (sortTabsRef.current) {
+      sortTabsRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   const handleCategoryChange = (cat) => {
     // Update history state so back button works
@@ -65,7 +76,7 @@ const Home = () => {
           let list = res.data && res.data.list ? res.data.list : (res.data || []);
           if (!Array.isArray(list) && Array.isArray(res.data)) list = res.data;
           // Shuffle list and take 6
-          const shuffled = list.sort(() => 0.5 - Math.random()).slice(0, 6);
+          const shuffled = [...list].sort(() => 0.5 - Math.random()).slice(0, 6);
           setHeroPosts(shuffled);
         }
       });
@@ -80,12 +91,8 @@ const Home = () => {
     let mounted = true;
     setLoadingMore(true);
 
-    // 当为 hot 模式时，我们尝试拉取尽可能多的文章到前端进行全局排序。
-    // 设一个较大的 fetchSize（根据项目规模可调）。
-    const fetchAllForHot = sortMode === 'hot';
-    const fetchSize = fetchAllForHot ? 10000 : size;
-    const fetchPage = fetchAllForHot ? 0 : page;
-
+    const fetchSize = size;
+    const fetchPage = page;
     const categoryParam = selectedCategory === '首页' ? null : selectedCategory;
 
     fetchPosts({ page: fetchPage, size: fetchSize, sortMode, category: categoryParam })
@@ -95,64 +102,16 @@ const Home = () => {
           let list = j.data && j.data.list ? j.data.list : (j.data || []);
           if (!Array.isArray(list) && Array.isArray(j.data)) list = j.data;
 
-          if (fetchAllForHot && list.length) {
-            try {
-              // 批量获取所有文章的浏览量并按自定义热度排序（view + like*30）
-              const ids = list.map(p => (p.id || p.postId));
-
-              const viewMap = new Map();
-              try {
-                const batchRes = await fetchBlogViewBatch(ids);
-                if (batchRes && batchRes.code === 200 && batchRes.data) {
-                  Object.entries(batchRes.data).forEach(([k, v]) => {
-                    viewMap.set(String(k), Number(v));
-                  });
-                }
-              } catch (e) {
-                console.error('[hot排序] 批量获取浏览量失败', e);
-              }
-
-              list = list.slice().sort((a, b) => {
-                const va = (viewMap.get(String(a.id || a.postId)) || 0) + ((a.likeCount || a.likes || 0) * 30);
-                const vb = (viewMap.get(String(b.id || b.postId)) || 0) + ((b.likeCount || b.likes || 0) * 30);
-                return vb - va;
-              });
-            } catch (e) {
-              console.error('[hot排序] 获取浏览量失败', e);
-            }
-
-            // 记录总条数，并在前端做分页切片展示
-            const start = page * size;
-            const paged = list.slice(start, start + size);
-
-            if (page === 0) {
-              setPosts(paged);
-            } else {
-              setPosts(prev => [...prev, ...paged]);
-            }
-
-            setHasMore(start + size < list.length);
+          if (page === 0) {
+            setPosts(list);
           } else {
-            // 非 hot 模式或后端已返回已排好序的列表（分页） -> 直接使用后端返回的这一页
-            if (page === 0) {
-              setPosts(list);
-            } else {
-              setPosts(prev => [...prev, ...list]);
-            }
-            // 若后端返回 total/分页信息，可在这里设置 totalCount（容错处理）
-            if (j.data && typeof j.data.total === 'number') {
-              // Use functional update or just rely on page * size logic to avoid dependency on posts
-              // Actually, we can just check if we reached the total
-              // Better: (page * size) + list.length < j.data.total
-              // But wait, page is 0-indexed.
-              // If page=0, we have list.length items.
-              // If page=1, we have size + list.length items.
-              // So total fetched so far is (page * size) + list.length
-              setHasMore((page * size) + list.length < j.data.total);
-            } else if (!fetchAllForHot) {
-              // 如果后端没有 total 字段，我们无法精确计算总页数，这里设为 null
-              setHasMore(list.length === size);
-            }
+            setPosts(prev => [...prev, ...list]);
+          }
+
+          if (j.data && typeof j.data.total === 'number') {
+            setHasMore((page * size) + list.length < j.data.total);
+          } else {
+            setHasMore(list.length === size);
           }
         } else {
           if (page === 0) setPosts([]);
@@ -170,20 +129,22 @@ const Home = () => {
       });
 
     return () => { mounted = false; };
-  }, [page, size, userId, sortMode, selectedCategory]);
+  }, [page, size, user?.id, sortMode, selectedCategory]);
 
   // Infinite Scroll Handler
   useEffect(() => {
     const handleScroll = () => {
       if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 200) {
-        if (!loadingMore && hasMore) {
+        // Guard: after switching sort/category we clear posts; don't auto-increment page
+        // before the first page of the new mode has loaded.
+        if (!loadingMore && hasMore && posts.length > 0) {
           setPage(prev => prev + 1);
         }
       }
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [loadingMore, hasMore]);
+  }, [loadingMore, hasMore, posts.length]);
 
   // 隐藏 Home 页滚动条（不影响滚动），离开时恢复
   useEffect(() => {
@@ -226,11 +187,13 @@ const Home = () => {
             </div>
           </div>
 
-          <HomeSortTabs sortMode={sortMode} onChange={handleSortChange} />
+          <div ref={sortTabsRef}>
+            <HomeSortTabs sortMode={sortMode} onChange={handleSortChange} />
+          </div>
 
           <div className="home-articles-list">
             <HomeArticleList posts={posts} selectedCategory={selectedCategory} />
-            {loadingMore && <div className="home-loading-more">加载中...</div>}
+            {loadingMore && <div className="home-loading-more">{'\u52a0\u8f7d\u4e2d...'}</div>}
             {!hasMore && posts.length > 0 && <div className="home-no-more">没有更多了</div>}
           </div>
         </div>

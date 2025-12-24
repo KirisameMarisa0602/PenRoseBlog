@@ -23,7 +23,8 @@ async function preloadBanner(limit = 6) {
     if (!Array.isArray(manifest) || manifest.length === 0) return;
     const activeId = String(manifest[0]?.id || manifest[0]?.name || '');
     if (!activeId) return;
-    const rr = await fetch(`/banner/assets/${activeId}/data.json`, { cache: 'no-cache' });
+    // data.json 通常随 activeId 变化而变化：允许缓存能显著加速二次进入
+    const rr = await fetch(`/banner/assets/${activeId}/data.json`, { cache: 'force-cache' });
     const data = rr.ok ? await rr.json() : null;
     if (!Array.isArray(data)) return;
     const urls = [];

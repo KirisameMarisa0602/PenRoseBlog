@@ -9,6 +9,7 @@ public class CommentDTO {
     private String content;
     private LocalDateTime createdAt;
     private Long likeCount;
+    private Long replyCount;
     private Boolean likedByCurrentUser;
     private String nickname;
     private String avatarUrl;
@@ -25,6 +26,8 @@ public class CommentDTO {
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public Long getLikeCount() { return likeCount; }
     public void setLikeCount(Long likeCount) { this.likeCount = likeCount; }
+    public Long getReplyCount() { return replyCount; }
+    public void setReplyCount(Long replyCount) { this.replyCount = replyCount; }
     public Boolean getLikedByCurrentUser() { return likedByCurrentUser; }
     public void setLikedByCurrentUser(Boolean likedByCurrentUser) { this.likedByCurrentUser = likedByCurrentUser; }
     public String getNickname() { return nickname; }

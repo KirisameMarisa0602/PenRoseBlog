@@ -37,7 +37,7 @@ const HomeCarousel = () => {
                     console.error("Failed to fetch fallback hot posts", err);
                 }
             }
-            
+
             setSlides(slidesData);
         };
         loadData();
@@ -70,27 +70,38 @@ const HomeCarousel = () => {
     return (
         <div className="home-carousel-container">
             {slides.map((slide, index) => {
+                const isPlaceholder = slide.id < 0;
                 const coverUrl = resolveUrl(slide.coverImageUrl);
                 const avatarUrl = resolveUrl(slide.authorAvatarUrl) || getDefaultAvatar(slide.userId);
-                
+
                 return (
-                    <div 
+                    <div
                         key={slide.id || slide.postId}
                         className={`home-carousel-slide ${index === currentIndex ? 'active' : ''}`}
-                        style={{ backgroundImage: `url(${coverUrl})` }}
-                        onClick={() => handleSlideClick(slide.id || slide.postId)}
+                        style={{
+                            backgroundImage: isPlaceholder
+                                ? 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)'
+                                : `url(${coverUrl})`
+                        }}
+                        onClick={() => !isPlaceholder && handleSlideClick(slide.id || slide.postId)}
                     >
                         <div className="home-carousel-content">
                             <div className="home-carousel-category">{slide.categoryName || '未分类'}</div>
                             <h2 className="home-carousel-title">{slide.title}</h2>
-                            <div className="home-carousel-info">
-                                <div className="home-carousel-author">
-                                    <img src={avatarUrl} alt="avatar" className="home-carousel-author-avatar" />
-                                    <span>{slide.authorNickname || slide.authorName}</span>
+                            {!isPlaceholder ? (
+                                <div className="home-carousel-info">
+                                    <div className="home-carousel-author">
+                                        <img src={avatarUrl} alt="avatar" className="home-carousel-author-avatar" />
+                                        <span>{slide.authorNickname || slide.authorName}</span>
+                                    </div>
+                                    <span>•</span>
+                                    <span>{slide.likeCount} 点赞</span>
                                 </div>
-                                <span>•</span>
-                                <span>{slide.likeCount} 点赞</span>
-                            </div>
+                            ) : (
+                                <div className="home-carousel-info">
+                                    <span>敬请期待</span>
+                                </div>
+                            )}
                         </div>
                     </div>
                 );
@@ -102,8 +113,8 @@ const HomeCarousel = () => {
                     <button className="home-carousel-nav-btn home-carousel-next" onClick={handleNext}>›</button>
                     <div className="home-carousel-indicators">
                         {slides.map((_, idx) => (
-                            <div 
-                                key={idx} 
+                            <div
+                                key={idx}
                                 className={`home-carousel-indicator ${idx === currentIndex ? 'active' : ''}`}
                                 onClick={(e) => { e.stopPropagation(); setCurrentIndex(idx); }}
                             />

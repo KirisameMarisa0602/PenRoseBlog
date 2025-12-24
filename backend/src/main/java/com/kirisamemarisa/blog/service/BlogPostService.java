@@ -32,7 +32,7 @@ public interface BlogPostService {
         PageResult<BlogPostDTO> search(String keyword, Long userId, String directory, String categoryName,
                         String status, int page,
                         int size,
-                        Long currentUserId);
+                        Long currentUserId, String sortMode);
 
         // 获取用户目录列表
         List<String> getUserDirectories(Long userId);

@@ -380,3 +380,53 @@
 .folder-node.is-leaf .folder-cross {
     display: none;
 }
+
+/* Horizontal Scroll for Files */
+.folder-files-horizontal-wrapper {
+    width: 100%;
+    overflow: hidden;
+    padding: 10px 0;
+}
+
+.folder-files-horizontal-scroll {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    padding: 4px 4px 16px 4px;
+    /* Bottom padding for scrollbar */
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Custom Scrollbar for horizontal list */
+.folder-files-horizontal-scroll::-webkit-scrollbar {
+    height: 8px;
+}
+
+.folder-files-horizontal-scroll::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+}
+
+.folder-files-horizontal-scroll::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+.folder-files-horizontal-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* Adjust file node in horizontal list */
+.folder-files-horizontal-scroll .folder-file-node {
+    flex: 0 0 300px;
+    /* Fixed width for cards */
+    margin: 0;
+    width: 300px;
+}
+
+.folder-files-horizontal-scroll .tree-article-card {
+    height: 100%;
+    /* Ensure full height */
+    margin-bottom: 0;
+}

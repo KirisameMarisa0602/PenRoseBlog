@@ -112,7 +112,13 @@ export default function CommentsSection({
                                     onClick={() => toggleRepliesPanel(c.id)}
                                 >
                                     <img src={iconComment} alt="reply" className="action-icon" />
-                                    <span className="count">{openReplies[c.id] ? '收起回复' : (c.replyCount || (repliesMap[c.id] || []).length || '回复')}</span>
+                                    <span className="count">{
+                                        (() => {
+                                            if (openReplies[c.id]) return '收起回复';
+                                            const rc = (typeof c.replyCount === 'number') ? c.replyCount : ((repliesMap[c.id] || []).length || 0);
+                                            return rc > 0 ? `展开 ${rc} 条回复` : '回复';
+                                        })()
+                                    }</span>
                                 </button>
                             </div>
 

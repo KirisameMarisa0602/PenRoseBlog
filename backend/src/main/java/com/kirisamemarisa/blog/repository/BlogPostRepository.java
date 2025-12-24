@@ -16,8 +16,19 @@ public interface BlogPostRepository extends JpaRepository<BlogPost, Long> {
         Optional<BlogPost> findByIdAndUserId(Long id, Long userId);
 
         // 搜索：标题包含 OR 标签名包含
-        @Query("SELECT DISTINCT b FROM BlogPost b LEFT JOIN b.tags t LEFT JOIN b.category c WHERE " +
-                        "(:keyword IS NULL OR :keyword = '' OR b.title LIKE %:keyword% OR t.name LIKE %:keyword%) " +
+        @Query(value = "SELECT b FROM BlogPost b " +
+                        "LEFT JOIN b.viewStats s " +
+                        "LEFT JOIN b.category c " +
+                        "WHERE " +
+                        "(:keyword IS NULL OR :keyword = '' OR b.title LIKE %:keyword% OR EXISTS (SELECT t FROM b.tags t WHERE t.name LIKE %:keyword%)) " +
+                        "AND (:userId IS NULL OR b.user.id = :userId) " +
+                        "AND (:directory IS NULL OR :directory = '' OR b.directory = :directory) " +
+                        "AND (:categoryName IS NULL OR :categoryName = '' OR c.name = :categoryName) " +
+                        "AND (:status IS NULL OR :status = '' OR b.status = :status OR (:status = 'PUBLISHED' AND b.status IS NULL))",
+               countQuery = "SELECT count(b) FROM BlogPost b " +
+                        "LEFT JOIN b.category c " +
+                        "WHERE " +
+                        "(:keyword IS NULL OR :keyword = '' OR b.title LIKE %:keyword% OR EXISTS (SELECT t FROM b.tags t WHERE t.name LIKE %:keyword%)) " +
                         "AND (:userId IS NULL OR b.user.id = :userId) " +
                         "AND (:directory IS NULL OR :directory = '' OR b.directory = :directory) " +
                         "AND (:categoryName IS NULL OR :categoryName = '' OR c.name = :categoryName) " +
@@ -45,5 +56,8 @@ public interface BlogPostRepository extends JpaRepository<BlogPost, Long> {
         long countByUserId(Long userId);
 
         // 获取某分类下点赞最多的文章
-        BlogPost findFirstByCategoryOrderByLikeCountDesc(com.kirisamemarisa.blog.model.Category category);
+        // BlogPost findFirstByCategoryOrderByLikeCountDesc(com.kirisamemarisa.blog.model.Category category);
+        
+        @Query("SELECT b FROM BlogPost b LEFT JOIN b.viewStats s WHERE b.category = :category ORDER BY b.likeCount DESC, COALESCE(s.viewCount, 0) DESC, b.favoriteCount DESC, b.id DESC")
+        List<BlogPost> findTopByCategory(@Param("category") com.kirisamemarisa.blog.model.Category category, Pageable pageable);
 }

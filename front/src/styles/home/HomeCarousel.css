@@ -132,3 +132,15 @@
 .home-carousel-next {
     right: 10px;
 }
+
+@media (max-width: 768px) {
+    .home-carousel-container {
+        height: 240px;
+    }
+    .home-carousel-title {
+        font-size: 1.2rem;
+    }
+    .home-carousel-content {
+        padding: 20px 16px 16px;
+    }
+}

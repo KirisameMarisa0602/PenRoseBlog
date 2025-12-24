@@ -12,10 +12,22 @@ export default function HomeSortTabs({ sortMode, onChange }) {
           最新文章
         </button>
         <button
-          className={`home-sort-tab ${sortMode === 'hot' ? 'active' : ''}`}
-          onClick={() => onChange && onChange('hot')}
+          className={`home-sort-tab ${sortMode === 'mostLikes' ? 'active' : ''}`}
+          onClick={() => onChange && onChange('mostLikes')}
         >
-          最热文章
+          最多点赞
+        </button>
+        <button
+          className={`home-sort-tab ${sortMode === 'mostFavorites' ? 'active' : ''}`}
+          onClick={() => onChange && onChange('mostFavorites')}
+        >
+          最多收藏
+        </button>
+        <button
+          className={`home-sort-tab ${sortMode === 'mostViews' ? 'active' : ''}`}
+          onClick={() => onChange && onChange('mostViews')}
+        >
+          最多浏览
         </button>
       </div>
     </div>

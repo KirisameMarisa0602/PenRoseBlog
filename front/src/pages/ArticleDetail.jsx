@@ -932,7 +932,7 @@ export default function ArticleDetail() {
                         color: '#666',
                     }}
                 >
-                    加载中...
+                    {'\u52a0\u8f7d\u4e2d...'}
                 </div>
             </div>
         );

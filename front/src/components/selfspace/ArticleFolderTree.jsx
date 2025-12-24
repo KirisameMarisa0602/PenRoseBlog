@@ -116,6 +116,11 @@ const FolderNode = ({ node, onSelect, selectedPath, level = 0, onDelete }) => {
 
   const isSelected = selectedPath === node.path;
 
+  // Separate children into folders and files
+  const childrenList = node.children ? Object.values(node.children) : [];
+  const folderChildren = childrenList.filter(c => c.type === 'folder');
+  const fileChildren = childrenList.filter(c => c.type === 'file');
+
   return (
     <div className={`folder-node level-${level} ${expanded ? 'expanded' : ''} ${!hasChildren ? 'is-leaf' : ''}`}>
       <div
@@ -135,7 +140,8 @@ const FolderNode = ({ node, onSelect, selectedPath, level = 0, onDelete }) => {
 
       {hasChildren && (
         <div className="folder-children">
-          {Object.values(node.children).map(child => (
+          {/* Render subfolders vertically */}
+          {folderChildren.map(child => (
             <FolderNode
               key={child.path}
               node={child}
@@ -145,6 +151,24 @@ const FolderNode = ({ node, onSelect, selectedPath, level = 0, onDelete }) => {
               onDelete={onDelete}
             />
           ))}
+
+          {/* Render files horizontally */}
+          {fileChildren.length > 0 && (
+            <div className="folder-files-horizontal-wrapper">
+              <div className="folder-files-horizontal-scroll">
+                {fileChildren.map(child => (
+                  <FolderNode
+                    key={child.path}
+                    node={child}
+                    onSelect={onSelect}
+                    selectedPath={selectedPath}
+                    level={level + 1}
+                    onDelete={onDelete}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
