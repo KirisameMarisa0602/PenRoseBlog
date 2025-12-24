@@ -83,7 +83,7 @@ public class AiClientService {
         return extractContentFromResponse(response);
     }
 
-    public Flux<String> chatStream(String userMessage, String overrideModel) {
+    public Flux<String> chatStream(String userMessage, String systemPrompt, String overrideModel) {
         String base = getBaseUrlForModel(overrideModel);
         String url = base + "/chat/completions";
         String model = (overrideModel != null && !overrideModel.isBlank()) ? overrideModel
@@ -94,10 +94,16 @@ public class AiClientService {
                     "AI api key is not configured. Set spring.ai.openai.api-key or set env var."));
         }
 
+        java.util.List<Map<String, Object>> messages = new java.util.ArrayList<>();
+        if (systemPrompt != null && !systemPrompt.isBlank()) {
+            messages.add(Map.of("role", "system", "content", systemPrompt));
+        }
+        messages.add(Map.of("role", "user", "content", userMessage));
+
         Map<String, Object> body = Map.of(
                 "model", model,
                 "stream", true,
-                "messages", List.of(Map.of("role", "user", "content", userMessage)));
+                "messages", messages);
 
         return webClient.post()
                 .uri(url)
@@ -337,16 +343,22 @@ public class AiClientService {
         }
     }
 
-    public void streamChat(String userMessage, String overrideModel,
+    public void streamChat(String userMessage, String systemPrompt, String overrideModel,
             org.springframework.web.servlet.mvc.method.annotation.SseEmitter emitter) {
         String url = properties.getNormalizedApiBaseUrl() + "/chat/completions";
         String model = (overrideModel != null && !overrideModel.isBlank()) ? overrideModel
                 : properties.getModelOrDefault();
         String apiKey = properties.getEffectiveApiKey();
 
+        java.util.List<Map<String, Object>> messages = new java.util.ArrayList<>();
+        if (systemPrompt != null && !systemPrompt.isBlank()) {
+            messages.add(Map.of("role", "system", "content", systemPrompt));
+        }
+        messages.add(Map.of("role", "user", "content", userMessage));
+
         Map<String, Object> body = Map.of(
                 "model", model,
-                "messages", List.of(Map.of("role", "user", "content", userMessage)),
+                "messages", messages,
                 "stream", true);
 
         webClient.post()

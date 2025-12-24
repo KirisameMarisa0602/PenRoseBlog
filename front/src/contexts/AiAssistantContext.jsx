@@ -5,6 +5,7 @@ import httpClient from '@utils/api/httpClient';
 export function AiAssistantProvider({ children }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [aiContext, setAiContext] = useState({ type: 'GLOBAL', id: null, content: null });
 
   const sendMessage = useCallback(async (message, { model } = {}) => {
     setLoading(true);
@@ -21,7 +22,7 @@ export function AiAssistantProvider({ children }) {
     }
   }, []);
 
-  const sendMessageStream = useCallback(async (message, { onChunk, firstChunkTimeoutMs = 20000, model, signal } = {}) => {
+  const sendMessageStream = useCallback(async (message, { onChunk, firstChunkTimeoutMs = 20000, model, signal, contextType, contextId, contextContent } = {}) => {
     setLoading(true);
     setError(null);
     let firstTimer;
@@ -44,7 +45,13 @@ export function AiAssistantProvider({ children }) {
         if (tokenVal) headers['Authorization'] = `Bearer ${tokenVal}`;
       } catch { /* ignore */ }
 
-      const body = { message, model };
+      const body = {
+        message,
+        model,
+        contextType: contextType || aiContext.type,
+        contextId: contextId || aiContext.id,
+        contextContent: contextContent || (typeof aiContext.getContent === 'function' ? aiContext.getContent() : aiContext.content)
+      };
 
       // Use the new POST streaming endpoint
       const res = await fetch('/api/ai/chat/stream', {
@@ -118,7 +125,7 @@ export function AiAssistantProvider({ children }) {
       if (firstTimer) clearTimeout(firstTimer);
       setLoading(false);
     }
-  }, [sendMessage]);
+  }, [sendMessage, aiContext]);
 
   const summarizeArticle = useCallback((content, options) => {
     const prompt = `请简要总结以下文章的核心内容：\n\n${content}`;
@@ -148,8 +155,10 @@ export function AiAssistantProvider({ children }) {
     summarizeArticle,
     polishText,
     continueWriting,
-    explainCode
-  }), [sendMessage, sendMessageStream, loading, error, summarizeArticle, polishText, continueWriting, explainCode]);
+    explainCode,
+    aiContext,
+    setAiContext
+  }), [sendMessage, sendMessageStream, loading, error, summarizeArticle, polishText, continueWriting, explainCode, aiContext]);
 
   return (
     <AiAssistantContext.Provider value={value}>{children}</AiAssistantContext.Provider>

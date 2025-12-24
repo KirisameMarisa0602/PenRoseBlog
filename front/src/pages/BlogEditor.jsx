@@ -13,6 +13,7 @@ import 'highlight.js/styles/atom-one-dark.css';
 import { BLOG_CATEGORIES } from '@utils/constants';
 import resolveUrl from '@utils/resolveUrl';
 import { fetchDirectories } from '@utils/api/postService';
+import { useAiAssistant } from '@contexts/useAiAssistant';
 
 const turndownService = new TurndownService();
 
@@ -33,6 +34,18 @@ const BlogEditor = () => {
   const [directory, setDirectory] = useState('');
   const [existingDirectories, setExistingDirectories] = useState([]); // 用户已有的目录列表
   const [outline, setOutline] = useState([]); // 文章大纲
+
+  const { setAiContext } = useAiAssistant();
+  const contentRef = React.useRef(content);
+  useEffect(() => { contentRef.current = content; }, [content]);
+
+  useEffect(() => {
+    setAiContext({
+      type: 'EDITING',
+      getContent: () => contentRef.current
+    });
+    return () => setAiContext({ type: 'GLOBAL' });
+  }, [setAiContext]);
 
   const TITLE_MAX = 80;
   const CONTENT_MIN = 10;

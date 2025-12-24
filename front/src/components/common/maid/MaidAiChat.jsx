@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
-import 'highlight.js/styles/github.css';
+import 'highlight.js/styles/atom-one-dark.css';
 import useAiAssistant from '@contexts/useAiAssistant';
 
 export default function MaidAiChat({ visible }) {
@@ -274,6 +274,32 @@ export default function MaidAiChat({ visible }) {
 
   const onKeyDown = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void send(); } };
 
+  // Quick Actions
+  const quickActions = React.useMemo(() => {
+    if (ai?.aiContext?.type === 'READING') {
+      return [
+        { label: '📝 生成大纲', prompt: '请为这篇文章生成一份详细的大纲。' },
+        { label: '💡 核心观点', prompt: '这篇文章的核心观点是什么？' },
+        { label: '❓ 解释术语', prompt: '请列出并解释这篇文章中的关键专业术语。' },
+        { label: '✨ 生成摘要', prompt: '请为这篇文章生成一份简短的摘要。' }
+      ];
+    } else if (ai?.aiContext?.type === 'EDITING') {
+      return [
+        { label: '✨ 润色当前段落', prompt: '请帮我润色一下我正在写的这段内容，使其更通顺专业。' },
+        { label: '✍️ 续写一段', prompt: '根据我目前写的内容，请帮我续写一段。' },
+        { label: '🔨 优化结构', prompt: '请检查我的文章结构，并给出优化建议（如标题层级）。' },
+        { label: '📝 生成Markdown示例', prompt: '请给我一个Markdown格式的博客文章示例模板。' }
+      ];
+    }
+    return [];
+  }, [ai?.aiContext?.type]);
+
+  const handleQuickAction = (prompt) => {
+    setText(prompt);
+    // Optional: auto-send
+    // setTimeout(() => send(), 0);
+  };
+
   if (!visible) return null;
 
   return (
@@ -321,6 +347,34 @@ export default function MaidAiChat({ visible }) {
           </div>
         ))}
       </div>
+
+      {/* Quick Actions Chips */}
+      {quickActions.length > 0 && (
+        <div className="maid-quick-actions" style={{ padding: '8px 12px', display: 'flex', gap: '8px', overflowX: 'auto', borderTop: '1px solid rgba(0,0,0,0.05)' }}>
+          {quickActions.map((action, idx) => (
+            <button
+              key={idx}
+              onClick={() => handleQuickAction(action.prompt)}
+              style={{
+                padding: '4px 10px',
+                fontSize: '12px',
+                borderRadius: '12px',
+                border: '1px solid #e5e7eb',
+                background: '#f9fafb',
+                color: '#374151',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={e => { e.target.style.background = '#eef2ff'; e.target.style.borderColor = '#c7d2fe'; }}
+              onMouseLeave={e => { e.target.style.background = '#f9fafb'; e.target.style.borderColor = '#e5e7eb'; }}
+            >
+              {action.label}
+            </button>
+          ))}
+        </div>
+      )}
+
       <div className="maid-ai-input-row">
         <div className="maid-input-wrap">
           <textarea

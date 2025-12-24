@@ -120,10 +120,14 @@
   gap: 16px;
   padding: 16px;
   border-bottom: 1px solid #f0f0f0;
-  transition: background 0.2s;
+  transition: background 0.2s ease;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  /* Fix for flickering/twitching on some browsers when using backdrop-filter */
+  transform: translateZ(0);
+  will-change: background;
 }
 
 .user-item:last-child {

@@ -10,11 +10,11 @@ import org.springframework.data.domain.Pageable;
 public interface UserRepository extends JpaRepository<User, Long> {
     User findByUsername(String username);
 
-    @Query("SELECT u, up FROM User u LEFT JOIN UserProfile up ON u.id = up.id WHERE u.username LIKE %:username%")
+    @Query("SELECT u, up FROM User u LEFT JOIN UserProfile up ON u.id = up.id WHERE u.username = :username")
     List<Object[]> searchByUsernameWithProfile(@Param("username") String username, Pageable pageable);
     @Query("SELECT u, up FROM User u LEFT JOIN UserProfile up ON u.id = up.id WHERE up.nickname LIKE %:nickname%")
     List<Object[]> searchByNicknameWithProfile(@Param("nickname") String nickname, Pageable pageable);
-    @Query("SELECT COUNT(u) FROM User u WHERE u.username LIKE %:username%")
+    @Query("SELECT COUNT(u) FROM User u WHERE u.username = :username")
     long countByUsername(@Param("username") String username);
     @Query("SELECT COUNT(up) FROM UserProfile up WHERE up.nickname LIKE %:nickname%")
     long countByNickname(@Param("nickname") String nickname);

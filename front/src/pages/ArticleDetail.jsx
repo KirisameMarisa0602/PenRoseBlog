@@ -31,9 +31,19 @@ export default function ArticleDetail() {
     const fromCategory = location.state?.fromCategory;
 
     // AI Assistant
-    const { summarizeArticle } = useAiAssistant();
+    const { summarizeArticle, setAiContext } = useAiAssistant();
     const [aiSummary, setAiSummary] = useState('');
     const [aiLoading, setAiLoading] = useState(false);
+
+    // Set AI Context for this article
+    useEffect(() => {
+        if (id) {
+            setAiContext({ type: 'READING', id: id });
+        }
+        return () => {
+            setAiContext({ type: 'GLOBAL', id: null });
+        };
+    }, [id, setAiContext]);
 
     const handleAiSummarize = async () => {
         if (!post?.content) return;
