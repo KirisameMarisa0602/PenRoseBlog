@@ -44,24 +44,47 @@ export default function MaidAiChat({ visible }) {
     return false;
   }
 
-  function PreWithCopy(props) {
-    const preRef = useRef(null);
+  function CodeRenderer({ inline, className, children, ...props }) {
     const [copied, setCopied] = useState(false);
+    const raw = String(children ?? '').replace(/\n$/, '');
+    const match = /language-([a-zA-Z0-9_+-]+)/.exec(className || '');
+    const lang = match?.[1] || '';
+
+    if (inline) {
+      return (
+        <code className={`maid-inline-code ${className || ''}`} {...props}>
+          {children}
+        </code>
+      );
+    }
+
     const doCopy = async () => {
-      try {
-        const codeEl = preRef.current ? preRef.current.querySelector('code') : null;
-        const raw = codeEl ? codeEl.innerText : '';
-        const ok = await copyToClipboard(raw);
-        if (ok) { setCopied(true); setTimeout(() => setCopied(false), 1200); }
-      } catch (e) { /* ignore */ void e; }
+      const ok = await copyToClipboard(raw);
+      if (ok) {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1200);
+      }
     };
+
     return (
-      <div className="maid-codeblock-wrap" style={{ position: 'relative' }}>
-        <button type="button" className="maid-copy-btn" title="复制代码" aria-label="复制代码" onClick={doCopy}>
-          <span className="maid-copy-icon" />
-          <span className="maid-copy-text">{copied ? '已复制' : '复制'}</span>
-        </button>
-        <pre ref={preRef} {...props} />
+      <div className="maid-codeblock" role="group" aria-label="代码块">
+        <div className="maid-codeblock-head">
+          <span className="maid-codeblock-lang">{lang || 'code'}</span>
+          <button
+            type="button"
+            className="maid-codeblock-copy"
+            title="复制代码"
+            aria-label="复制代码"
+            onClick={doCopy}
+          >
+            {copied ? '已复制' : '复制'}
+          </button>
+        </div>
+        <pre className="maid-codeblock-pre">
+          <code className={className} {...props}>
+            {raw}
+          </code>
+        </pre>
       </div>
     );
   }
@@ -264,22 +287,33 @@ export default function MaidAiChat({ visible }) {
         {messages.map((m, i) => (
           <div key={i} className={`maid-ai-msg ${m.role === 'user' ? 'user' : 'assistant'}`}>
             <div className="maid-ai-msg-actions">
-              <button
-                type="button"
-                className="maid-copy-msg-btn"
-                title="复制整条"
-                aria-label="复制整条"
-                onClick={async () => { const ok = await copyToClipboard(m.text); if (ok) { setCopiedMsgIdx(i); setTimeout(() => setCopiedMsgIdx(null), 1200); } }}
-              >
-                <span className="maid-copy-icon" />
-                <span className="maid-copy-text">{copiedMsgIdx === i ? '已复制' : '复制'}</span>
-              </button>
+              {m.role === 'assistant' && (
+                <button
+                  type="button"
+                  className="maid-copy-msg-btn"
+                  title="复制整段回答"
+                  aria-label="复制整段回答"
+                  onClick={async () => {
+                    const ok = await copyToClipboard(m.text);
+                    if (ok) {
+                      setCopiedMsgIdx(i);
+                      setTimeout(() => setCopiedMsgIdx(null), 1200);
+                    }
+                  }}
+                >
+                  <span className="maid-copy-icon" />
+                  <span className="maid-copy-text">{copiedMsgIdx === i ? '已复制' : '复制回答'}</span>
+                </button>
+              )}
             </div>
             <div className="maid-ai-msg-text">
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 rehypePlugins={[rehypeHighlight]}
-                components={{ pre: PreWithCopy }}
+                components={{
+                  pre: ({ children }) => <>{children}</>,
+                  code: CodeRenderer,
+                }}
               >
                 {String(m.text || '')}
               </ReactMarkdown>
