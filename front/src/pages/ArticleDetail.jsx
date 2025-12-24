@@ -898,7 +898,7 @@ export default function ArticleDetail() {
         }
     }, [comments, sortedComments, commentsPerPage, openCommentReplyAndScroll]);
 
-    // ---------- 这里处理“不存在”和“加载中”两种状�?----------
+    // ---------- 这里处理“不存在”和“加载中”两种状态 ----------
 
     if (notFound) {
         return (
@@ -932,13 +932,13 @@ export default function ArticleDetail() {
                         color: '#666',
                     }}
                 >
-                    加载�?..
+                    加载中...
                 </div>
             </div>
         );
     }
 
-    // 计算当前登录用户是否是作�?
+    // 计算当前登录用户是否是作者
     const ownerId =
         post.userId ||
         post.authorId ||

@@ -41,6 +41,7 @@ export default function BannerNavbar({ bannerId }) {
   const [error, setError] = useState(null);
   const [unreadTotal, setUnreadTotal] = useState(0);
   const [sysUnread, setSysUnread] = useState(0);
+  const [penroseScale, setPenroseScale] = useState(0.2);
 
   const lastScrollRef = useRef(0);
   const prevHiddenRef = useRef(false);
@@ -53,6 +54,19 @@ export default function BannerNavbar({ bannerId }) {
   const compensateRef = useRef(1);
   const moveXRef = useRef(0);
   const animStateRef = useRef({ homing: false, startTime: 0, duration: 300 });
+
+  // Calculate penrose logo scale dynamically for better browser compatibility
+  useEffect(() => {
+    const updateScale = () => {
+      const navH = window.innerHeight * 0.15; // 15vh
+      const cell = Math.min(navH, window.innerWidth / 8);
+      const size = cell * 0.6;
+      setPenroseScale(size / 360);
+    };
+    updateScale();
+    window.addEventListener('resize', updateScale);
+    return () => window.removeEventListener('resize', updateScale);
+  }, []);
 
   // Sync navHidden state to body class for other components to react
   useEffect(() => {
@@ -365,22 +379,22 @@ export default function BannerNavbar({ bannerId }) {
 
   // 新增：封装成函数，便于复用
   const refreshUnreadTotal = React.useCallback(() => {
-    if (!userId) { 
-      setUnreadTotal(0); 
+    if (!userId) {
+      setUnreadTotal(0);
       setSysUnread(0);
-      return; 
+      return;
     }
     fetchUnreadTotal()
       .then(j => { if (j && j.code === 200) setUnreadTotal(Number(j.data) || 0); })
       .catch((err) => { void err; });
-      
+
     notificationApi.getUnreadCount()
       .then(res => {
         if (res && res.code === 200) {
-           setSysUnread(typeof res.data === 'number' ? res.data : (res.data?.count || 0));
+          setSysUnread(typeof res.data === 'number' ? res.data : (res.data?.count || 0));
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [userId]);
 
   useEffect(() => {
@@ -481,7 +495,7 @@ export default function BannerNavbar({ bannerId }) {
         {/* 1. Logo + Home Text */}
         <div className="nav-brand" aria-label="站点标识" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           <a href="/" className="penrose-logo" aria-label="返回首页" title="返回首页">
-            <div className="penrose-scale">
+            <div className="penrose-scale" style={{ transform: `translate(-50%, -50%) scale(${penroseScale})` }}>
               <div className="penrose-shell">
                 <div className="penrose-wrapper">
                   <div className="penrose-a" />

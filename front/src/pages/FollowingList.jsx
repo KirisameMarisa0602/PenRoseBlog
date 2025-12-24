@@ -12,11 +12,10 @@ export default function FollowingList() {
   const [list, setList] = useState([]);
   const [error, setError] = useState(null);
   const { user } = useAuthState();
-  useNavigate();
 
   const handleUnfollow = async (targetId) => {
     try {
-      const j = await unfollow(targetId, user?.id ? Number(user.id) : undefined);
+      const j = await unfollow(targetId);
       const ok = j && (j.code === 200 || j.status === 200);
       if (ok) {
         setList(prev => prev.filter(u => String(u.id) !== String(targetId)));

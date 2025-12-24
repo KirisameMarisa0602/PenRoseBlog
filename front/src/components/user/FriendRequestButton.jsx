@@ -31,7 +31,7 @@ export default function FriendRequestButton({ targetId, onSent, initialFriend = 
     try {
       if (isFriendFlag) {
         // 取消我对TA的关注 => 破坏互关，即“删除好友”
-        const j = await unfollow(targetId, Number(user.id));
+        const j = await unfollow(targetId);
         if (j && (j.code === 200 || j.status === 200)) {
           setIsFriendFlag(false); setSent(false);
         } else {

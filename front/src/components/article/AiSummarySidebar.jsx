@@ -16,7 +16,10 @@ const AiSummarySidebar = ({ summary, loading, onSummarize }) => {
             padding: '20px',
             boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
             marginBottom: '20px',
-            border: '1px solid rgba(0,0,0,0.04)'
+            border: '1px solid rgba(0,0,0,0.04)',
+            height: '360px',
+            display: 'flex',
+            flexDirection: 'column'
         }}>
             <div className="sidebar-header" style={{
                 display: 'flex',
@@ -37,7 +40,7 @@ const AiSummarySidebar = ({ summary, loading, onSummarize }) => {
                 <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '700', background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>AI 智能摘要</h3>
             </div>
 
-            <div className="sidebar-content">
+            <div className="sidebar-content" style={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto' }}>
                 {!summary && !loading && (
                     <div style={{ textAlign: 'center', padding: '10px 0' }}>
                         <p style={{ fontSize: '13px', color: '#666', marginBottom: '15px' }}>
@@ -152,6 +155,16 @@ const AiSummarySidebar = ({ summary, loading, onSummarize }) => {
                 }
                 .ai-summary-markdown code {
                     font-family: 'Space Mono', monospace;
+                }
+
+                /* Keep scrolling but hide scrollbar (matches app-wide style) */
+                .ai-summary-card .sidebar-content {
+                    -ms-overflow-style: none;
+                    scrollbar-width: none;
+                }
+                .ai-summary-card .sidebar-content::-webkit-scrollbar {
+                    width: 0;
+                    height: 0;
                 }
             `}</style>
         </div>

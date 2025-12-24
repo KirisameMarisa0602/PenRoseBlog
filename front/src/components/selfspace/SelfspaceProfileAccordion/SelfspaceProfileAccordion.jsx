@@ -4,6 +4,8 @@ import '@styles/selfspace/SelfspaceProfileAccordion/selfspaceProfileAccordion.cs
 import httpClient from '@utils/api/httpClient';
 import { useAuthState } from '@hooks/useAuthState';
 import { getDefaultAvatar } from '@utils/avatarUtils';
+import FollowButton from '@components/user/FollowButton';
+import FriendRequestButton from '@components/user/FriendRequestButton';
 
 // 个人空间左侧手风琴面板
 export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHeight = '100%', viewUserId = null, hideEditPanel = false }) {
@@ -608,6 +610,19 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                         <div className="stat-val" style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{stats.articleCount}</div>
                         <div className="stat-label" style={{ fontSize: '0.8rem', opacity: 0.8 }}>文章</div>
                       </div>
+                    </div>
+                  )}
+
+                  {isActive && isLoggedIn && user?.id && userId && String(user.id) !== String(userId) && (
+                    <div className="profile-actions-row" style={{
+                      display: 'flex',
+                      gap: '12px',
+                      marginTop: '20px',
+                      opacity: 1,
+                      transition: 'opacity 0.3s ease'
+                    }}>
+                      <FollowButton targetId={userId} />
+                      <FriendRequestButton targetId={userId} />
                     </div>
                   )}
                 </div>

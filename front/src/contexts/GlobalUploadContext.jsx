@@ -6,21 +6,38 @@ import axios from 'axios';
 export const GlobalUploadProvider = ({ children }) => {
     const [uploads, setUploads] = useState({});
 
+    const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+    const withRetry = useCallback(async (fn, { retries = 2, baseDelayMs = 500 } = {}) => {
+        let lastErr;
+        for (let attempt = 0; attempt <= retries; attempt++) {
+            try {
+                return await fn(attempt);
+            } catch (err) {
+                lastErr = err;
+                if (attempt >= retries) break;
+                const delay = baseDelayMs * Math.pow(2, attempt);
+                await sleep(delay);
+            }
+        }
+        throw lastErr;
+    }, []);
+
     const startUpload = useCallback((id, file) => {
         setUploads(prev => ({ ...prev, [id]: { file, status: 'uploading', progress: 0 } }));
     }, []);
 
     const updateProgress = useCallback((id, progress) => {
-        setUploads(prev => ({ 
-            ...prev, 
-            [id]: { ...prev[id], progress } 
+        setUploads(prev => ({
+            ...prev,
+            [id]: { ...prev[id], progress }
         }));
     }, []);
 
     const finishUpload = useCallback((id, url) => {
-        setUploads(prev => ({ 
-            ...prev, 
-            [id]: { ...prev[id], status: 'completed', url, progress: 100 } 
+        setUploads(prev => ({
+            ...prev,
+            [id]: { ...prev[id], status: 'completed', url, progress: 100 }
         }));
         // Auto remove after 3 seconds
         setTimeout(() => {
@@ -33,9 +50,9 @@ export const GlobalUploadProvider = ({ children }) => {
     }, []);
 
     const failUpload = useCallback((id, error) => {
-        setUploads(prev => ({ 
-            ...prev, 
-            [id]: { ...prev[id], status: 'error', error } 
+        setUploads(prev => ({
+            ...prev,
+            [id]: { ...prev[id], status: 'error', error }
         }));
     }, []);
 
@@ -70,20 +87,22 @@ export const GlobalUploadProvider = ({ children }) => {
                         params: { fileName: file.name, otherId },
                         headers
                     });
-                    
+
                     if (presignRes.data && presignRes.data.code === 200 && presignRes.data.data) {
                         const { uploadUrl: cosPutUrl, publicUrl } = presignRes.data.data;
-                        
-                        // 直接 PUT 到 COS
-                        await axios.put(cosPutUrl, file, {
+
+                        // 直接 PUT 到 COS（轻量重试，降低偶发失败）
+                        await withRetry(() => axios.put(cosPutUrl, file, {
                             headers: { 'Content-Type': file.type || 'application/octet-stream' },
+                            timeout: 600000,
                             onUploadProgress: (progressEvent) => {
+                                if (!progressEvent.total) return;
                                 let percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
                                 if (percentCompleted >= 100) percentCompleted = 99;
                                 updateProgress(id, percentCompleted);
                             }
-                        });
-                        
+                        }), { retries: 2, baseDelayMs: 600 });
+
                         mediaUrl = publicUrl;
                     }
                 } catch (err) {
@@ -96,14 +115,16 @@ export const GlobalUploadProvider = ({ children }) => {
                 const formData = new FormData();
                 formData.append('file', file);
 
-                const uploadRes = await api.post(uploadUrl, formData, {
+                const uploadRes = await withRetry(() => api.post(uploadUrl, formData, {
                     headers: { ...headers, 'Content-Type': 'multipart/form-data' },
+                    timeout: 600000,
                     onUploadProgress: (progressEvent) => {
+                        if (!progressEvent.total) return;
                         let percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
                         if (percentCompleted >= 100) percentCompleted = 99;
                         updateProgress(id, percentCompleted);
                     }
-                });
+                }), { retries: 1, baseDelayMs: 600 });
 
                 if (uploadRes.data && uploadRes.data.code === 200 && uploadRes.data.data) {
                     mediaUrl = uploadRes.data.data;
@@ -111,7 +132,7 @@ export const GlobalUploadProvider = ({ children }) => {
                     throw new Error(uploadRes.data?.msg || '上传失败');
                 }
             }
-            
+
             // Send the message
             const finalBody = { ...sendBody, mediaUrl };
             const sendRes = await api.post(sendUrl, finalBody, { headers });
@@ -132,11 +153,11 @@ export const GlobalUploadProvider = ({ children }) => {
     }, [startUpload, updateProgress, finishUpload, failUpload]);
 
     return (
-        <GlobalUploadContext.Provider value={{ 
-            uploads, 
-            startUpload, 
-            updateProgress, 
-            finishUpload, 
+        <GlobalUploadContext.Provider value={{
+            uploads,
+            startUpload,
+            updateProgress,
+            finishUpload,
             failUpload,
             removeUpload,
             uploadAndSendMedia

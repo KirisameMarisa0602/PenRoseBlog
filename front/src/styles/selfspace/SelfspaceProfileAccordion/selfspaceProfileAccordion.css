@@ -1479,9 +1479,21 @@ input[type="file"]::file-selector-button:hover {
   min-height: 0;
   overflow: auto;
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 16px;
   padding-bottom: 10px;
+  align-content: start;
+}
+
+/* Hide scrollbar but keep scroll for contact list */
+.profile-contact-list {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.profile-contact-list::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
 .contact-item {
@@ -1693,4 +1705,60 @@ input[type="file"]::file-selector-button:hover {
   background: #f0f5ff;
   transform: translateY(-2px);
   box-shadow: 0 14px 34px rgba(15, 23, 42, 0.10);
+}
+
+/* Profile Actions Row (Follow/Add Friend) */
+.profile-actions-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  z-index: 10;
+}
+
+.profile-actions-row .follow-btn,
+.profile-actions-row .friend-request-btn {
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 100px;
+}
+
+.profile-actions-row .follow-btn {
+  background: linear-gradient(135deg, #6e8efb, #a777e3);
+  color: white;
+}
+
+.profile-actions-row .friend-request-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.profile-actions-row .follow-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(110, 142, 251, 0.5);
+  filter: brightness(1.1);
+}
+
+.profile-actions-row .friend-request-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.profile-actions-row .friend-request-btn.sent {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  cursor: default;
+  transform: none;
+  box-shadow: none;
 }

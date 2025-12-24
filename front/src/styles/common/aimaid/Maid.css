@@ -263,6 +263,7 @@
 .maid-ai-messages {
   padding: 16px;
   overflow-y: auto;
+  overflow-x: hidden;
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
@@ -288,6 +289,7 @@
   max-width: 90%;
   display: flex;
   flex-direction: column;
+  min-width: 0;
   animation: fadeIn 0.3s ease;
 }
 
@@ -322,6 +324,9 @@
   word-break: break-word;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   font-weight: 500;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .maid-ai-msg.user .maid-ai-msg-text {
@@ -442,7 +447,9 @@
 .maid-codeblock-pre {
   margin: 0;
   padding: 12px 12px;
-  overflow: auto;
+  overflow-x: auto;
+  overflow-y: auto;
+  max-width: 100%;
   background: transparent;
 }
 

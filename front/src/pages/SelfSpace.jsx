@@ -80,21 +80,6 @@ export default function SelfSpace() {
       <div className="selfspace-page anime-neon-bg" data-page="selfspace">
         <aside className="selfspace-left-panel" aria-label="个人空间侧边栏">
           <div className="selfspace-left-panel-inner">
-            {/* 非本人时：在手风琴上方展示一个简介条 */}
-            {!isOwner && viewProfile && (
-              <div className="selfspace-user-brief">
-                <img
-                  className="selfspace-user-brief-avatar"
-                  src={isValidAvatar(viewProfile.avatarUrl) ? resolveUrl(viewProfile.avatarUrl) : getDefaultAvatar(effectiveUserId)}
-                  alt="avatar"
-                  onError={e => { e.currentTarget.src = getDefaultAvatar(effectiveUserId); }}
-                />
-                <div className="selfspace-user-brief-info">
-                  <div className="nick">{viewProfile.nickname || viewProfile.username || `用户${effectiveUserId}`}</div>
-                  <div className="uname">@{viewProfile.username || ''}</div>
-                </div>
-              </div>
-            )}
             <SelfspaceProfileAccordion
               panelWidth="100%"
               panelHeight="100%"

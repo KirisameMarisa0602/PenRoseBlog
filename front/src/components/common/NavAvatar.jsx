@@ -52,12 +52,17 @@ export default function NavAvatar({
       onClick();
       return;
     }
-    // 在个人空间中：点击头像相当于刷新当前页面
-    if (location.pathname.startsWith('/selfspace')) {
+
+    // 检查是否已经在自己的个人空间
+    const params = new URLSearchParams(location.search);
+    const urlUserId = params.get('userId');
+    const isMyProfile = location.pathname.startsWith('/selfspace') && (!urlUserId || String(urlUserId) === String(user?.id));
+
+    if (isMyProfile) {
       window.location.reload();
       return;
     }
-    // 其余页面：默认进入个人空间
+    // 其余页面或在别人主页时：跳转回自己的个人空间
     navigate('/selfspace');
   };
 
@@ -105,7 +110,7 @@ export default function NavAvatar({
       {isLoggedIn && dropdownOpen && user && (
         <div
           onClick={e => e.stopPropagation()}
-          style={{position: 'absolute', top: '100%', right: 0, zIndex: 10000}}
+          style={{ position: 'absolute', top: '100%', right: 0, zIndex: 10000 }}
         >
           <AvatarDropdown user={user} onLogout={logout} />
         </div>

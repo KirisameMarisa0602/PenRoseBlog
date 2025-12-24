@@ -26,6 +26,7 @@ if (!Live2DModel._tickerRegistered) {
 // ensureCubismCoreReady 已通过 utils 引入，移除本地重复定义
 
 export default function Maid({ defaultCollapsed = true, onModelLoaded, onWidthChange }) {
+  const COLLAPSED_RESERVE_PX = 72; // reserve space for the expand handle + shadow so it doesn't occlude content
   const containerRef = useRef(null);
   const appRef = useRef(null);
   const modelRef = useRef(null);
@@ -44,7 +45,7 @@ export default function Maid({ defaultCollapsed = true, onModelLoaded, onWidthCh
   // Notify parent about width changes
   useEffect(() => {
     if (onWidthChange) {
-      onWidthChange(collapsed ? 0 : panelWidth);
+      onWidthChange(collapsed ? COLLAPSED_RESERVE_PX : panelWidth);
     }
   }, [panelWidth, collapsed, onWidthChange]);
 
@@ -387,7 +388,7 @@ export default function Maid({ defaultCollapsed = true, onModelLoaded, onWidthCh
     // 根据收起状态与当前面板宽度，设置页面级 CSS 变量以控制右侧占位宽度
     try {
       const w = Math.min(panelWidth || 0, Math.round((typeof window !== 'undefined' ? window.innerWidth : 0) * 0.33));
-      const value = collapsed ? '0px' : `${w}px`;
+      const value = collapsed ? `${COLLAPSED_RESERVE_PX}px` : `${w}px`;
       document.documentElement.style.setProperty('--maid-sidebar-width', value);
     } catch { /* ignore */ }
   }, [panelWidth, collapsed]);

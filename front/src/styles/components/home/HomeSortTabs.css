@@ -1,41 +1,55 @@
-.home-sort-dropdown-container {
+.home-sort-tabs-container {
   display: flex;
-  justify-content: flex-end;
-  margin-bottom: 30px;
-  padding-right: 8px;
-  position: relative;
-  z-index: 95;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 18px 0 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 12px;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 }
 
-.home-sort-select {
-  padding: 6px 12px;
-  border: 1px solid #e3e5e7;
-  border-radius: 10px;
-  background-color: rgba(255, 255, 255, 0.9);
+.home-sort-tabs {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.home-sort-tab {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 16px;
+  font-weight: 500;
   color: #61666d;
-  font-size: 14px;
   cursor: pointer;
-  outline: none;
   transition: all 0.2s;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
 }
 
-.home-sort-select:hover {
-  border-color: #00aeec;
+.home-sort-tab:hover {
   color: #00aeec;
-  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 1);
 }
 
-.home-sort-select:focus {
+.home-sort-tab.active {
+  color: #00aeec;
+  font-weight: 600;
   border-color: #00aeec;
-  box-shadow: 0 0 0 2px rgba(0, 174, 236, 0.2);
+  background: rgba(255, 255, 255, 1);
 }
 
 @media (max-width: 768px) {
-  .home-sort-dropdown-container {
-    justify-content: flex-start;
-    padding-right: 0;
+  .home-sort-tabs {
+    gap: 8px;
+  }
+
+  .home-sort-tab {
+    font-size: 14px;
+    padding: 7px 10px;
   }
 }

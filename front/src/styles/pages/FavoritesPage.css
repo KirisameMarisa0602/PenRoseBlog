@@ -1,6 +1,8 @@
 /* FavoritesPage.css */
 .favorites-page-container {
-    width: 100vw;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
     height: 100vh;
     overflow: hidden;
     background-color: transparent;

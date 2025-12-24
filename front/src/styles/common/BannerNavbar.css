@@ -1,4 +1,6 @@
-html, body, #root {
+html,
+body,
+#root {
   width: 100%;
   min-height: 100vh;
 }
@@ -9,6 +11,7 @@ html, body, #root {
   height: 100%;
   min-height: 1px;
 }
+
 /* 编辑文章按钮样式 */
 .nav-edit-blog-btn {
   display: inline-block;
@@ -30,10 +33,12 @@ html, body, #root {
   cursor: pointer;
   opacity: 0.96;
 }
+
 .nav-edit-blog-btn:hover {
   background: #069167;
   opacity: 1;
 }
+
 .bili-banner {
   position: absolute;
   inset: 0;
@@ -47,11 +52,20 @@ html, body, #root {
   user-select: none;
   z-index: 0;
 }
-.banner-navbar { position: fixed; }
-.banner-navbar .nav-inner { position: relative; z-index: 2; }
+
 .banner-navbar {
   position: fixed;
-  top: 0; left: 0;
+}
+
+.banner-navbar .nav-inner {
+  position: relative;
+  z-index: 2;
+}
+
+.banner-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
   --navH: 15vh;
   height: var(--navH);
@@ -61,6 +75,7 @@ html, body, #root {
   background-color: transparent;
   margin: 0;
 }
+
 .banner-navbar .nav-inner {
   height: var(--navH);
   width: 100%;
@@ -79,7 +94,9 @@ html, body, #root {
   height: 100%;
   display: grid;
   place-items: center;
-  margin: 0; padding: 0; box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
   --cell: min(var(--navH), calc(100vw / 8));
 }
 
@@ -91,6 +108,7 @@ html, body, #root {
   justify-content: center;
   height: 100%;
 }
+
 .nav-edit-blog-btn {
   margin: 0;
   align-self: center;
@@ -105,6 +123,7 @@ html, body, #root {
   justify-content: center;
   height: 100%;
 }
+
 .nav-avatar {
   margin: 0;
 }
@@ -117,13 +136,16 @@ html, body, #root {
   justify-content: center;
   height: 100%;
 }
+
 .nav-search-cell .nav-edit-blog-btn {
   background: linear-gradient(90deg, #6a8cff 0%, #8fd3f4 100%);
-  box-shadow: 0 2px 8px rgba(191,200,218,0.6);
+  box-shadow: 0 2px 8px rgba(191, 200, 218, 0.6);
 }
 
 /* small gap for items in edit cell (notification + edit button) */
-.nav-edit-cell > * { margin: 0 6px; }
+.nav-edit-cell>* {
+  margin: 0 6px;
+}
 
 /* notification bell basic style if component uses .notification-bell */
 .notification-bell {
@@ -134,19 +156,28 @@ html, body, #root {
   border-radius: 6px;
   cursor: pointer;
 }
-.notification-bell:hover { background: rgba(0,0,0,0.04); }
+
+.notification-bell:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
 
 /* 移除原 nav-actions 区域的右侧布局（如有） */
-.banner-navbar.is-hidden { transform: translateY(-110%); }
+.banner-navbar.is-hidden {
+  transform: translateY(-110%);
+}
 
 /* 左侧 1/8 容器与 Logo：严格居中、无空隙 */
-.nav-brand{
+.nav-brand {
   grid-column: 1 / 2;
   height: 100%;
   display: grid;
-  place-items: center; /* 居中 */
-  margin: 0; padding: 0; box-sizing: border-box;
-  --cell: min(var(--navH), calc(100vw / 8)); /* 单元基准尺寸 */
+  place-items: center;
+  /* 居中 */
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  --cell: min(var(--navH), calc(100vw / 8));
+  /* 单元基准尺寸 */
 }
 
 /* Ensure links in navbar don't have underlines */
@@ -155,26 +186,40 @@ html, body, #root {
   color: inherit;
 }
 
-.nav-brand > *{ margin: 0; padding: 0; }
+.nav-brand>* {
+  margin: 0;
+  padding: 0;
+}
 
-.banner-navbar .nav-brand .penrose-logo{
+.banner-navbar .nav-brand .penrose-logo {
   position: relative;
   display: inline-grid;
-  place-items: center; 
-  --penroseSize: calc(var(--cell) * 0.6); /* 默认缩放到单元 60% */
-  /* 需为无单位数值：用 360px 约掉 px 单位 */
-  --penroseScale: calc(var(--penroseSize) / 360px);
+  place-items: center;
+  --penroseSize: calc(var(--cell) * 0.6);
+  /* 默认缩放到单元 60% */
   width: var(--penroseSize);
   height: var(--penroseSize);
   aspect-ratio: 1 / 1;
   z-index: 2;
 }
-.bili-banner .bili-layer { position: absolute; left:0; top:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
+
+.bili-banner .bili-layer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .bili-banner .bili-media {
   -webkit-user-select: none;
   user-select: none;
   pointer-events: none;
 }
+
 .banner-navbar .nav-brand .penrose-scale {
   /* 固定基准盒尺寸，确保 translate(-50%,-50%) 以中心为基点 */
   position: absolute;
@@ -182,10 +227,17 @@ html, body, #root {
   top: 50%;
   width: 360px;
   height: 360px;
-  transform: translate(-50%, -50%) scale(var(--penroseScale));
+  /* transform 由 JS 动态控制以保证跨浏览器兼容性 */
   transform-origin: center center;
+  transition: transform 0.2s ease;
 }
-.banner-navbar .penrose-shell { position: relative; top: 0; left: 0; }
+
+.banner-navbar .penrose-shell {
+  position: relative;
+  top: 0;
+  left: 0;
+}
+
 .banner-navbar .penrose-a,
 .banner-navbar .penrose-b,
 .banner-navbar .penrose-c {
@@ -197,8 +249,21 @@ html, body, #root {
   left: 0;
   transform: rotate(60deg) skew(30deg);
 }
-.banner-navbar .penrose-b { background-color: #aaa; transform: rotate(180deg) skew(30deg); left: 180px; top: 36px; }
-.banner-navbar .penrose-c { background-color: #666; transform: rotate(-60deg) skew(30deg); left: 101px; top: 199px; }
+
+.banner-navbar .penrose-b {
+  background-color: #aaa;
+  transform: rotate(180deg) skew(30deg);
+  left: 180px;
+  top: 36px;
+}
+
+.banner-navbar .penrose-c {
+  background-color: #666;
+  transform: rotate(-60deg) skew(30deg);
+  left: 101px;
+  top: 199px;
+}
+
 .banner-navbar .penrose-a::after,
 .banner-navbar .penrose-b::after,
 .banner-navbar .penrose-c::after {
@@ -213,8 +278,15 @@ html, body, #root {
   border-right: 20px solid #333;
   transition: .5s;
 }
-.banner-navbar .penrose-b::after { border-right: 20px solid #aaa; }
-.banner-navbar .penrose-c::after { border-right: 20px solid #666; }
+
+.banner-navbar .penrose-b::after {
+  border-right: 20px solid #aaa;
+}
+
+.banner-navbar .penrose-c::after {
+  border-right: 20px solid #666;
+}
+
 .banner-navbar .penrose-logo:hover .penrose-a::after,
 .banner-navbar .penrose-logo:hover .penrose-b::after,
 .banner-navbar .penrose-logo:hover .penrose-c::after {
@@ -222,8 +294,21 @@ html, body, #root {
   top: 31px;
   left: 76px;
 }
-.banner-navbar .penrose-wrapper2 { position: absolute; transform: scale(0.5); margin-left: 56px; margin-top: 121px; }
-.banner-navbar .penrose-wrapper3 { position: absolute; transform: scale(0.22); margin-left: 88px; margin-top: 188px; }
+
+.banner-navbar .penrose-wrapper2 {
+  position: absolute;
+  transform: scale(0.5);
+  margin-left: 56px;
+  margin-top: 121px;
+}
+
+.banner-navbar .penrose-wrapper3 {
+  position: absolute;
+  transform: scale(0.22);
+  margin-left: 88px;
+  margin-top: 188px;
+}
+
 .banner-navbar .penrose-d,
 .banner-navbar .penrose-e,
 .banner-navbar .penrose-f {
@@ -235,42 +320,249 @@ html, body, #root {
   left: -160px;
   transform: rotate(60deg) skew(30deg);
 }
-.banner-navbar .penrose-e { background-color: #666; top: 400px; left: 173px; transform: rotate(120deg) skew(30deg); }
-.banner-navbar .penrose-f { background-color: #aaa; top: 35px; left: 100px; transform: rotate(180deg) skew(30deg); }
-.banner-navbar .nav-inner { position: relative; z-index: 2; }
-.example-banner { position:absolute; inset:0; overflow:hidden; pointer-events:auto; }
-.bili-banner .example-host { position:absolute; inset:0; pointer-events:auto; }
-.example-spring .view { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
-.example-spring .view:nth-of-type(1)> img { width:5612px; height:209px; transform: scale(1) translate(0px, -17.4194px) rotate(0deg); opacity:1; }
-.example-spring .view:nth-of-type(2)> img { width:5612px; height:209px; transform: scale(1) translate(1277.42px, 0px) rotate(0deg); opacity:1; }
-.example-spring .view:nth-of-type(3)> img { width:1841px; height:188px; transform: scale(1) translate(783.871px, 0px) rotate(0deg); opacity:1; }
-.example-spring .view:nth-of-type(4)> img { width:1671px; height:204px; transform: scale(1) translate(-739.742px, 0px) rotate(0deg); opacity:1; }
-.example-spring .view:nth-of-type(5)> img { width:290px; height:72px; transform: scale(1) translate(705.484px, 52.2581px) rotate(0deg); opacity:1; }
-.example-spring .view:nth-of-type(6)> img { width:238px; height:98px; transform: scale(1) translate(292.645px, 42.271px) rotate(0deg); opacity:0; }
-.example-spring .view:nth-of-type(7)> img { width:1428px; height:146px; transform: scale(1) translate(130.065px, 16.2581px) rotate(0deg); opacity:1; }
-.example-spring .view:nth-of-type(8)> img { width:1428px; height:94px; transform: scale(1) translate(-406.452px, 56.9032px) rotate(0deg); opacity:1; }
-.example-spring .view:nth-of-type(9)> img { width:230px; height:160px; transform: scale(1) translate(-278.71px, 18.5806px) rotate(0deg); opacity:0; }
-.example-spring .view:nth-of-type(10)> img { width:67px; height:118px; transform: scale(1) translate(-394.839px, 37.1613px) rotate(0deg); opacity:0; }
-.example-spring .view:nth-of-type(11)> img { width:314px; height:132px; transform: scale(1) translate(-104.516px, 15.6774px) rotate(0deg); opacity:1; }
-.example-spring .view:nth-of-type(12)> img { width:2483px; height:209px; transform: scale(1) translate(116.129px, 0px) rotate(0deg); opacity:1; }
-.example-spring .view:nth-of-type(13)> img { width:487px; height:170px; transform: scale(1) translate(250.839px, 15.6774px) rotate(0deg); opacity:1; }
-.example-spring .view:nth-of-type(14)> img { width:515px; height:245px; transform: scale(1) translate(2438.71px, 0px) rotate(0deg); filter: blur(2px); opacity:1; }
-.example-spring .view:nth-of-type(15)> img { width:1112px; height:209px; transform: scale(1) translate(-1161.29px, 0px) rotate(0deg); filter: blur(1px); opacity:1; }
-.example-autumn { position:absolute; inset:0; }
-.example-autumn > div { position:absolute; inset:0; display:flex; justify-content:center; align-items:center; --offset:0px; --blur:2px; }
-.example-autumn > div > img { display:block; width:110%; height:100%; object-fit:cover; transform: translateX(var(--offset)); filter: blur(var(--blur)); }
-.example-winter { position:absolute; inset:0; --percentage:0.5; }
-.example-winter .view, .example-winter .tree { position:absolute; inset:0; display:flex; justify-content:center; align-items:center; }
-.example-winter img, .example-winter video { position:absolute; display:block; width:120%; height:100%; object-fit:cover; }
-.example-winter .morning { z-index:20; opacity: calc(1 - (var(--percentage) - 0.25) / 0.25); }
-.example-winter .afternoon { z-index:10; opacity: calc(1 - (var(--percentage) - 0.5) / 0.5); }
-.example-winter .view { transform: translateX(calc(var(--percentage) * 100px)); }
-.example-winter .tree { transform: translateX(calc(var(--percentage) * 50px)); filter: blur(3px); }
-.example-winter .view, .example-winter .tree, .example-winter .morning, .example-winter .afternoon { transition:.2s all ease-in; }
-.example-winter.moving .view, .example-winter.moving .tree, .example-winter.moving .morning, .example-winter.moving .afternoon { transition:none; }
-.example-winter .window-cover { opacity: calc((var(--percentage) - 0.9) / 0.1); }
-.example-spring .view > img { height: 100% !important; width: auto !important; }
-.example-spring .spring-sakura-canvas { position:absolute; inset:0; pointer-events:none; }
+
+.banner-navbar .penrose-e {
+  background-color: #666;
+  top: 400px;
+  left: 173px;
+  transform: rotate(120deg) skew(30deg);
+}
+
+.banner-navbar .penrose-f {
+  background-color: #aaa;
+  top: 35px;
+  left: 100px;
+  transform: rotate(180deg) skew(30deg);
+}
+
+.banner-navbar .nav-inner {
+  position: relative;
+  z-index: 2;
+}
+
+.example-banner {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+.bili-banner .example-host {
+  position: absolute;
+  inset: 0;
+  pointer-events: auto;
+}
+
+.example-spring .view {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.example-spring .view:nth-of-type(1)>img {
+  width: 5612px;
+  height: 209px;
+  transform: scale(1) translate(0px, -17.4194px) rotate(0deg);
+  opacity: 1;
+}
+
+.example-spring .view:nth-of-type(2)>img {
+  width: 5612px;
+  height: 209px;
+  transform: scale(1) translate(1277.42px, 0px) rotate(0deg);
+  opacity: 1;
+}
+
+.example-spring .view:nth-of-type(3)>img {
+  width: 1841px;
+  height: 188px;
+  transform: scale(1) translate(783.871px, 0px) rotate(0deg);
+  opacity: 1;
+}
+
+.example-spring .view:nth-of-type(4)>img {
+  width: 1671px;
+  height: 204px;
+  transform: scale(1) translate(-739.742px, 0px) rotate(0deg);
+  opacity: 1;
+}
+
+.example-spring .view:nth-of-type(5)>img {
+  width: 290px;
+  height: 72px;
+  transform: scale(1) translate(705.484px, 52.2581px) rotate(0deg);
+  opacity: 1;
+}
+
+.example-spring .view:nth-of-type(6)>img {
+  width: 238px;
+  height: 98px;
+  transform: scale(1) translate(292.645px, 42.271px) rotate(0deg);
+  opacity: 0;
+}
+
+.example-spring .view:nth-of-type(7)>img {
+  width: 1428px;
+  height: 146px;
+  transform: scale(1) translate(130.065px, 16.2581px) rotate(0deg);
+  opacity: 1;
+}
+
+.example-spring .view:nth-of-type(8)>img {
+  width: 1428px;
+  height: 94px;
+  transform: scale(1) translate(-406.452px, 56.9032px) rotate(0deg);
+  opacity: 1;
+}
+
+.example-spring .view:nth-of-type(9)>img {
+  width: 230px;
+  height: 160px;
+  transform: scale(1) translate(-278.71px, 18.5806px) rotate(0deg);
+  opacity: 0;
+}
+
+.example-spring .view:nth-of-type(10)>img {
+  width: 67px;
+  height: 118px;
+  transform: scale(1) translate(-394.839px, 37.1613px) rotate(0deg);
+  opacity: 0;
+}
+
+.example-spring .view:nth-of-type(11)>img {
+  width: 314px;
+  height: 132px;
+  transform: scale(1) translate(-104.516px, 15.6774px) rotate(0deg);
+  opacity: 1;
+}
+
+.example-spring .view:nth-of-type(12)>img {
+  width: 2483px;
+  height: 209px;
+  transform: scale(1) translate(116.129px, 0px) rotate(0deg);
+  opacity: 1;
+}
+
+.example-spring .view:nth-of-type(13)>img {
+  width: 487px;
+  height: 170px;
+  transform: scale(1) translate(250.839px, 15.6774px) rotate(0deg);
+  opacity: 1;
+}
+
+.example-spring .view:nth-of-type(14)>img {
+  width: 515px;
+  height: 245px;
+  transform: scale(1) translate(2438.71px, 0px) rotate(0deg);
+  filter: blur(2px);
+  opacity: 1;
+}
+
+.example-spring .view:nth-of-type(15)>img {
+  width: 1112px;
+  height: 209px;
+  transform: scale(1) translate(-1161.29px, 0px) rotate(0deg);
+  filter: blur(1px);
+  opacity: 1;
+}
+
+.example-autumn {
+  position: absolute;
+  inset: 0;
+}
+
+.example-autumn>div {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  --offset: 0px;
+  --blur: 2px;
+}
+
+.example-autumn>div>img {
+  display: block;
+  width: 110%;
+  height: 100%;
+  object-fit: cover;
+  transform: translateX(var(--offset));
+  filter: blur(var(--blur));
+}
+
+.example-winter {
+  position: absolute;
+  inset: 0;
+  --percentage: 0.5;
+}
+
+.example-winter .view,
+.example-winter .tree {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.example-winter img,
+.example-winter video {
+  position: absolute;
+  display: block;
+  width: 120%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.example-winter .morning {
+  z-index: 20;
+  opacity: calc(1 - (var(--percentage) - 0.25) / 0.25);
+}
+
+.example-winter .afternoon {
+  z-index: 10;
+  opacity: calc(1 - (var(--percentage) - 0.5) / 0.5);
+}
+
+.example-winter .view {
+  transform: translateX(calc(var(--percentage) * 100px));
+}
+
+.example-winter .tree {
+  transform: translateX(calc(var(--percentage) * 50px));
+  filter: blur(3px);
+}
+
+.example-winter .view,
+.example-winter .tree,
+.example-winter .morning,
+.example-winter .afternoon {
+  transition: .2s all ease-in;
+}
+
+.example-winter.moving .view,
+.example-winter.moving .tree,
+.example-winter.moving .morning,
+.example-winter.moving .afternoon {
+  transition: none;
+}
+
+.example-winter .window-cover {
+  opacity: calc((var(--percentage) - 0.9) / 0.1);
+}
+
+.example-spring .view>img {
+  height: 100% !important;
+  width: auto !important;
+}
+
+.example-spring .spring-sakura-canvas {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
 
 /* 右侧 7/8 区域：7 列，竖直方向不再拆分 1/3 与 2/3 */
 .banner-navbar .nav-actions {
@@ -287,10 +579,18 @@ html, body, #root {
 }
 
 /* 默认子项在单行中按列顺序自动放置 */
-.banner-navbar .nav-actions > * { grid-row: 1; }
+.banner-navbar .nav-actions>* {
+  grid-row: 1;
+}
 
 /* 头像：最右一列，垂直居中对齐 */
-.banner-navbar .nav-actions .nav-avatar { grid-column: 7; grid-row: 1; justify-self: center; align-self: center; }
+.banner-navbar .nav-actions .nav-avatar {
+  grid-column: 7;
+  grid-row: 1;
+  justify-self: center;
+  align-self: center;
+}
+
 /* 导航菜单项样式优化 */
 .nav-menu-cell .nav-link {
   font-weight: 700;
@@ -306,15 +606,24 @@ html, body, #root {
   display: inline-block;
   line-height: 1.2;
 }
-.nav-menu-cell .nav-link:hover, .nav-menu-cell .nav-link:focus {
+
+.nav-menu-cell .nav-link:hover,
+.nav-menu-cell .nav-link:focus {
   color: #fff;
   background: #1a2233;
   text-decoration: none;
 }
-.nav-message-cell { position: relative; }
-.nav-message-cell .nav-edit-blog-btn { position: relative; }
-.nav-badge{
-  position:absolute;
+
+.nav-message-cell {
+  position: relative;
+}
+
+.nav-message-cell .nav-edit-blog-btn {
+  position: relative;
+}
+
+.nav-badge {
+  position: absolute;
   top: 18%;
   right: 28%;
   min-width: 18px;
@@ -322,28 +631,36 @@ html, body, #root {
   padding: 0 5px;
   border-radius: 9px;
   background: #ff4d4f;
-  color:#fff;
-  font-size:12px;
-  line-height:18px;
-  text-align:center;
-  box-shadow: 0 0 0 2px rgba(255,255,255,0.8);
+  color: #fff;
+  font-size: 12px;
+  line-height: 18px;
+  text-align: center;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8);
 }
 
 .nav-badge-dot {
-    position: absolute;
-    top: 20%;
-    right: 20%;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background-color: #ff4d4f;
-    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8);
-    animation: badgePulse 2s infinite;
-    z-index: 10;
+  position: absolute;
+  top: 20%;
+  right: 20%;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #ff4d4f;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8);
+  animation: badgePulse 2s infinite;
+  z-index: 10;
 }
 
 @keyframes badgePulse {
-    0% { box-shadow: 0 0 0 0 rgba(255, 77, 79, 0.4); }
-    70% { box-shadow: 0 0 0 4px rgba(255, 77, 79, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(255, 77, 79, 0); }
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 77, 79, 0.4);
+  }
+
+  70% {
+    box-shadow: 0 0 0 4px rgba(255, 77, 79, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 77, 79, 0);
+  }
 }

@@ -61,7 +61,13 @@ export default function ArticleCard({ post, className, onDelete, mode = 'horizon
             <Link to={linkTarget} state={state} className="article-card-link">
                 <div className="article-card-cover-wrapper">
                     {coverSrc ? (
-                        <img src={coverSrc} alt={post.title} className="article-card-cover" />
+                        <img
+                            src={coverSrc}
+                            alt={post.title}
+                            className="article-card-cover"
+                            loading="lazy"
+                            decoding="async"
+                        />
                     ) : (
                         <div className="article-card-cover-placeholder" />
                     )}
@@ -82,7 +88,7 @@ export default function ArticleCard({ post, className, onDelete, mode = 'horizon
                         </div>
                     )}
                     {onDelete && (
-                        <button 
+                        <button
                             onClick={handleDeleteClick}
                             style={{
                                 position: 'absolute',
@@ -112,7 +118,13 @@ export default function ArticleCard({ post, className, onDelete, mode = 'horizon
 
                     <div className="article-card-meta-top">
                         <div className="article-card-author">
-                            <img src={avatar} alt={author} className="article-card-avatar" />
+                            <img
+                                src={avatar}
+                                alt={author}
+                                className="article-card-avatar"
+                                loading="lazy"
+                                decoding="async"
+                            />
                             <span className="article-card-nickname">{author}</span>
                         </div>
                         <span className="article-card-time">{formatDate(created)}</span>
