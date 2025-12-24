@@ -416,6 +416,47 @@ export default function Maid({ defaultCollapsed = true, onModelLoaded, onWidthCh
   }, [setInnerHeight]);
 
 
+  const triggerMotion = useCallback(async (groupName) => {
+    const model = modelRef.current;
+    if (!model) return;
+    try {
+      // 动作/表情映射表
+      // 优先匹配表情(Expression)，因为该模型主要依靠表情进行交互
+      const mappings = {
+        thinking: ['星星眼', '眼镜', 'Thinking', 'TapBody'], // 思考时：星星眼(期待) 或 戴眼镜
+        happy: ['爱心眼', '害羞', 'Happy', 'TapHead'],       // 开心时：爱心眼 或 害羞
+        surprise: ['流泪', '黑脸', '生气', 'Surprise', 'FlickHead'] // 错误/惊讶时：流泪 或 黑脸
+      };
+
+      const candidates = mappings[groupName] || [groupName];
+
+      // 尝试播放表情或动作
+      // 注意：pixi-live2d-display 中 expression() 接收的是 model3.json 中定义的 Name 或文件名(无后缀)
+      // 我们遍历候选列表，尝试触发
+      for (const name of candidates) {
+        // 1. 尝试作为表情触发
+        try {
+          // model.expression() 返回 Promise
+          const res = await model.expression(name);
+          if (res) return; // 如果成功触发表情，则结束
+        } catch (e) { /* ignore */ }
+
+        // 2. 尝试作为动作触发
+        try {
+          // 检查动作组是否存在
+          const settings = model?.internalModel?.settings || model?.internalModel?._settings;
+          const motions = settings?.motions || settings?.Motions || settings?._motions;
+          if (motions && (motions[name] || Object.keys(motions).some(k => k.toLowerCase() === name.toLowerCase()))) {
+            await model.motion(name);
+            return; // 成功触发动作则结束
+          }
+        } catch (e) { /* ignore */ }
+      }
+    } catch (e) {
+      // ignore global error
+    }
+  }, []);
+
   // 计算上下区以及画布区高度（扣除控制栏高度）
   const { topHeightPx, bottomHeightPx, canvasAreaHeightPx } = calcHeights(controlbarH);
 
@@ -429,7 +470,7 @@ export default function Maid({ defaultCollapsed = true, onModelLoaded, onWidthCh
       {/* 主体：上部聊天，下部看板娘，可拖拽分割；高度完全由 calcHeights 控制，保证拖拽条位置精确 */}
       <div className="maid-top" style={{ height: innerHeight ? topHeightPx + 'px' : undefined }}>
         <div className="maid-ai-chat-wrap">
-          <MaidAiChat visible={!collapsed} />
+          <MaidAiChat visible={!collapsed} triggerMotion={triggerMotion} />
         </div>
       </div>
       <Splitter

@@ -399,59 +399,6 @@ export default function TipTapEditor({ value, onChange, placeholder = '开始创
   const colorPickerRef = useRef(null);
   const fontPickerRef = useRef(null);
 
-  // AI Assistant
-  const { polishText, continueWriting } = useAiAssistant();
-  const [aiProcessing, setAiProcessing] = useState(false);
-
-  const handleAiPolish = async () => {
-    if (!editor) return;
-    const { from, to } = editor.state.selection;
-    const text = editor.state.doc.textBetween(from, to, ' ');
-    if (!text) {
-      alert('请先选择需要润色的文本');
-      return;
-    }
-
-    setAiProcessing(true);
-    try {
-      let polished = '';
-      await polishText(text, {
-        onChunk: (chunk) => { polished += chunk; }
-      });
-      if (polished) {
-        editor.chain().focus().insertContentAt({ from, to }, polished).run();
-      }
-    } catch (e) {
-      console.error(e);
-      alert('AI 润色失败');
-    } finally {
-      setAiProcessing(false);
-    }
-  };
-
-  const handleAiContinue = async () => {
-    if (!editor) return;
-    const { to } = editor.state.selection;
-    const from = Math.max(0, to - 1000);
-    const context = editor.state.doc.textBetween(from, to, ' ');
-
-    setAiProcessing(true);
-    try {
-      let generated = '';
-      await continueWriting(context, {
-        onChunk: (chunk) => { generated += chunk; }
-      });
-      if (generated) {
-        editor.chain().focus().insertContent(generated).run();
-      }
-    } catch (e) {
-      console.error(e);
-      alert('AI 续写失败');
-    } finally {
-      setAiProcessing(false);
-    }
-  };
-
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -646,34 +593,6 @@ export default function TipTapEditor({ value, onChange, placeholder = '开始创
     <div className="tiptap-editor">
       {/* 增强的工具栏 */}
       <div className="tiptap-toolbar">
-        {/* AI Tools */}
-        <div className="tt-toolbar-group">
-          <button
-            type="button"
-            className={`tt-btn ai-btn ${aiProcessing ? 'processing' : ''}`}
-            onClick={handleAiPolish}
-            title="AI 润色选中文字"
-            disabled={aiProcessing}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
-            </svg>
-            <span style={{ fontSize: '12px', marginLeft: '4px' }}>润色</span>
-          </button>
-          <button
-            type="button"
-            className={`tt-btn ai-btn ${aiProcessing ? 'processing' : ''}`}
-            onClick={handleAiContinue}
-            title="AI 续写"
-            disabled={aiProcessing}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-            </svg>
-            <span style={{ fontSize: '12px', marginLeft: '4px' }}>续写</span>
-          </button>
-        </div>
-
         {/* 历史操作 */}
         <div className="tt-toolbar-group">
           <button type="button" className="tt-btn" onClick={() => editor.chain().focus().undo().run()} disabled={!editor.can().undo()} title="撤销"><Icons.Undo /></button>

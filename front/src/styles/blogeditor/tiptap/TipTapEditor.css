@@ -51,22 +51,17 @@
 .tiptap-toolbar {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 10px 16px;
-  background: #f1f5f9;
-  /* 加深工具栏背景 */
-  border-bottom: 1px solid #cbd5e1;
-  /* 加深工具栏边框 */
+  gap: 8px;
+  padding: 12px 16px;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
   flex-wrap: wrap;
-  /* 允许换行，防止下拉菜单被裁剪 */
   overflow: visible;
-  /* 允许下拉菜单溢出 */
   position: sticky;
   top: 0;
   z-index: 20;
-  border-radius: 12px 12px 0 0;
-  -ms-overflow-style: none;
-  /* IE and Edge */
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
 @supports (scrollbar-width: none) {
@@ -77,66 +72,61 @@
 
 .tiptap-toolbar::-webkit-scrollbar {
   display: none;
-  /* Chrome/Safari 隐藏滚动条 */
 }
 
 .tt-toolbar-group {
   display: flex;
   align-items: center;
-  gap: 1px;
+  gap: 2px;
   position: relative;
-  background: transparent;
-  /* 移除背景 */
-  padding: 0;
-  border-radius: 0;
-  border: none;
-  /* 移除边框 */
+  background: #f8fafc;
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid #f1f5f9;
   flex-shrink: 0;
-  /* 防止被压缩 */
 }
 
 /* 添加分隔线 */
+.tt-toolbar-group:not(:last-child) {
+  margin-right: 4px;
+}
+
 .tt-toolbar-group:not(:last-child)::after {
-  content: '';
-  display: block;
-  width: 1px;
-  height: 20px;
-  background: #e5e7eb;
-  margin: 0 8px;
+  display: none;
 }
 
 .tt-btn {
   height: 32px;
-  /* 稍微减小高度 */
   min-width: 32px;
-  padding: 0 6px;
-  border: 1px solid transparent;
+  padding: 0 8px;
+  border: none;
   border-radius: 6px;
   background: transparent;
-  color: #6b7280;
+  color: #64748b;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  transition: all 0.2s ease;
+  gap: 6px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: 13px;
   font-weight: 500;
 }
 
 .tt-btn:hover:not(:disabled) {
-  background: #f3f4f6;
-  color: #111827;
+  background: #e2e8f0;
+  color: #0f172a;
+  transform: translateY(-1px);
 }
 
 .tt-btn[aria-pressed="true"] {
   background: #eff6ff;
   color: #3b82f6;
+  box-shadow: 0 1px 2px rgba(59, 130, 246, 0.1);
 }
 
-.tt-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+.tt-btn:active {
+  transform: translateY(0);
 }
 
 .tt-font-btn {

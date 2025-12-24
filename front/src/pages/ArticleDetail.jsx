@@ -6,7 +6,6 @@ import 'highlight.js/styles/atom-one-dark.css';
 import '@styles/article/ArticleDetail.css';
 import '@styles/article/ArticleSidebars.css';
 import AuthorSidebar from '@components/article/AuthorSidebar';
-import AiSummarySidebar from '@components/article/AiSummarySidebar';
 import ArticleSidebar from '@components/article/ArticleSidebar';
 import ArticleActions from '@components/article/ArticleActions';
 import CommentsSection from '@components/article/CommentsSection';
@@ -31,9 +30,7 @@ export default function ArticleDetail() {
     const fromCategory = location.state?.fromCategory;
 
     // AI Assistant
-    const { summarizeArticle, setAiContext } = useAiAssistant();
-    const [aiSummary, setAiSummary] = useState('');
-    const [aiLoading, setAiLoading] = useState(false);
+    const { setAiContext } = useAiAssistant();
 
     // Set AI Context for this article
     useEffect(() => {
@@ -44,23 +41,6 @@ export default function ArticleDetail() {
             setAiContext({ type: 'GLOBAL', id: null });
         };
     }, [id, setAiContext]);
-
-    const handleAiSummarize = async () => {
-        if (!post?.content) return;
-        if (aiSummary) return; // Already summarized
-
-        setAiLoading(true);
-        try {
-            await summarizeArticle(post.content, {
-                onChunk: (chunk) => setAiSummary(prev => prev + chunk)
-            });
-        } catch (err) {
-            console.error(err);
-            setAiSummary('AI 总结失败，请稍后重试。');
-        } finally {
-            setAiLoading(false);
-        }
-    };
 
     const handleBack = () => {
         if (fromCategory) {
@@ -1160,12 +1140,6 @@ export default function ArticleDetail() {
                     <AuthorSidebar
                         post={post}
                         currentUserId={userId}
-                    />
-
-                    <AiSummarySidebar
-                        summary={aiSummary}
-                        loading={aiLoading}
-                        onSummarize={handleAiSummarize}
                     />
                 </div>
 

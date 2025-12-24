@@ -5,7 +5,7 @@ import rehypeHighlight from 'rehype-highlight';
 import 'highlight.js/styles/atom-one-dark.css';
 import useAiAssistant from '@contexts/useAiAssistant';
 
-export default function MaidAiChat({ visible }) {
+export default function MaidAiChat({ visible, triggerMotion }) {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState('');
   const [sending, setSending] = useState(false);
@@ -126,6 +126,26 @@ export default function MaidAiChat({ visible }) {
   useEffect(() => {
     try { localStorage.setItem('maid.ai.draft', text); } catch { /* ignore */ }
   }, [text]);
+
+  // 监听发送状态，触发 Live2D 动作
+  const prevSendingRef = useRef(sending);
+  useEffect(() => {
+    if (!triggerMotion) return;
+    const prev = prevSendingRef.current;
+
+    if (!prev && sending) {
+      // 开始发送
+      triggerMotion('thinking');
+    } else if (prev && !sending) {
+      // 发送结束
+      if (error) {
+        triggerMotion('surprise');
+      } else {
+        triggerMotion('happy');
+      }
+    }
+    prevSendingRef.current = sending;
+  }, [sending, error, triggerMotion]);
 
   // 已移除模型持久化
 
@@ -296,6 +316,7 @@ export default function MaidAiChat({ visible }) {
 
   const handleQuickAction = (prompt) => {
     setText(prompt);
+    if (triggerMotion) triggerMotion('thinking');
     // Optional: auto-send
     // setTimeout(() => send(), 0);
   };
@@ -350,24 +371,12 @@ export default function MaidAiChat({ visible }) {
 
       {/* Quick Actions Chips */}
       {quickActions.length > 0 && (
-        <div className="maid-quick-actions" style={{ padding: '8px 12px', display: 'flex', gap: '8px', overflowX: 'auto', borderTop: '1px solid rgba(0,0,0,0.05)' }}>
+        <div className="maid-quick-actions">
           {quickActions.map((action, idx) => (
             <button
               key={idx}
+              className="maid-quick-action-chip"
               onClick={() => handleQuickAction(action.prompt)}
-              style={{
-                padding: '4px 10px',
-                fontSize: '12px',
-                borderRadius: '12px',
-                border: '1px solid #e5e7eb',
-                background: '#f9fafb',
-                color: '#374151',
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-                transition: 'all 0.2s'
-              }}
-              onMouseEnter={e => { e.target.style.background = '#eef2ff'; e.target.style.borderColor = '#c7d2fe'; }}
-              onMouseLeave={e => { e.target.style.background = '#f9fafb'; e.target.style.borderColor = '#e5e7eb'; }}
             >
               {action.label}
             </button>
