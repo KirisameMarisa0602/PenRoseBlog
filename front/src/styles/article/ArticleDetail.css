@@ -7,6 +7,32 @@
   padding-top: 20px;
 }
 
+/* Sidebar sticky positioning adjustment for navbar visibility */
+.article-left-column,
+.article-sidebar {
+  position: sticky;
+  transition: top 0.3s ease;
+  z-index: 10;
+}
+
+body:not(.navbar-hidden-mode) .article-left-column,
+body:not(.navbar-hidden-mode) .article-sidebar {
+  top: 180px !important;
+}
+
+body:not(.navbar-hidden-mode) .article-sidebar {
+  height: calc(100vh - 200px) !important;
+}
+
+body.navbar-hidden-mode .article-left-column,
+body.navbar-hidden-mode .article-sidebar {
+  top: 100px !important;
+}
+
+body.navbar-hidden-mode .article-sidebar {
+  height: calc(100vh - 120px) !important;
+}
+
 /* AI Summary Modal */
 .ai-summary-modal-overlay {
   position: fixed;

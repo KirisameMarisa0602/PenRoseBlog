@@ -1137,7 +1137,7 @@ export default function ArticleDetail() {
             )}
             <div className="article-detail-container">
                 {/* Left Column: Back Button + Author Info */}
-                <div className="article-left-column" style={{ display: 'flex', flexDirection: 'column', gap: '20px', position: 'sticky', top: '100px', height: 'fit-content' }}>
+                <div className="article-left-column" style={{ display: 'flex', flexDirection: 'column', gap: '20px', height: 'fit-content' }}>
                     <div className="article-back-nav-container">
                         <button
                             onClick={handleBack}

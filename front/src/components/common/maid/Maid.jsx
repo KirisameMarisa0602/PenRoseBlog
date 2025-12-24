@@ -48,7 +48,6 @@ export default function Maid({ defaultCollapsed = true, onModelLoaded, onWidthCh
     }
   }, [panelWidth, collapsed, onWidthChange]);
 
-  const [dpi, setDpi] = useState(3);
   const [userScale] = useState(1); // UI 不再暴露
   const basePosRef = useRef({ x: 0, y: 0 });
   const offsetRef = useRef({ x: 0, y: 0 });
@@ -218,7 +217,7 @@ export default function Maid({ defaultCollapsed = true, onModelLoaded, onWidthCh
       if (allMaids.length > 1) {
         allMaids.forEach(el => {
           if (el !== container && el.parentElement) {
-             el.parentElement.removeChild(el);
+            el.parentElement.removeChild(el);
           }
         });
       }
@@ -233,7 +232,7 @@ export default function Maid({ defaultCollapsed = true, onModelLoaded, onWidthCh
       backgroundAlpha: 0,
       antialias: true,
       autoDensity: true,
-      resolution: dpi,
+      resolution: 3,
       roundPixels: true,
       powerPreference: 'high-performance',
     });
@@ -274,7 +273,7 @@ export default function Maid({ defaultCollapsed = true, onModelLoaded, onWidthCh
       } catch { /* ignore */ }
       appRef.current = null;
     };
-  }, [fitAndPlaceMemo, dpi]); // 仅依赖 fitAndPlaceMemo (通常稳定)，移除 loadAndShowModel 以避免重建 App
+  }, [fitAndPlaceMemo]); // 仅依赖 fitAndPlaceMemo (通常稳定)，移除 loadAndShowModel 以避免重建 App
 
   // 监听模型配置变化，加载模型
   useEffect(() => {
@@ -293,7 +292,7 @@ export default function Maid({ defaultCollapsed = true, onModelLoaded, onWidthCh
     const canvasEl = visibleWrap; if (!canvasEl) return;
     try { app.renderer.resize(canvasEl.clientWidth, canvasEl.clientHeight); } catch { /* ignore */ }
     try { fitAndPlaceMemo(); } catch { /* ignore */ }
-  }, [panelWidth, collapsed, userScale, dpi, splitRatio, innerHeight, fitAndPlaceMemo]);
+  }, [panelWidth, collapsed, userScale, splitRatio, innerHeight, fitAndPlaceMemo]);
 
 
   const resolveExpressionUrl = useCallback((file) => {
@@ -340,17 +339,6 @@ export default function Maid({ defaultCollapsed = true, onModelLoaded, onWidthCh
   }, [getCategorizedExpressions, getExpressionJson, selectedClothes, selectedAction, selectedScene, compositeTargetRef, enforcerFnRef, enforcerOnRef, modelRef]);
 
   useEffect(() => { void applyCompositeFromSelections(); }, [applyCompositeFromSelections, selectedClothes, selectedAction, selectedScene]);
-
-  useEffect(() => {
-    const app = appRef.current; const container = containerRef.current; if (!app || !container || !app.renderer) return;
-    const r = Math.max(1, Math.min(3, Number(dpi) || 1));
-    try {
-      if (app.renderer.resolution !== r) {
-        app.renderer.resolution = r;
-        app.renderer.resize(container.clientWidth, container.clientHeight);
-      }
-    } catch { /* ignore */ }
-  }, [dpi]);
 
   useEffect(() => { fitAndPlaceMemo(); }, [fitAndPlaceMemo]);
 
@@ -453,9 +441,9 @@ export default function Maid({ defaultCollapsed = true, onModelLoaded, onWidthCh
       />
       <div className="maid-bottom" style={{ height: innerHeight ? bottomHeightPx + 'px' : undefined }}>
         <CanvasArea heightPx={canvasAreaHeightPx} />
-        <ControlBar 
-          getCategorizedExpressions={getCategorizedExpressions} 
-          openPanel={openPanel} 
+        <ControlBar
+          getCategorizedExpressions={getCategorizedExpressions}
+          openPanel={openPanel}
           setOpenPanel={setOpenPanel}
           settingsOpen={settingsOpen}
           onToggleSettings={toggleSettings}
@@ -466,8 +454,6 @@ export default function Maid({ defaultCollapsed = true, onModelLoaded, onWidthCh
 
       {settingsOpen && !collapsed && (
         <SettingsPanel
-          dpi={dpi}
-          setDpi={setDpi}
           currentModelKey={currentModelKey}
           setModelKey={setCurrentModelKey}
         />

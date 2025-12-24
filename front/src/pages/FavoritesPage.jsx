@@ -9,7 +9,7 @@ export default function FavoritesPage() {
     const userId = user?.id ? String(user.id) : null;
 
     const [activeCategory, setActiveCategory] = useState(null);
-    
+
     const [categoryData, setCategoryData] = useState({});
     const [paginationMap, setPaginationMap] = useState({});
     const [loadingMap, setLoadingMap] = useState({});
@@ -29,14 +29,14 @@ export default function FavoritesPage() {
             .then(j => {
                 if (j && (j.code === 200 || j.status === 200)) {
                     const list = j.data?.list || j.data || [];
-                    
+
                     setCategoryData(prev => {
                         const existing = prev[category] || [];
                         // Filter duplicates
                         const newItems = list.filter(item => !existing.some(ex => ex.id === item.id));
                         return { ...prev, [category]: pageNum === 0 ? list : [...existing, ...newItems] };
                     });
-                    
+
                     setPaginationMap(prev => ({
                         ...prev,
                         [category]: {
@@ -72,25 +72,25 @@ export default function FavoritesPage() {
     const renderCategoryCard = (category) => {
         const isActive = activeCategory === category;
         return (
-            <div 
-                className={`favorites-card ${isActive ? 'active' : ''}`} 
+            <div
+                className={`favorites-card ${isActive ? 'active' : ''}`}
                 key={category}
                 onMouseEnter={() => handleMouseEnter(category)}
             >
                 <div className="card-bg">
-                    <img 
-                        src={`/imgs/categories/${category}.jpg`} 
-                        alt={category} 
+                    <img
+                        src={`/imgs/categories/${category}.jpg`}
+                        alt={category}
                         className="bg-image"
-                        onError={(e) => {e.target.style.display='none'}} 
+                        onError={(e) => { e.target.style.display = 'none' }}
                     />
                     <div className="bg-overlay"></div>
                     <div className="card-label">
                         <span>{category}</span>
                     </div>
                 </div>
-                
-                <div 
+
+                <div
                     className={`favorites-content-area ${isActive ? 'visible' : ''}`}
                     onScroll={(e) => isActive && handleScroll(e, category)}
                 >
@@ -98,17 +98,22 @@ export default function FavoritesPage() {
                         <div className="articles-grid">
                             {categoryData[category] && categoryData[category].length > 0 ? (
                                 categoryData[category].map(post => (
-                                    <ArticleCard 
-                                        key={post.id} 
-                                        post={post} 
-                                        mode="vertical" 
+                                    <ArticleCard
+                                        key={post.id}
+                                        post={post}
+                                        mode="vertical"
                                         className="fav-article-card"
                                     />
                                 ))
                             ) : (
                                 !loadingMap[category] && <div className="no-data">暂无收藏</div>
                             )}
-                            {loadingMap[category] && <div className="loading-spinner">加载中...</div>}
+                            {loadingMap[category] && (
+                                <div className="favorites-loading-container">
+                                    <div className="loading-spinner"></div>
+                                    <span className="loading-text">加载中...</span>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

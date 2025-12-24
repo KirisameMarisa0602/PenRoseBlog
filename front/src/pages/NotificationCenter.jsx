@@ -366,11 +366,6 @@ export default function NotificationCenter() {
                             notifications.map(renderNotificationItem)
                         )}
                     </div>
-                    {hasMore && notifications.length > 0 && (
-                        <button className="load-more-btn" onClick={handleLoadMore} disabled={loading}>
-                            {loading ? '加载中...' : '加载更多'}
-                        </button>
-                    )}
                 </div>
             </div>
         </div>

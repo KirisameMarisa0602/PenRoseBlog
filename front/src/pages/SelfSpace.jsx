@@ -49,7 +49,10 @@ export default function SelfSpace() {
     let url = `/api/blogpost?userId=${effectiveUserId}&page=${fetchPage}&size=${fetchSize}`;
     if (currentUserId) url += `&currentUserId=${currentUserId}`;
 
-    fetch(url)
+    const token = typeof localStorage !== 'undefined' ? localStorage.getItem('token') : null;
+    fetch(url, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    })
       .then(r => r.json())
       .then(async j => {
         if (!mounted) return;
