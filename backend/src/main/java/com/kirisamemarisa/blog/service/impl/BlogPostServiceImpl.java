@@ -111,6 +111,42 @@ public class BlogPostServiceImpl implements BlogPostService {
         } else {
             post.setStatus("PUBLISHED");
         }
+
+        // Handle Category (JSON endpoint previously ignored this)
+        String categoryName = dto.getCategoryName();
+        if (categoryName != null && !categoryName.trim().isEmpty()) {
+            String cleanCategory = categoryName.trim();
+            Optional<Category> catOpt = categoryRepository.findByName(cleanCategory);
+            if (catOpt.isPresent()) {
+                post.setCategory(catOpt.get());
+            } else {
+                Category newCat = new Category();
+                newCat.setName(cleanCategory);
+                post.setCategory(categoryRepository.save(newCat));
+            }
+        }
+
+        // Handle Tags (JSON endpoint previously ignored this)
+        if (dto.getTags() != null) {
+            if (dto.getTags().size() > 5) {
+                return new ApiResponse<>(400, "标签数量不能超过5个", null);
+            }
+            java.util.Set<Tag> tagSet = new java.util.HashSet<>();
+            for (String tagName : dto.getTags()) {
+                if (tagName == null || tagName.trim().isEmpty()) continue;
+                String cleanName = tagName.trim();
+                Optional<Tag> tagOpt = tagRepository.findByName(cleanName);
+                if (tagOpt.isPresent()) {
+                    tagSet.add(tagOpt.get());
+                } else {
+                    Tag newTag = new Tag();
+                    newTag.setName(cleanName);
+                    tagSet.add(tagRepository.save(newTag));
+                }
+            }
+            post.setTags(tagSet);
+        }
+
         BlogPost saved = blogPostRepository.save(post);
         return new ApiResponse<>(200, "创建成功", saved.getId());
     }
@@ -171,6 +207,46 @@ public class BlogPostServiceImpl implements BlogPostService {
         if (dto.getStatus() != null) {
             post.setStatus(dto.getStatus());
         }
+
+        // Handle Category updates (mapper intentionally ignores category)
+        if (dto.getCategoryName() != null) {
+            String categoryName = dto.getCategoryName();
+            if (categoryName.trim().isEmpty()) {
+                post.setCategory(null);
+            } else {
+                String cleanCategory = categoryName.trim();
+                Optional<Category> catOpt = categoryRepository.findByName(cleanCategory);
+                if (catOpt.isPresent()) {
+                    post.setCategory(catOpt.get());
+                } else {
+                    Category newCat = new Category();
+                    newCat.setName(cleanCategory);
+                    post.setCategory(categoryRepository.save(newCat));
+                }
+            }
+        }
+
+        // Handle Tag updates (mapper intentionally ignores tags)
+        if (dto.getTags() != null) {
+            if (dto.getTags().size() > 5) {
+                return new ApiResponse<>(400, "标签数量不能超过5个", false);
+            }
+            java.util.Set<Tag> tagSet = new java.util.HashSet<>();
+            for (String tagName : dto.getTags()) {
+                if (tagName == null || tagName.trim().isEmpty()) continue;
+                String cleanName = tagName.trim();
+                Optional<Tag> tagOpt = tagRepository.findByName(cleanName);
+                if (tagOpt.isPresent()) {
+                    tagSet.add(tagOpt.get());
+                } else {
+                    Tag newTag = new Tag();
+                    newTag.setName(cleanName);
+                    tagSet.add(tagRepository.save(newTag));
+                }
+            }
+            post.setTags(tagSet);
+        }
+
         // 支持后续字段扩展
         blogpostMapper.updateEntityFromDTO(dto, post);
         blogPostRepository.save(post);
