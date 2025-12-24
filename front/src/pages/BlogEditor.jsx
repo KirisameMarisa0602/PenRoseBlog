@@ -12,6 +12,7 @@ import hljs from 'highlight.js';
 import 'highlight.js/styles/atom-one-dark.css';
 import { BLOG_CATEGORIES } from '@utils/constants';
 import resolveUrl from '@utils/resolveUrl';
+import { fetchDirectories } from '@utils/api/postService';
 
 const turndownService = new TurndownService();
 
@@ -139,8 +140,7 @@ const BlogEditor = () => {
   // 获取用户已有的目录列表
   useEffect(() => {
     if (userId) {
-      fetch(`/api/blogpost/directories?userId=${userId}`)
-        .then(r => r.json())
+      fetchDirectories(userId)
         .then(res => {
           if (res && (res.code === 200 || res.status === 200) && Array.isArray(res.data)) {
             setExistingDirectories(res.data);
@@ -267,7 +267,7 @@ const BlogEditor = () => {
       });
       if (res && (res.status === 200 || res.data?.code === 200)) {
         alert(status === 'PUBLISHED' ? (editId ? '更新成功！' : '发布成功！') : '草稿保存成功！');
-        
+
         if (status === 'PUBLISHED') {
           try {
             localStorage.removeItem('blog.editor.title');
@@ -433,14 +433,14 @@ const BlogEditor = () => {
   const scrollToHeader = (item) => {
     let container;
     let headers;
-    
+
     if (previewMode) {
-       container = document.querySelector('.tiptap-content'); // In preview mode
+      container = document.querySelector('.tiptap-content'); // In preview mode
     } else if (editorMode === 'rich') {
-       container = document.querySelector('.ProseMirror'); // TipTap editor content
+      container = document.querySelector('.ProseMirror'); // TipTap editor content
     } else {
-       // Markdown mode - scroll the preview pane if visible, or just do nothing as textarea scrolling is hard
-       container = document.querySelector('.markdown-preview-content');
+      // Markdown mode - scroll the preview pane if visible, or just do nothing as textarea scrolling is hard
+      container = document.querySelector('.markdown-preview-content');
     }
 
     if (container) {
@@ -454,11 +454,11 @@ const BlogEditor = () => {
   const scrollToResource = (res) => {
     let container;
     if (previewMode) {
-       container = document.querySelector('.tiptap-content');
+      container = document.querySelector('.tiptap-content');
     } else if (editorMode === 'rich') {
-       container = document.querySelector('.ProseMirror');
+      container = document.querySelector('.ProseMirror');
     } else {
-       container = document.querySelector('.markdown-preview-content');
+      container = document.querySelector('.markdown-preview-content');
     }
 
     if (container) {
@@ -477,11 +477,11 @@ const BlogEditor = () => {
 
   const handleResourceReorder = (fromIndex, toIndex) => {
     if (fromIndex === toIndex) return;
-    
+
     // Simple string replacement strategy
     // We need to find the exact strings in content and swap them
     // Note: This is risky if there are identical tags. We rely on the order.
-    
+
     // Re-find all tags to ensure we have current positions
     let tags = [];
     let match;
@@ -499,7 +499,7 @@ const BlogEditor = () => {
       }
       const htmlImgRegex = /<img\s+[^>]*src="([^"]*)"[^>]*>/g;
       while ((match = htmlImgRegex.exec(content)) !== null) {
-         tags.push({ start: match.index, end: match.index + match[0].length, text: match[0] });
+        tags.push({ start: match.index, end: match.index + match[0].length, text: match[0] });
       }
       tags.sort((a, b) => a.start - b.start);
     }
@@ -514,28 +514,28 @@ const BlogEditor = () => {
     // Assume fromIndex < toIndex for simplicity in logic, swap if not
     let first = fromIndex < toIndex ? tagA : tagB;
     let second = fromIndex < toIndex ? tagB : tagA;
-    
+
     // If we are swapping, we put second's text in first's place and vice versa
-    const newContent = 
-      content.substring(0, first.start) + 
-      second.text + 
-      content.substring(first.end, second.start) + 
-      first.text + 
+    const newContent =
+      content.substring(0, first.start) +
+      second.text +
+      content.substring(first.end, second.start) +
+      first.text +
       content.substring(second.end);
-      
+
     setContent(newContent);
   };
 
   const handleResourceRemove = (resource) => {
     if (!window.confirm('确定要移除这个资源吗？')) return;
-    
+
     const targetStr = content.substring(resource.index, resource.index + resource.fullTag.length);
     if (targetStr === resource.fullTag) {
-       const newContent = content.substring(0, resource.index) + content.substring(resource.index + resource.fullTag.length);
-       setContent(newContent);
+      const newContent = content.substring(0, resource.index) + content.substring(resource.index + resource.fullTag.length);
+      setContent(newContent);
     } else {
-       // Fallback if index mismatch
-       setContent(content.replace(resource.fullTag, ''));
+      // Fallback if index mismatch
+      setContent(content.replace(resource.fullTag, ''));
     }
   };
 
@@ -569,7 +569,7 @@ const BlogEditor = () => {
     // 限制层级：最多允许3级目录
     const parts = val.split('/');
     if (parts.length > 3) {
-        val = parts.slice(0, 3).join('/');
+      val = parts.slice(0, 3).join('/');
     }
     setDirectory(val);
   };
@@ -579,9 +579,9 @@ const BlogEditor = () => {
       {/* Top Header: Title & Main Actions */}
       <div className="blog-editor-header">
         <button className="blog-editor-back-btn" onClick={() => navigate('/', { state: { scrollToCarousel: true } })} title="返回首页">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
         </button>
-        
+
         <input
           type="text"
           className="blog-editor-title-input-inline"
@@ -591,69 +591,69 @@ const BlogEditor = () => {
         />
 
         <div className="blog-editor-header-actions">
-           {/* Delete Draft Button */}
-           {editId && (
-             <button 
-               className="blog-editor-btn danger" 
-               onClick={handleDelete}
-               title="删除草稿"
-               style={{ marginRight: '8px', backgroundColor: '#fee2e2', color: '#ef4444', border: '1px solid #fecaca' }}
-             >
-               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-             </button>
-           )}
+          {/* Delete Draft Button */}
+          {editId && (
+            <button
+              className="blog-editor-btn danger"
+              onClick={handleDelete}
+              title="删除草稿"
+              style={{ marginRight: '8px', backgroundColor: '#fee2e2', color: '#ef4444', border: '1px solid #fecaca' }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            </button>
+          )}
 
-           {/* Mode Switch */}
-           <button 
-             className={`blog-editor-btn secondary ${editorMode === 'markdown' ? 'active' : ''}`}
-             onClick={async () => {
-                if (editorMode === 'markdown') {
-                  try {
-                    const fixedContent = (content || '').replace(/(^|\n)(#{1,6})([^\s#])/g, '$1$2 $3');
-                    const html = await marked.parse(fixedContent);
-                    setContent(html);
-                  } catch (error) {
-                    console.error('Markdown parsing failed', error);
-                  }
-                  setEditorMode('rich');
-                } else {
-                  try {
-                    const md = turndownService.turndown(content);
-                    setContent(md);
-                  } catch (error) {
-                    console.error('Turndown failed', error);
-                  }
-                  setEditorMode('markdown');
+          {/* Mode Switch */}
+          <button
+            className={`blog-editor-btn secondary ${editorMode === 'markdown' ? 'active' : ''}`}
+            onClick={async () => {
+              if (editorMode === 'markdown') {
+                try {
+                  const fixedContent = (content || '').replace(/(^|\n)(#{1,6})([^\s#])/g, '$1$2 $3');
+                  const html = await marked.parse(fixedContent);
+                  setContent(html);
+                } catch (error) {
+                  console.error('Markdown parsing failed', error);
                 }
-             }}
-             title="切换编辑模式"
-           >
-             {editorMode === 'markdown' ? '切换富文本' : '切换Markdown'}
-           </button>
+                setEditorMode('rich');
+              } else {
+                try {
+                  const md = turndownService.turndown(content);
+                  setContent(md);
+                } catch (error) {
+                  console.error('Turndown failed', error);
+                }
+                setEditorMode('markdown');
+              }
+            }}
+            title="切换编辑模式"
+          >
+            {editorMode === 'markdown' ? '切换富文本' : '切换Markdown'}
+          </button>
 
-           {/* Preview Toggle */}
-           <button 
-             className={`blog-editor-btn secondary ${previewMode ? 'active' : ''}`}
-             onClick={() => setPreviewMode(!previewMode)}
-           >
-             {previewMode ? '编辑' : '预览'}
-           </button>
+          {/* Preview Toggle */}
+          <button
+            className={`blog-editor-btn secondary ${previewMode ? 'active' : ''}`}
+            onClick={() => setPreviewMode(!previewMode)}
+          >
+            {previewMode ? '编辑' : '预览'}
+          </button>
 
-           <div className="divider-vertical" style={{height: '24px', margin: '0 8px', background: '#e2e8f0', width: '1px'}}></div>
+          <div className="divider-vertical" style={{ height: '24px', margin: '0 8px', background: '#e2e8f0', width: '1px' }}></div>
 
-           <button 
-             className="blog-editor-btn secondary"
-             onClick={(e) => handleSubmit(e, 'DRAFT')}
-             disabled={submitting || !title.trim()}
-           >{submitting && submitType === 'DRAFT' ? '保存中...' : '保存草稿'}
-           </button>
-           <button 
-             className="blog-editor-btn primary"
-             onClick={(e) => handleSubmit(e, 'PUBLISHED')}
-             disabled={submitting || !title.trim() || contentLen < CONTENT_MIN}
-           >
-             {submitting && submitType === 'PUBLISHED' ? '发布中...' : '正式发布'}
-           </button>
+          <button
+            className="blog-editor-btn secondary"
+            onClick={(e) => handleSubmit(e, 'DRAFT')}
+            disabled={submitting || !title.trim()}
+          >{submitting && submitType === 'DRAFT' ? '保存中...' : '保存草稿'}
+          </button>
+          <button
+            className="blog-editor-btn primary"
+            onClick={(e) => handleSubmit(e, 'PUBLISHED')}
+            disabled={submitting || !title.trim() || contentLen < CONTENT_MIN}
+          >
+            {submitting && submitType === 'PUBLISHED' ? '发布中...' : '正式发布'}
+          </button>
         </div>
       </div>
 
@@ -661,161 +661,161 @@ const BlogEditor = () => {
       <div className="blog-editor-body">
         {/* Left Sidebar: Outline & Resources */}
         <div className="blog-editor-left-sidebar">
-           <SidebarAccordion title="文章大纲" defaultOpen={true} className="flex-module outline-module">
-              <div className="sidebar-helper-text outline-list-container">
-                 {outline.length > 0 ? (
-                   <div className="outline-list">
-                     {outline.map((item, idx) => (
-                       <div 
-                         key={idx} 
-                         className={`outline-item level-${item.level}`}
-                         onClick={() => scrollToHeader(item)}
-                       >
-                         {item.text}
-                       </div>
-                     ))}
-                   </div>
-                 ) : (
-                   <p style={{ color: '#94a3b8', textAlign: 'center', padding: '10px 0' }}>暂无大纲内容</p>
-                 )}
-              </div>
-           </SidebarAccordion>
+          <SidebarAccordion title="文章大纲" defaultOpen={true} className="flex-module outline-module">
+            <div className="sidebar-helper-text outline-list-container">
+              {outline.length > 0 ? (
+                <div className="outline-list">
+                  {outline.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className={`outline-item level-${item.level}`}
+                      onClick={() => scrollToHeader(item)}
+                    >
+                      {item.text}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p style={{ color: '#94a3b8', textAlign: 'center', padding: '10px 0' }}>暂无大纲内容</p>
+              )}
+            </div>
+          </SidebarAccordion>
 
-           <SidebarAccordion title={<span>资源管理 <small style={{fontSize: '11px', color: '#94a3b8', fontWeight: 'normal', marginLeft: '4px'}}>拖动可调整位置</small></span>} defaultOpen={true} className="flex-module resource-module">
-              <ResourceManager 
-                content={content} 
-                editorMode={editorMode} 
-                onReorder={handleResourceReorder}
-                onItemClick={scrollToResource}
-                onRemove={handleResourceRemove}
-              />
-           </SidebarAccordion>
+          <SidebarAccordion title={<span>资源管理 <small style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 'normal', marginLeft: '4px' }}>拖动可调整位置</small></span>} defaultOpen={true} className="flex-module resource-module">
+            <ResourceManager
+              content={content}
+              editorMode={editorMode}
+              onReorder={handleResourceReorder}
+              onItemClick={scrollToResource}
+              onRemove={handleResourceRemove}
+            />
+          </SidebarAccordion>
         </div>
 
         {/* Center: Editor Area */}
         <div className="blog-editor-content-area">
-           {previewMode ? (
-             <div className="blog-editor-preview-wrapper">
-                <h1 className="preview-title">{title || '无标题'}</h1>
-                {coverPreview && <img src={coverPreview} alt="Cover" className="preview-cover" />}
-                <div className="tiptap-content" dangerouslySetInnerHTML={{ __html: previewHtml }} />
-             </div>
-           ) : (
-             <div className="editor-wrapper">
-                {editorMode === 'rich' ? (
-                  <TipTapEditor value={content} onChange={setContent} placeholder={'开始创作…'} userId={userId} />
-                ) : (
-                  <MarkdownEditor content={content} onChange={setContent} />
-                )}
-             </div>
-           )}
+          {previewMode ? (
+            <div className="blog-editor-preview-wrapper">
+              <h1 className="preview-title">{title || '无标题'}</h1>
+              {coverPreview && <img src={coverPreview} alt="Cover" className="preview-cover" />}
+              <div className="tiptap-content" dangerouslySetInnerHTML={{ __html: previewHtml }} />
+            </div>
+          ) : (
+            <div className="editor-wrapper">
+              {editorMode === 'rich' ? (
+                <TipTapEditor value={content} onChange={setContent} placeholder={'开始创作…'} userId={userId} />
+              ) : (
+                <MarkdownEditor content={content} onChange={setContent} />
+              )}
+            </div>
+          )}
         </div>
 
         {/* Right Sidebar: Settings */}
         <div className="blog-editor-sidebar">
-           {/* Publish Settings Card */}
-           <div className="sidebar-card">
-              <h3>发布设置</h3>
-              <div className="sidebar-form-item">
-                <label>分类</label>
-                <select 
-                  className="blog-editor-select full-width"
-                  value={category} 
-                  onChange={e => setCategory(e.target.value)}
-                >
-                  <option value="" disabled>选择分类</option>
-                  {PREDEFINED_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
-              </div>
+          {/* Publish Settings Card */}
+          <div className="sidebar-card">
+            <h3>发布设置</h3>
+            <div className="sidebar-form-item">
+              <label>分类</label>
+              <select
+                className="blog-editor-select full-width"
+                value={category}
+                onChange={e => setCategory(e.target.value)}
+              >
+                <option value="" disabled>选择分类</option>
+                {PREDEFINED_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
 
-              <div className="sidebar-form-item">
-                <label>目录</label>
-                <div className="directory-input-wrapper full-width">
-                   <input
-                      type="text"
-                      placeholder="目录1/目录2/目录3"
-                      value={directory}
-                      onChange={handleDirectoryChange}
-                      list="directory-options"
-                      className="blog-editor-input full-width"
-                      title="最多支持三级目录"
-                   />
-                   <datalist id="directory-options">
-                      {existingDirectories.map((dir, idx) => <option key={idx} value={dir} />)}
-                   </datalist>
-                </div>
-                <div style={{ fontSize: '12px', color: '#999', marginTop: '4px' }}>
-                  最多支持三级目录，使用 / 分隔
-                </div>
+            <div className="sidebar-form-item">
+              <label>目录</label>
+              <div className="directory-input-wrapper full-width">
+                <input
+                  type="text"
+                  placeholder="目录1/目录2/目录3"
+                  value={directory}
+                  onChange={handleDirectoryChange}
+                  list="directory-options"
+                  className="blog-editor-input full-width"
+                  title="最多支持三级目录"
+                />
+                <datalist id="directory-options">
+                  {existingDirectories.map((dir, idx) => <option key={idx} value={dir} />)}
+                </datalist>
               </div>
-
-              <div className="sidebar-form-item">
-                <label>标签</label>
-                <div className="tags-input-container full-width">
-                    <div className="tags-list">
-                      {tags.map(tag => (
-                        <span key={tag} className="tag-chip">
-                          {tag} <span onClick={() => handleRemoveTag(tag)}>&times;</span>
-                        </span>
-                      ))}
-                    </div>
-                    {tags.length < TAG_MAX_COUNT && (
-                      <input
-                        type="text"
-                        placeholder={tags.length === 0 ? "输入标签按回车" : "继续添加..."}
-                        value={tagInput}
-                        onChange={e => setTagInput(e.target.value)}
-                        onKeyDown={handleTagKeyDown}
-                        className="tag-input-field"
-                      />
-                    )}
-                </div>
+              <div style={{ fontSize: '12px', color: '#999', marginTop: '4px' }}>
+                最多支持三级目录，使用 / 分隔
               </div>
-           </div>
+            </div>
 
-           {/* Cover Card */}
-           <div className="sidebar-card">
-              <h3>封面</h3>
-              <div className="cover-upload-area">
-                 {coverPreview ? (
-                   <div className="cover-preview-large">
-                     <img src={coverPreview} alt="Cover" />
-                     <div className="cover-actions">
-                        <label className="change-cover-btn">
-                           更换
-                           <input type="file" accept="image/*" onChange={handleCoverChange} hidden />
-                        </label>
-                        <button className="remove-cover-btn" onClick={() => {setCover(null); setCoverPreview(null); setRemoveCover(true);}}>移除</button>
-                     </div>
-                   </div>
-                 ) : (
-                   <label className="upload-cover-placeholder">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                      <span>点击上传封面</span>
+            <div className="sidebar-form-item">
+              <label>标签</label>
+              <div className="tags-input-container full-width">
+                <div className="tags-list">
+                  {tags.map(tag => (
+                    <span key={tag} className="tag-chip">
+                      {tag} <span onClick={() => handleRemoveTag(tag)}>&times;</span>
+                    </span>
+                  ))}
+                </div>
+                {tags.length < TAG_MAX_COUNT && (
+                  <input
+                    type="text"
+                    placeholder={tags.length === 0 ? "输入标签按回车" : "继续添加..."}
+                    value={tagInput}
+                    onChange={e => setTagInput(e.target.value)}
+                    onKeyDown={handleTagKeyDown}
+                    className="tag-input-field"
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Cover Card */}
+          <div className="sidebar-card">
+            <h3>封面</h3>
+            <div className="cover-upload-area">
+              {coverPreview ? (
+                <div className="cover-preview-large">
+                  <img src={coverPreview} alt="Cover" />
+                  <div className="cover-actions">
+                    <label className="change-cover-btn">
+                      更换
                       <input type="file" accept="image/*" onChange={handleCoverChange} hidden />
-                   </label>
-                 )}
-              </div>
-           </div>
+                    </label>
+                    <button className="remove-cover-btn" onClick={() => { setCover(null); setCoverPreview(null); setRemoveCover(true); }}>移除</button>
+                  </div>
+                </div>
+              ) : (
+                <label className="upload-cover-placeholder">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                  <span>点击上传封面</span>
+                  <input type="file" accept="image/*" onChange={handleCoverChange} hidden />
+                </label>
+              )}
+            </div>
+          </div>
 
-           {/* Info Card */}
-           <div className="sidebar-card">
-              <h3>文章信息</h3>
-              <div className="sidebar-stats">
-                 <div className="stat-row">
-                    <span>标题字数</span>
-                    <span className={titleLen > TITLE_MAX ? 'over-limit' : ''}>{titleLen} / {TITLE_MAX}</span>
-                 </div>
-                 <div className="stat-row">
-                    <span>正文字数</span>
-                    <span>{contentLen}</span>
-                 </div>
-                 <div className="stat-row">
-                    <span>预计阅读</span>
-                    <span>{Math.ceil(contentLen / 400)} 分钟</span>
-                 </div>
+          {/* Info Card */}
+          <div className="sidebar-card">
+            <h3>文章信息</h3>
+            <div className="sidebar-stats">
+              <div className="stat-row">
+                <span>标题字数</span>
+                <span className={titleLen > TITLE_MAX ? 'over-limit' : ''}>{titleLen} / {TITLE_MAX}</span>
               </div>
-           </div>
+              <div className="stat-row">
+                <span>正文字数</span>
+                <span>{contentLen}</span>
+              </div>
+              <div className="stat-row">
+                <span>预计阅读</span>
+                <span>{Math.ceil(contentLen / 400)} 分钟</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

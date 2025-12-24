@@ -115,7 +115,14 @@ public class FriendRequestController {
         User me = resolveCurrentUser(principal);
         if (me == null) {
             logger.info("Unauthenticated SSE subscribe attempt");
-            return null;
+            SseEmitter failed = new SseEmitter(0L);
+            try {
+                failed.send(SseEmitter.event().name("error")
+                        .data(new ApiResponse<>(401, "未认证", null)));
+            } catch (Exception ignored) {
+            }
+            failed.complete();
+            return failed;
         }
         // initial payload: pending requests (DTO)
         List<FriendRequestDTO> pending = friendRequestService.pendingFor(me);

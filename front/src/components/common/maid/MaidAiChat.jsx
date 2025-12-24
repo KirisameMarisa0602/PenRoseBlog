@@ -119,7 +119,9 @@ export default function MaidAiChat({ visible }) {
           hasChunkRef.current = false;
           await new Promise((resolve) => {
             try {
-              const url = `/api/ai/chat/stream?message=${encodeURIComponent(t)}`;
+              const token = typeof localStorage !== 'undefined' ? localStorage.getItem('token') : null;
+              const tokenParam = token ? `&token=${encodeURIComponent(token)}` : `&token=`;
+              const url = `/api/ai/chat/stream?message=${encodeURIComponent(t)}${tokenParam}`;
               const es = new EventSource(url);
               eventSourceRef.current = es;
               es.onmessage = (ev) => {
@@ -149,7 +151,10 @@ export default function MaidAiChat({ visible }) {
         abortRef.current = controller;
         const payload = { message: t };
         const url = '/api/ai/chat';
-        const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), signal: controller.signal });
+        const token = typeof localStorage !== 'undefined' ? localStorage.getItem('token') : null;
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers.Authorization = `Bearer ${token}`;
+        const res = await fetch(url, { method: 'POST', headers, body: JSON.stringify(payload), signal: controller.signal });
         if (!res.ok) { const txt = await res.text(); throw new Error(`请求失败 ${res.status}: ${txt}`); }
         const data = await res.json(); const raw = data?.reply ?? data; setMessages((m) => [...m, { role: 'assistant', text: String(raw ?? '') }]);
         return;

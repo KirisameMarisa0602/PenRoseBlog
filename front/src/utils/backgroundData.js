@@ -1,20 +1,15 @@
+import resolveUrl from '@utils/resolveUrl';
+
 // Since site_assets is configured as publicDir in vite.config.js,
 // files inside site_assets are served at the root path.
-// site_assets/background/bg01.mp4 -> /background/bg01.mp4
+// When VITE_CDN_URL is set, resolveUrl maps /background/* -> {CDN}/site_assets/background/*
 
-const bg01 = '/background/bg01.mp4';
-const bg02 = '/background/bg02.mp4';
-const bg03 = '/background/bg03.mp4';
-const bg04 = '/background/bg04.mp4';
-const bg05 = '/background/bg05.mp4';
-const bg06 = '/background/bg06.mp4';
-
-const img01 = '/background/img01.png';
-const img02 = '/background/img02.png';
-const img03 = '/background/img03.png';
-const img04 = '/background/img04.png';
-const img05 = '/background/img05.png';
-const img06 = '/background/img06.png';
+const img01 = resolveUrl('/background/img01.png');
+const img02 = resolveUrl('/background/img02.png');
+const img03 = resolveUrl('/background/img03.png');
+const img04 = resolveUrl('/background/img04.png');
+const img05 = resolveUrl('/background/img05.png');
+const img06 = resolveUrl('/background/img06.png');
 
 export const BACKGROUND_DATA = [
   { id: 1, type: 'image', src: img01, preview: img01, title: 'Background 01' },

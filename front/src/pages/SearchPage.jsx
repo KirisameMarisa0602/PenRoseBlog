@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ArticleCard from '@components/common/ArticleCard';
 import UserSearch from './UserSearch'; // Reuse existing UserSearch page component
+import { fetchPosts } from '@utils/api/postService';
 import '@styles/home/Home.css'; // Reuse Home styles for article list
 import '@styles/pages/SearchPage.css';
 
@@ -39,8 +40,7 @@ export default function SearchPage() {
         }
 
         setLoading(true);
-        fetch(`/api/blogpost?keyword=${encodeURIComponent(executedQuery)}&page=${page}&size=10`)
-            .then(r => r.json())
+        fetchPosts({ page, size: 10, keyword: executedQuery })
             .then(j => {
                 if (j && (j.code === 200 || j.status === 200)) {
                     const list = j.data?.list || j.data || [];

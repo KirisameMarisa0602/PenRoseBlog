@@ -3,27 +3,39 @@
   justify-content: flex-end;
   margin-bottom: 30px;
   padding-right: 8px;
+  position: relative;
+  z-index: 95;
 }
 
 .home-sort-select {
   padding: 6px 12px;
   border: 1px solid #e3e5e7;
-  border-radius: 6px;
-  background-color: #fff;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.9);
   color: #61666d;
   font-size: 14px;
   cursor: pointer;
   outline: none;
   transition: all 0.2s;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
 }
 
 .home-sort-select:hover {
   border-color: #00aeec;
   color: #00aeec;
+  transform: translateY(-1px);
 }
 
 .home-sort-select:focus {
   border-color: #00aeec;
   box-shadow: 0 0 0 2px rgba(0, 174, 236, 0.2);
+}
+
+@media (max-width: 768px) {
+  .home-sort-dropdown-container {
+    justify-content: flex-start;
+    padding-right: 0;
+  }
 }

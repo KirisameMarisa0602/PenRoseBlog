@@ -21,6 +21,13 @@ public class CommentController {
 
     @PostMapping
     public ApiResponse<Long> addComment(@RequestBody CommentCreateDTO dto) {
+        Long currentUserId = com.kirisamemarisa.blog.common.JwtUtil.getCurrentUserId();
+        if (currentUserId == null) {
+            return new ApiResponse<>(401, "未登录", null);
+        }
+        if (dto != null) {
+            dto.setUserId(currentUserId);
+        }
         return commentService.addComment(dto);
     }
 

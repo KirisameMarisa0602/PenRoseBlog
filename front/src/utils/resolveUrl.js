@@ -25,18 +25,13 @@ export default function resolveUrl(url) {
   // 包含 site_assets 下的静态资源和 sources 下的用户上传资源
   const cdnPrefixes = [
     // User uploads (backend)
-    '/sources', '/avatar', /* '/background' 强制本地，不走CDN */ '/blogpostcontent', '/blogpostcover', '/messages', '/profile', '/files', '/uploads',
+    '/sources', '/avatar', '/blogpostcontent', '/blogpostcover', '/messages', '/profile', '/files', '/uploads',
     // Static assets (site_assets)
-    '/site_assets', '/banner', '/icons', '/imgs', '/live2dmodels', '/live2dsrc'
+    '/site_assets', '/banner', '/icons', '/imgs', '/live2dmodels', '/live2dsrc', '/background'
   ];
 
   // 站点静态资源前缀（这些资源在本地/Nginx是根路径，但在 COS 中位于 site_assets 目录下）
-  const siteAssetPrefixes = ['/banner', '/icons', '/imgs', '/live2dmodels', '/live2dsrc'];
-
-  // 登录/注册/首页主题背景与占位图：强制本地
-  if (path.startsWith('/background')) {
-    return path;
-  }
+  const siteAssetPrefixes = ['/banner', '/icons', '/imgs', '/live2dmodels', '/live2dsrc', '/background'];
 
   if (CDN_URL && cdnPrefixes.some(prefix => path.startsWith(prefix))) {
     // 如果是站点静态资源，且路径没有以 /site_assets 开头，则补全 /site_assets 前缀

@@ -20,6 +20,13 @@ public class CommentReplyController {
     // 新增回复
     @PostMapping
     public ApiResponse<Long> addReply(@RequestBody CommentReplyCreateDTO dto) {
+        Long currentUserId = com.kirisamemarisa.blog.common.JwtUtil.getCurrentUserId();
+        if (currentUserId == null) {
+            return new ApiResponse<>(401, "未登录", null);
+        }
+        if (dto != null) {
+            dto.setUserId(currentUserId);
+        }
         return commentReplyService.addReply(dto);
     }
 
@@ -35,13 +42,23 @@ public class CommentReplyController {
 
     // 删除回复（只能本人删除）
     @DeleteMapping("/{replyId}")
-    public ApiResponse<Boolean> deleteReply(@PathVariable Long replyId, @RequestParam Long userId) {
+    public ApiResponse<Boolean> deleteReply(@PathVariable Long replyId, @RequestParam(required = false) Long userId) {
+        Long currentUserId = com.kirisamemarisa.blog.common.JwtUtil.getCurrentUserId();
+        if (currentUserId == null) {
+            return new ApiResponse<>(401, "未登录", false);
+        }
+        userId = currentUserId;
         return commentReplyService.deleteReply(replyId, userId);
     }
 
     // 点赞 / 取消点赞
     @PostMapping("/{replyId}/like")
-    public ApiResponse<Boolean> toggleLike(@PathVariable Long replyId, @RequestParam Long userId) {
+    public ApiResponse<Boolean> toggleLike(@PathVariable Long replyId, @RequestParam(required = false) Long userId) {
+        Long currentUserId = com.kirisamemarisa.blog.common.JwtUtil.getCurrentUserId();
+        if (currentUserId == null) {
+            return new ApiResponse<>(401, "未登录", false);
+        }
+        userId = currentUserId;
         return commentReplyService.toggleLike(replyId, userId);
     }
 

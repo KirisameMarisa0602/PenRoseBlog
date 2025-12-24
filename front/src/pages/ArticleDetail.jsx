@@ -11,8 +11,8 @@ import ArticleSidebar from '@components/article/ArticleSidebar';
 import ArticleActions from '@components/article/ArticleActions';
 import CommentsSection from '@components/article/CommentsSection';
 import ForwardFriendsModal from '@components/article/ForwardFriendsModal';
-import { fetchPostDetail, recordPostView, toggleFavorite, sharePost, deletePost } from '@utils/api/postService';
-import { getReply } from '@utils/api/commentService';
+import { fetchPostDetail, recordPostView, toggleFavorite, sharePost, deletePost, fetchShareUrl, togglePostLike } from '@utils/api/postService';
+import { getReply, toggleCommentLike as apiToggleCommentLike, toggleReplyLike as apiToggleReplyLike } from '@utils/api/commentService';
 // 评论操作改为使用 useArticleComments 提供的方法
 import useArticleComments from '@hooks/useArticleComments';
 import { fetchFriendsList } from '@utils/api/friendService';
@@ -584,17 +584,7 @@ export default function ArticleDetail() {
             return;
         }
         try {
-            const token = localStorage.getItem('token');
-            const res = await fetch(
-                `/api/comment/${commentId}/like?userId=${userId}`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': token ? `Bearer ${token}` : ''
-                    }
-                }
-            );
-            const j = await res.json().catch(() => null);
+            const j = await apiToggleCommentLike(commentId);
             if (j && j.code === 200) {
                 reloadComments();
             }
@@ -609,17 +599,7 @@ export default function ArticleDetail() {
             return;
         }
         try {
-            const token = localStorage.getItem('token');
-            const res = await fetch(
-                `/api/comment-reply/${replyId}/like?userId=${userId}`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': token ? `Bearer ${token}` : ''
-                    }
-                }
-            );
-            const j = await res.json().catch(() => null);
+            const j = await apiToggleReplyLike(replyId);
             if (j && j.code === 200) {
                 await loadReplies(parentCommentId);
             }
@@ -686,17 +666,7 @@ export default function ArticleDetail() {
             return;
         }
         try {
-            const token = localStorage.getItem('token');
-            const res = await fetch(
-                `/api/blogpost/${id}/like?userId=${userId}`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': token ? `Bearer ${token}` : ''
-                    }
-                }
-            );
-            const j = await res.json();
+            const j = await togglePostLike(id);
             if (j && j.code === 200) {
                 const data = await fetchPostDetail(id, { currentUserId: userId });
                 if (data && data.code === 200) setPost(data.data);
@@ -984,8 +954,7 @@ export default function ArticleDetail() {
     const ensureShareUrl = async () => {
         if (shareUrl) return shareUrl;
         try {
-            const res = await fetch(`/api/blogpost/${id}/share-url`);
-            const j = await res.json().catch(() => null);
+            const j = await fetchShareUrl(id);
             if (j && j.code === 200 && j.data) {
                 setShareUrl(j.data);
                 return j.data;

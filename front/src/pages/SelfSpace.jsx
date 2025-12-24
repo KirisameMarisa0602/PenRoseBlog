@@ -6,6 +6,8 @@ import ArticleFolderTree from '@components/selfspace/ArticleFolderTree.jsx';
 import { useAuthState } from '@hooks/useAuthState';
 import resolveUrl from '@utils/resolveUrl';
 import { getDefaultAvatar, isValidAvatar } from '@utils/avatarUtils';
+import httpClient from '@utils/api/httpClient';
+import { fetchPosts } from '@utils/api/postService';
 
 // SelfSpace 页面：左侧 25vw 手风琴资料面板 + 右侧内容区域
 export default function SelfSpace() {
@@ -22,12 +24,9 @@ export default function SelfSpace() {
   const [viewProfile, setViewProfile] = useState(null);
   useEffect(() => {
     if (!effectiveUserId || isOwner) { setViewProfile(null); return; }
-    const token = typeof localStorage !== 'undefined' ? localStorage.getItem('token') : null;
-    fetch(`/api/user/profile/${effectiveUserId}`, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {}
-    })
-      .then(r => r.json())
-      .then(j => {
+    httpClient.get(`/user/profile/${effectiveUserId}`)
+      .then(res => {
+        const j = res?.data;
         if (j && (j.code === 200 || j.status === 200)) setViewProfile(j.data || null);
       })
       .catch(() => { });
@@ -49,11 +48,7 @@ export default function SelfSpace() {
     let url = `/api/blogpost?userId=${effectiveUserId}&page=${fetchPage}&size=${fetchSize}`;
     if (currentUserId) url += `&currentUserId=${currentUserId}`;
 
-    const token = typeof localStorage !== 'undefined' ? localStorage.getItem('token') : null;
-    fetch(url, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {}
-    })
-      .then(r => r.json())
+    fetchPosts({ page: fetchPage, size: fetchSize, userId: effectiveUserId, currentUserId })
       .then(async j => {
         if (!mounted) return;
         if (j && (j.code === 200 || j.status === 200)) {

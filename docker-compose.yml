@@ -5,7 +5,7 @@ services:
     image: mysql:8.0
     container_name: blog-mysql
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-20050602}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: blogdb
     volumes:
       - mysql_data:/var/lib/mysql
@@ -14,7 +14,7 @@ services:
     networks:
       - blog-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-20050602}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$${MYSQL_ROOT_PASSWORD}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -36,7 +36,7 @@ services:
     image: rabbitmq:3-management
     container_name: blog-rabbitmq
     ports:
-      - "15672:15672"
+      - "127.0.0.1:15672:15672"
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-guest}
@@ -56,10 +56,10 @@ services:
       DB_HOST: mysql
       REDIS_HOST: redis
       RABBITMQ_HOST: rabbitmq
-      DB_PASSWORD: ${DB_PASSWORD:-20050602}
+      DB_PASSWORD: ${DB_PASSWORD}
       RABBITMQ_USER: ${RABBITMQ_USER:-guest}
       RABBITMQ_PASS: ${RABBITMQ_PASS:-guest}
-      RABBITMQ_EXCHANGE: ${RABBITMQ_EXCHANGE}
+      RABBITMQ_EXCHANGE: ${RABBITMQ_EXCHANGE:-blog.notifications}
       JWT_SECRET: ${JWT_SECRET}
       COS_SECRET_ID: ${COS_SECRET_ID}
       COS_SECRET_KEY: ${COS_SECRET_KEY}

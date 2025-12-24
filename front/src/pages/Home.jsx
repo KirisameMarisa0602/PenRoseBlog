@@ -10,6 +10,7 @@ import HomeCarousel from '@components/home/HomeCarousel';
 import ArticleCard from '@components/common/ArticleCard';
 import ScrollControls from '@components/common/ScrollControls';
 import { fetchPosts } from '@utils/api/postService';
+import { fetchBlogViewBatch } from '@utils/api/blogViewService';
 import { useAuthState } from '@hooks/useAuthState';
 
 const Home = () => {
@@ -40,14 +41,14 @@ const Home = () => {
   }, [location.state]);
 
   const handleSortChange = (mode) => { setSortMode(mode); setPage(0); setPosts([]); setHasMore(true); };
-  
-  const handleCategoryChange = (cat) => { 
+
+  const handleCategoryChange = (cat) => {
     // Update history state so back button works
     navigate('.', { state: { category: cat }, replace: true });
-    setSelectedCategory(cat); 
-    setPage(0); 
-    setPosts([]); 
-    setHasMore(true); 
+    setSelectedCategory(cat);
+    setPage(0);
+    setPosts([]);
+    setHasMore(true);
   };
 
   // 专门获取 Hero 区右侧的文章（始终显示最新/热门的前6个）
@@ -59,15 +60,15 @@ const Home = () => {
     // but maybe we can fetch a larger page size and slice randomly.
     // Or just fetch page 0, size 20.
     fetchPosts({ page: 0, size: 20, sortMode: 'hot', category: categoryParam })
-        .then(res => {
-            if (res && res.code === 200) {
-                let list = res.data && res.data.list ? res.data.list : (res.data || []);
-                if (!Array.isArray(list) && Array.isArray(res.data)) list = res.data;
-                // Shuffle list and take 6
-                const shuffled = list.sort(() => 0.5 - Math.random()).slice(0, 6);
-                setHeroPosts(shuffled);
-            }
-        });
+      .then(res => {
+        if (res && res.code === 200) {
+          let list = res.data && res.data.list ? res.data.list : (res.data || []);
+          if (!Array.isArray(list) && Array.isArray(res.data)) list = res.data;
+          // Shuffle list and take 6
+          const shuffled = list.sort(() => 0.5 - Math.random()).slice(0, 6);
+          setHeroPosts(shuffled);
+        }
+      });
   }, [selectedCategory]);
 
   useEffect(() => {
@@ -98,22 +99,17 @@ const Home = () => {
             try {
               // 批量获取所有文章的浏览量并按自定义热度排序（view + like*30）
               const ids = list.map(p => (p.id || p.postId));
-              
+
               const viewMap = new Map();
               try {
-                  const batchRes = await fetch('/api/blogview/batch', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify(ids)
-                  }).then(r => r.ok ? r.json() : null);
-                  
-                  if (batchRes && batchRes.code === 200 && batchRes.data) {
-                      Object.entries(batchRes.data).forEach(([k, v]) => {
-                          viewMap.set(String(k), Number(v));
-                      });
-                  }
+                const batchRes = await fetchBlogViewBatch(ids);
+                if (batchRes && batchRes.code === 200 && batchRes.data) {
+                  Object.entries(batchRes.data).forEach(([k, v]) => {
+                    viewMap.set(String(k), Number(v));
+                  });
+                }
               } catch (e) {
-                  console.error('[hot排序] 批量获取浏览量失败', e);
+                console.error('[hot排序] 批量获取浏览量失败', e);
               }
 
               list = list.slice().sort((a, b) => {
@@ -128,20 +124,20 @@ const Home = () => {
             // 记录总条数，并在前端做分页切片展示
             const start = page * size;
             const paged = list.slice(start, start + size);
-            
+
             if (page === 0) {
-                setPosts(paged);
+              setPosts(paged);
             } else {
-                setPosts(prev => [...prev, ...paged]);
+              setPosts(prev => [...prev, ...paged]);
             }
-            
+
             setHasMore(start + size < list.length);
           } else {
             // 非 hot 模式或后端已返回已排好序的列表（分页） -> 直接使用后端返回的这一页
             if (page === 0) {
-                setPosts(list);
+              setPosts(list);
             } else {
-                setPosts(prev => [...prev, ...list]);
+              setPosts(prev => [...prev, ...list]);
             }
             // 若后端返回 total/分页信息，可在这里设置 totalCount（容错处理）
             if (j.data && typeof j.data.total === 'number') {
@@ -159,17 +155,17 @@ const Home = () => {
             }
           }
         } else {
-            if (page === 0) setPosts([]);
-            setHasMore(false);
+          if (page === 0) setPosts([]);
+          setHasMore(false);
         }
         setLoadingMore(false);
       })
       .catch(err => {
         console.error('[Home] 获取文章失败', err);
         if (mounted) {
-            if (page === 0) setPosts([]);
-            setLoadingMore(false);
-            setHasMore(false);
+          if (page === 0) setPosts([]);
+          setLoadingMore(false);
+          setHasMore(false);
         }
       });
 
@@ -200,38 +196,38 @@ const Home = () => {
       <HeroSection />
       <div className="home-page-wrapper">
         <HomeCategoryTabs selectedCategory={selectedCategory} onSelectCategory={handleCategoryChange} />
-        
+
         <div className="home-articles-container">
           {/* Hero Section: Carousel + Top Grid */}
+          <div className="home-hero-toolbar">
+            <button className="home-hero-refresh-btn" onClick={fetchHeroPosts}>
+              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+              </svg>
+              换一换
+            </button>
+          </div>
           <div className="home-hero-section">
             <div className="home-hero-carousel">
-                <HomeCarousel />
+              <HomeCarousel />
             </div>
             <div className="home-hero-grid-container">
-                <div className="home-hero-grid-header">
-                    <button className="home-hero-refresh-btn" onClick={fetchHeroPosts}>
-                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="23 4 23 10 17 10"></polyline>
-                            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
-                        </svg>
-                        换一换
-                    </button>
-                </div>
-                <div className="home-hero-grid">
-                    {heroPosts.map(p => (
-                        <ArticleCard 
-                            key={p.id || p.postId} 
-                            post={p} 
-                            className="home-hero-card" 
-                            mode="vertical" 
-                        />
-                    ))}
-                </div>
+              <div className="home-hero-grid">
+                {heroPosts.map(p => (
+                  <ArticleCard
+                    key={p.id || p.postId}
+                    post={p}
+                    className="home-hero-card"
+                    mode="vertical"
+                  />
+                ))}
+              </div>
             </div>
           </div>
 
           <HomeSortTabs sortMode={sortMode} onChange={handleSortChange} />
-          
+
           <div className="home-articles-list">
             <HomeArticleList posts={posts} selectedCategory={selectedCategory} />
             {loadingMore && <div className="home-loading-more">加载中...</div>}

@@ -63,20 +63,42 @@ public class BlogPostController {
 
     @GetMapping("/directories")
     public ApiResponse<java.util.List<String>> getDirectories(@RequestParam Long userId) {
+        Long currentUserId = com.kirisamemarisa.blog.common.JwtUtil.getCurrentUserId();
+        if (currentUserId == null) {
+            return new ApiResponse<>(401, "未登录", null);
+        }
+        if (!currentUserId.equals(userId)) {
+            return new ApiResponse<>(403, "无权访问他人目录", null);
+        }
         return new ApiResponse<>(200, "获取成功", blogPostService.getUserDirectories(userId));
     }
 
     @GetMapping("/favorites")
     public ApiResponse<PageResult<BlogPostDTO>> getFavorites(@RequestParam Long userId,
             @RequestParam(required = false) String categoryName,
-            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
+        Long currentUserId = com.kirisamemarisa.blog.common.JwtUtil.getCurrentUserId();
+        if (currentUserId == null) {
+            return new ApiResponse<>(401, "未登录", null);
+        }
+        if (!currentUserId.equals(userId)) {
+            return new ApiResponse<>(403, "无权访问他人收藏", null);
+        }
+
         PageResult<BlogPostDTO> result = blogPostService.getFavorites(userId, categoryName, page, size);
         return new ApiResponse<>(200, "获取成功", result);
     }
 
     @GetMapping("/favorites/categories")
     public ApiResponse<java.util.List<String>> getFavoriteCategories(@RequestParam Long userId) {
+        Long currentUserId = com.kirisamemarisa.blog.common.JwtUtil.getCurrentUserId();
+        if (currentUserId == null) {
+            return new ApiResponse<>(401, "未登录", null);
+        }
+        if (!currentUserId.equals(userId)) {
+            return new ApiResponse<>(403, "无权访问他人收藏", null);
+        }
         return new ApiResponse<>(200, "获取成功", blogPostService.getFavoriteCategories(userId));
     }
 
@@ -128,7 +150,12 @@ public class BlogPostController {
 
     @PostMapping("/comment/{id}/like")
     public ApiResponse<Boolean> toggleCommentLike(@PathVariable Long id,
-            @RequestParam Long userId) {
+            @RequestParam(required = false) Long userId) {
+        Long currentUserId = com.kirisamemarisa.blog.common.JwtUtil.getCurrentUserId();
+        if (currentUserId == null) {
+            return new ApiResponse<>(401, "未登录", false);
+        }
+        userId = currentUserId;
         return blogPostService.toggleCommentLike(id, userId);
     }
 
@@ -140,12 +167,18 @@ public class BlogPostController {
     @PostMapping("/withcover")
     public ApiResponse<Long> createWithCover(@RequestParam("title") String title,
             @RequestParam("content") String content,
-            @RequestParam("userId") Long userId,
+            @RequestParam(value = "userId", required = false) Long userId,
             @RequestParam(value = "directory", required = false) String directory,
             @RequestParam(value = "categoryName", required = false) String categoryName,
             @RequestParam(value = "tags", required = false) java.util.List<String> tags,
             @RequestParam(value = "status", required = false) String status,
             @RequestParam(value = "cover", required = false) MultipartFile cover) {
+        Long currentUserId = com.kirisamemarisa.blog.common.JwtUtil.getCurrentUserId();
+        if (currentUserId == null) {
+            return new ApiResponse<>(401, "未登录", null);
+        }
+        // 兼容旧前端传参：忽略 userId 入参，避免伪造
+        userId = currentUserId;
         return blogPostService.createWithCover(title, content, userId, directory, categoryName, tags, status, cover);
     }
 
@@ -166,7 +199,12 @@ public class BlogPostController {
     // 新增：删除博客接口
     // 前端调用示例：DELETE /api/blogpost/{id}?userId=当前用户ID
     @DeleteMapping("/{id}")
-    public ApiResponse<Boolean> delete(@PathVariable Long id, @RequestParam Long userId) {
+    public ApiResponse<Boolean> delete(@PathVariable Long id, @RequestParam(required = false) Long userId) {
+        Long currentUserId = com.kirisamemarisa.blog.common.JwtUtil.getCurrentUserId();
+        if (currentUserId == null) {
+            return new ApiResponse<>(401, "未登录", false);
+        }
+        userId = currentUserId;
         return blogPostService.delete(id, userId);
     }
 
@@ -177,6 +215,11 @@ public class BlogPostController {
     public ApiResponse<java.util.Map<String, String>> getPresignedUrl(
             @RequestParam("fileName") String fileName,
             @RequestParam(value = "userId", required = false) Long userId) {
+        Long currentUserId = com.kirisamemarisa.blog.common.JwtUtil.getCurrentUserId();
+        if (currentUserId == null) {
+            return new ApiResponse<>(401, "未登录", null);
+        }
+        userId = currentUserId;
         // 检查是否为视频文件
         boolean isVideo = fileName != null && (fileName.toLowerCase().endsWith(".mp4") ||
                 fileName.toLowerCase().endsWith(".mov") ||
@@ -199,6 +242,11 @@ public class BlogPostController {
     @PostMapping("/media")
     public ApiResponse<String> uploadMedia(@RequestParam("file") MultipartFile file,
             @RequestParam(value = "userId", required = false) Long userId) {
+        Long currentUserId = com.kirisamemarisa.blog.common.JwtUtil.getCurrentUserId();
+        if (currentUserId == null) {
+            return new ApiResponse<>(401, "未登录", null);
+        }
+        userId = currentUserId;
         // 检查是否为视频文件
         String contentType = file.getContentType();
         if (contentType != null && contentType.startsWith("video/")) {

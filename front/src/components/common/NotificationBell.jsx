@@ -48,7 +48,8 @@ export default function NotificationBell() {
         const tokenParam = token ? `?token=${encodeURIComponent(token)}` : `?token=`;
 
         try {
-            es = new EventSource(`/api/notifications/subscribe/${userId}${tokenParam}`);
+            // 后端路由：GET /api/notifications/subscribe
+            es = new EventSource(`/api/notifications/subscribe${tokenParam}`);
         } catch {
             es = null;
         }

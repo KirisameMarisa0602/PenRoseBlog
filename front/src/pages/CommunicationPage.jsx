@@ -862,7 +862,7 @@ export default function CommunicationPage() {
                         });
                         return next;
                     });
-                    
+
                     requestAnimationFrame(() => {
                         const el = rightScrollRef.current;
                         if (el) el.scrollTop = el.scrollHeight;
@@ -1038,9 +1038,11 @@ export default function CommunicationPage() {
         if (!otherId || !userId) return;
         let es = null;
         let pollTimer = null;
+        const token = typeof localStorage !== 'undefined' ? localStorage.getItem('token') : null;
+        const tokenParam = token ? `&token=${encodeURIComponent(token)}` : `&token=`;
         const subscribeUrl = `/api/messages/subscribe/${otherId}?userId=${encodeURIComponent(
             userId
-        )}&_=${Date.now()}`;
+        )}${tokenParam}&_=${Date.now()}`;
         try {
             es = new EventSource(subscribeUrl);
         } catch (err) {
@@ -1256,7 +1258,7 @@ export default function CommunicationPage() {
                                             />
                                             {/* Online status indicator could go here */}
                                         </div>
-                                        
+
                                         <div className="sidebar-item-info">
                                             <div className="sidebar-item-row-top">
                                                 <span className="conversation-sidebar-name">
@@ -1280,7 +1282,7 @@ export default function CommunicationPage() {
                                                 🚫
                                             </div>
                                         )}
-                                        
+
                                         {String(c.otherId) === String(otherId) && <div className="active-indicator"></div>}
                                     </button>
                                 ))}

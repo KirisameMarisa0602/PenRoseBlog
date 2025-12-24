@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { useAuthState } from '@hooks/useAuthState';
 import { BLOG_CATEGORIES } from '@utils/constants';
+import { fetchFavorites as apiFetchFavorites } from '@utils/api/postService';
 import ArticleCard from '@components/common/ArticleCard';
 import '@styles/pages/FavoritesPage.css';
 
@@ -24,8 +25,7 @@ export default function FavoritesPage() {
 
         setLoadingMap(prev => ({ ...prev, [category]: true }));
 
-        fetch(`/api/blogpost/favorites?userId=${userId}&categoryName=${encodeURIComponent(category)}&page=${pageNum}&size=10`)
-            .then(r => r.json())
+        apiFetchFavorites({ userId, page: pageNum, size: 10, categoryName: category })
             .then(j => {
                 if (j && (j.code === 200 || j.status === 200)) {
                     const list = j.data?.list || j.data || [];
@@ -33,7 +33,10 @@ export default function FavoritesPage() {
                     setCategoryData(prev => {
                         const existing = prev[category] || [];
                         // Filter duplicates
-                        const newItems = list.filter(item => !existing.some(ex => ex.id === item.id));
+                        const newItems = list.filter(item => {
+                            const itemId = item?.id ?? item?.postId;
+                            return !existing.some(ex => (ex?.id ?? ex?.postId) === itemId);
+                        });
                         return { ...prev, [category]: pageNum === 0 ? list : [...existing, ...newItems] };
                     });
 

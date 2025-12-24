@@ -4,6 +4,7 @@ import com.kirisamemarisa.blog.common.ApiResponse;
 import com.kirisamemarisa.blog.dto.NotificationDTO;
 import com.kirisamemarisa.blog.dto.PageResult;
 import com.kirisamemarisa.blog.model.User;
+import com.kirisamemarisa.blog.repository.NotificationRepository;
 import com.kirisamemarisa.blog.service.CurrentUserResolver;
 import com.kirisamemarisa.blog.service.NotificationService;
 import org.springframework.data.domain.PageRequest;
@@ -18,18 +19,28 @@ public class NotificationController {
 
     private final NotificationService notificationService;
     private final CurrentUserResolver currentUserResolver;
+    private final NotificationRepository notificationRepository;
 
     public NotificationController(NotificationService notificationService,
-            CurrentUserResolver currentUserResolver) {
+            CurrentUserResolver currentUserResolver,
+            NotificationRepository notificationRepository) {
         this.notificationService = notificationService;
         this.currentUserResolver = currentUserResolver;
+        this.notificationRepository = notificationRepository;
     }
 
     @GetMapping("/subscribe")
     public SseEmitter subscribe(@AuthenticationPrincipal Object principal) {
         User currentUser = currentUserResolver.resolve(principal);
         if (currentUser == null) {
-            return null; // Or handle error appropriately
+            SseEmitter failed = new SseEmitter(0L);
+            try {
+                failed.send(SseEmitter.event().name("error")
+                        .data(new ApiResponse<>(401, "未认证", null)));
+            } catch (Exception ignored) {
+            }
+            failed.complete();
+            return failed;
         }
         return notificationService.subscribe(currentUser.getId(), "Connected");
     }
@@ -89,7 +100,21 @@ public class NotificationController {
     }
 
     @PutMapping("/{id}/read")
-    public ApiResponse<Void> markAsRead(@PathVariable Long id) {
+    public ApiResponse<Void> markAsRead(@PathVariable Long id,
+            @AuthenticationPrincipal Object principal) {
+        User currentUser = currentUserResolver.resolve(principal);
+        if (currentUser == null) {
+            return new ApiResponse<>(401, "Unauthorized", null);
+        }
+
+        var n = notificationRepository.findById(id).orElse(null);
+        if (n == null) {
+            return new ApiResponse<>(404, "Not Found", null);
+        }
+        if (n.getReceiverId() == null || !n.getReceiverId().equals(currentUser.getId())) {
+            return new ApiResponse<>(403, "Forbidden", null);
+        }
+
         notificationService.markAsRead(id);
         return new ApiResponse<>(200, "Success", null);
     }

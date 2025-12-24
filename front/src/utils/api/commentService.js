@@ -43,3 +43,13 @@ export async function getReply(replyId) {
   const response = await httpClient.get(`/comment-reply/${replyId}`);
   return response.data;
 }
+
+export async function toggleCommentLike(commentId) {
+  const response = await httpClient.post(`/comment/${commentId}/like`);
+  return response.data;
+}
+
+export async function toggleReplyLike(replyId) {
+  const response = await httpClient.post(`/comment-reply/${replyId}/like`);
+  return response.data;
+}

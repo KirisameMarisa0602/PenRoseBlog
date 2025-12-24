@@ -1,0 +1,59 @@
+spring.application.name=blog
+
+# 说明：
+# - 该 sample 文件用于本地/部署参考，请复制为 application.properties 或通过环境变量注入。
+# - 推荐做法：application.properties 保持“仅引用环境变量”，真正的密钥放在 docker-compose 的 .env 中。
+
+server.port=8080
+
+# --- Datasource MySQL ---
+spring.datasource.url=jdbc:mysql://${DB_HOST:localhost}:3306/blogdb?useSSL=false&serverTimezone=UTC&characterEncoding=utf8&allowPublicKeyRetrieval=true
+spring.datasource.username=${DB_USER:root}
+spring.datasource.password=${DB_PASSWORD:}
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# --- JPA ---
+# 生产建议改为 validate/none，并配合 Flyway/Liquibase 管理
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=false
+spring.jpa.open-in-view=false
+
+# --- Redis ---
+spring.data.redis.host=${REDIS_HOST:localhost}
+spring.data.redis.port=${REDIS_PORT:6379}
+spring.data.redis.database=${REDIS_DB:0}
+
+# --- RabbitMQ ---
+spring.rabbitmq.host=${RABBITMQ_HOST:localhost}
+spring.rabbitmq.port=${RABBITMQ_PORT:5672}
+spring.rabbitmq.username=${RABBITMQ_USER:guest}
+spring.rabbitmq.password=${RABBITMQ_PASS:guest}
+app.rabbitmq.exchange=${RABBITMQ_EXCHANGE:blog.notifications}
+
+# --- JWT Security ---
+jwt.secret=${JWT_SECRET:}
+
+# --- Tencent Cloud COS---
+cos.secretId=${COS_SECRET_ID:}
+cos.secretKey=${COS_SECRET_KEY:}
+cos.region=${COS_BUCKET_REGION:}
+cos.bucketName=${COS_BUCKET_NAME:}
+cos.cdnUrl=${COS_CDN_URL:}
+cos.enableAccelerate=${COS_ENABLE_ACCELERATE:true}
+
+# --- File Upload Limits ---
+spring.servlet.multipart.max-file-size=128MB
+spring.servlet.multipart.max-request-size=128MB
+
+# --- AI Configuration (OpenAI-compatible providers e.g. DeepSeek) ---
+spring.ai.openai.api-key=${DEEPSEEK_API_KEY:}
+spring.ai.openai.model=${AI_MODEL:deepseek-reasoner}
+spring.ai.openai.api-base-url=${DEEPSEEK_API_BASE_URL:https://api.deepseek.com}
+
+# --- Compression ---
+server.compression.enabled=true
+server.compression.mime-types=text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
+server.compression.min-response-size=1024
+
+# Flyway（当前项目默认禁用）
+spring.flyway.enabled=false

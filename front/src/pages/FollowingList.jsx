@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import '@styles/message/MessageList.css';
 import '@styles/pages/FollowingList.css';
 import { fetchFollowing } from '@utils/api/friendService';
@@ -12,7 +12,7 @@ export default function FollowingList() {
   const [list, setList] = useState([]);
   const [error, setError] = useState(null);
   const { user } = useAuthState();
-  const navigate = useNavigate();
+  useNavigate();
 
   const handleUnfollow = async (targetId) => {
     try {
@@ -27,17 +27,6 @@ export default function FollowingList() {
       console.error(e);
       alert('网络错误');
     }
-  };
-
-  // 新增：进入会话后自动刷新一次，确保布局正常
-  const gotoConversationWithRefresh = (id) => {
-    if (!id) return;
-    navigate(`/conversation/${id}`);
-    setTimeout(() => {
-      try { window.location.reload(); } catch (err) {
-        console.error('[FollowingList reload failed]', err);
-      }
-    }, 0);
   };
 
   useEffect(() => {
@@ -92,14 +81,6 @@ export default function FollowingList() {
                       onClick={() => handleUnfollow(u.id)}
                     >
                       取消关注
-                    </button>
-                    {/* 原 Link 改为按钮，点击后跳转并刷新一次 */}
-                    <button
-                      type="button"
-                      className="message-list-linkbtn"
-                      onClick={() => gotoConversationWithRefresh(u.id)}
-                    >
-                      私信
                     </button>
                   </div>
                 </div>

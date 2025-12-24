@@ -1,28 +1,36 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useBackground } from '../../contexts/useBackground';
 import '../../styles/common/GlobalBackground.css';
 import '../../styles/loading/Loading.css';
+import resolveUrl from '@utils/resolveUrl';
 
 const GlobalBackground = () => {
+  const location = useLocation();
   const { activeBackground } = useBackground();
   const [loading, setLoading] = useState(false);
   const [currentSrc, setCurrentSrc] = useState(null);
 
-  useEffect(() => {
-    if (activeBackground?.src && activeBackground.src !== currentSrc) {
-      setLoading(true);
-      setCurrentSrc(activeBackground.src);
+  const isWelcomePage = location.pathname === '/welcome';
+  const effectiveBackground = isWelcomePage
+    ? { id: 'welcome', type: 'image', src: resolveUrl('/background/img00.png') }
+    : activeBackground;
 
-      if (activeBackground.type !== 'video') {
+  useEffect(() => {
+    if (effectiveBackground?.src && effectiveBackground.src !== currentSrc) {
+      setLoading(true);
+      setCurrentSrc(effectiveBackground.src);
+
+      if (effectiveBackground.type !== 'video') {
         const img = new Image();
-        img.src = activeBackground.src;
+        img.src = effectiveBackground.src;
         img.onload = () => setLoading(false);
         img.onerror = () => setLoading(false);
       }
     }
-  }, [activeBackground, currentSrc]);
+  }, [effectiveBackground, currentSrc]);
 
-  if (!activeBackground) return null;
+  if (!effectiveBackground) return null;
 
   return (
     <>
@@ -32,9 +40,9 @@ const GlobalBackground = () => {
         </div>
       )}
       <div className="global-background-layer">
-        {activeBackground.type === 'video' ? (
+        {effectiveBackground.type === 'video' ? (
           <video
-            key={activeBackground.src}
+            key={effectiveBackground.src}
             autoPlay
             loop
             muted
@@ -43,12 +51,12 @@ const GlobalBackground = () => {
             onLoadedData={() => setLoading(false)}
             onError={() => setLoading(false)}
           >
-            <source src={activeBackground.src} type="video/mp4" />
+            <source src={effectiveBackground.src} type="video/mp4" />
           </video>
         ) : (
           <div
             className="global-background-image"
-            style={{ backgroundImage: `url(${activeBackground.src})` }}
+            style={{ backgroundImage: `url(${effectiveBackground.src})` }}
           />
         )}
         {/* Overlay for better text readability */}

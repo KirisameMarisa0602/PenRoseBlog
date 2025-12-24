@@ -137,8 +137,10 @@ input[type="file"]::file-selector-button {
   font-size: 13px;
   transition: all 0.2s;
   margin-right: 10px;
-  color: #333; /* Darker text color */
-  font-weight: 600; /* Bolder text */
+  color: #333;
+  /* Darker text color */
+  font-weight: 600;
+  /* Bolder text */
 }
 
 input[type="file"]::file-selector-button:hover {
@@ -266,9 +268,12 @@ input[type="file"]::file-selector-button:hover {
 /* 仅当滚动型面板处于激活状态时，允许纵向滚动，避免内容被裁切 */
 .profilepanel-scroll-section.profilepanel-section-active {
   overflow-y: auto;
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
+
 .profilepanel-scroll-section.profilepanel-section-active::-webkit-scrollbar {
   display: none;
 }
@@ -277,17 +282,22 @@ input[type="file"]::file-selector-button:hover {
 .profilepanel-scroll-content {
   align-items: flex-start;
 }
+
 /* ==========================================================================
    New UI Styles for Gender Selector & Tags (Beautification)
    ========================================================================== */
 
 /* --- Scrollbar Hiding --- */
 .profilepanel-useredit-panel::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
+  display: none;
+  /* Chrome, Safari, Opera */
 }
+
 .profilepanel-useredit-panel {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
   overflow-x: hidden;
 }
 
@@ -295,6 +305,7 @@ input[type="file"]::file-selector-button:hover {
 .profilepanel-edit-sidebar::-webkit-scrollbar {
   display: none;
 }
+
 .profilepanel-edit-sidebar {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -304,6 +315,7 @@ input[type="file"]::file-selector-button:hover {
 .profilepanel-edit-content::-webkit-scrollbar {
   display: none;
 }
+
 .profilepanel-edit-content {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -335,7 +347,7 @@ input[type="file"]::file-selector-button:hover {
 
 .profile-gender-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
   border-color: #b3d8ff;
 }
 
@@ -478,9 +490,17 @@ input[type="file"]::file-selector-button:hover {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
+
 /*
   Selfspace Profile Accordion - Consolidated styles
   - 合并基础样式并删除冗余定�?
@@ -620,8 +640,10 @@ input[type="file"]::file-selector-button {
   font-size: 13px;
   transition: all 0.2s;
   margin-right: 10px;
-  color: #333; /* Darker text color */
-  font-weight: 600; /* Bolder text */
+  color: #333;
+  /* Darker text color */
+  font-weight: 600;
+  /* Bolder text */
 }
 
 input[type="file"]::file-selector-button:hover {
@@ -749,9 +771,12 @@ input[type="file"]::file-selector-button:hover {
 /* 仅当滚动型面板处于激活状态时，允许纵向滚动，避免内容被裁�?*/
 .profilepanel-scroll-section.profilepanel-section-active {
   overflow-y: auto;
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
+
 .profilepanel-scroll-section.profilepanel-section-active::-webkit-scrollbar {
   display: none;
 }
@@ -760,17 +785,22 @@ input[type="file"]::file-selector-button:hover {
 .profilepanel-scroll-content {
   align-items: flex-start;
 }
+
 /* ==========================================================================
    New UI Styles for Gender Selector & Tags (Beautification)
    ========================================================================== */
 
 /* --- Scrollbar Hiding --- */
 .profilepanel-useredit-panel::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
+  display: none;
+  /* Chrome, Safari, Opera */
 }
+
 .profilepanel-useredit-panel {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
   overflow-x: hidden;
 }
 
@@ -778,6 +808,7 @@ input[type="file"]::file-selector-button:hover {
 .profilepanel-edit-sidebar::-webkit-scrollbar {
   display: none;
 }
+
 .profilepanel-edit-sidebar {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -787,6 +818,7 @@ input[type="file"]::file-selector-button:hover {
 .profilepanel-edit-content::-webkit-scrollbar {
   display: none;
 }
+
 .profilepanel-edit-content {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -818,7 +850,7 @@ input[type="file"]::file-selector-button:hover {
 
 .profile-gender-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
   border-color: #b3d8ff;
 }
 
@@ -929,16 +961,20 @@ input[type="file"]::file-selector-button:hover {
   font-size: 14px;
   width: 100%;
   outline: none;
-  color: #333; /* Fix invisible text */
+  color: #333;
+  /* Fix invisible text */
 }
 
 .profile-add-tag-btn {
   background: none;
   border: 1px dashed #ccc;
   color: #999;
-  width: 32px; /* Increased size */
-  height: 32px; /* Increased size */
-  flex: 0 0 32px; /* Prevent squashing */
+  width: 32px;
+  /* Increased size */
+  height: 32px;
+  /* Increased size */
+  flex: 0 0 32px;
+  /* Prevent squashing */
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -963,8 +999,15 @@ input[type="file"]::file-selector-button:hover {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 
@@ -1020,7 +1063,8 @@ input[type="file"]::file-selector-button:hover {
 }
 
 .profile-file-input {
-  display: none; /* Hide the default file input */
+  display: none;
+  /* Hide the default file input */
 }
 
 .profile-file-label {
@@ -1066,7 +1110,7 @@ input[type="file"]::file-selector-button:hover {
   border-radius: 8px;
   overflow: hidden;
   background: #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1175,13 +1219,34 @@ input[type="file"]::file-selector-button:hover {
 }
 
 /* About Me Section Styles */
+.profilepanel-about-panel {
+  padding: 30px;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.profilepanel-section-title {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 15px;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
 .profile-about-content {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 30px;
-  height: auto;
-  padding-bottom: 20px;
+  gap: 16px;
+  min-height: 0;
+  overflow-y: auto;
+  padding-bottom: 10px;
 }
 
 .profile-tags-section {
@@ -1199,6 +1264,74 @@ input[type="file"]::file-selector-button:hover {
   justify-content: center;
 }
 
+/* Standard bubble tag card (replaces matchbox visual) */
+.profile-tags-bubble-card {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 16px;
+  padding: 14px 14px;
+  box-sizing: border-box;
+}
+
+.profile-tags-bubble-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+@keyframes tagBubbleFloat {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-4px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.profile-tag-bubble {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(24, 144, 255, 0.16), rgba(24, 144, 255, 0.08));
+  border: 1px solid rgba(24, 144, 255, 0.18);
+  color: #2a3550;
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(24, 144, 255, 0.10);
+  transform: translateZ(0);
+  will-change: transform;
+  animation: tagBubbleFloat 3.2s ease-in-out infinite;
+  animation-delay: calc((var(--i, 0) * 120ms) * -1);
+}
+
+.profile-tag-bubble:hover {
+  transform: translateY(-6px) scale(1.05);
+  box-shadow: 0 10px 26px rgba(24, 144, 255, 0.18);
+  border-color: rgba(24, 144, 255, 0.28);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .profile-tag-bubble {
+    animation: none;
+    transition: none;
+  }
+}
+
 .matchbox-scale-wrapper {
   transform: scale(0.9);
   transform-origin: center;
@@ -1206,22 +1339,26 @@ input[type="file"]::file-selector-button:hover {
 
 .no-tags-placeholder {
   width: 100%;
-  height: 200px;
-  background: #f9f9f9;
+  min-height: 140px;
+  background: rgba(249, 249, 249, 0.9);
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #999;
   font-style: italic;
+  border: 1px dashed rgba(0, 0, 0, 0.12);
 }
 
 .profile-bio-section {
-  flex: none;
+  flex: 1;
   display: flex;
   flex-direction: column;
   min-width: 0;
-  height: auto;
+  min-height: 0;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 16px;
+  padding: 16px;
 }
 
 .profile-bio-title {
@@ -1247,15 +1384,14 @@ input[type="file"]::file-selector-button:hover {
   line-height: 1.8;
   color: #444;
   background: #f8f9fa;
-  padding: 25px;
+  padding: 18px;
   border-radius: 12px;
   white-space: pre-wrap;
   font-size: 1rem;
   border: 1px solid #eee;
-  box-shadow: inset 0 1px 4px rgba(0,0,0,0.02);
-  overflow-y: visible;
-  height: auto;
-  min-height: 150px;
+  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.02);
+  overflow-y: auto;
+  min-height: 0;
 }
 
 /* Responsive adjustments - kept for safety but layout is unified */
@@ -1270,9 +1406,17 @@ input[type="file"]::file-selector-button:hover {
    ========================================= */
 
 @keyframes gradientFlow {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .profilepanel-section {
@@ -1280,7 +1424,7 @@ input[type="file"]::file-selector-button:hover {
   background: rgba(255, 255, 255, 0.75) !important;
   backdrop-filter: blur(16px) !important;
   -webkit-backdrop-filter: blur(16px) !important;
-  
+
   /* Streaming Light Border Effect */
   border: 2px solid transparent !important;
   background-clip: padding-box !important;
@@ -1294,11 +1438,14 @@ input[type="file"]::file-selector-button:hover {
 .profilepanel-section::after {
   content: "";
   position: absolute;
-  top: -2px; left: -2px; right: -2px; bottom: -2px;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
   background: linear-gradient(45deg, #ff9a9e, #fad0c4, #a18cd1, #fbc2eb, #8fd3f4);
   background-size: 300% 300%;
   z-index: -1;
-  border-radius: 18px; 
+  border-radius: 18px;
   animation: gradientFlow 6s ease infinite;
   pointer-events: none;
 }
@@ -1308,4 +1455,242 @@ input[type="file"]::file-selector-button:hover {
   box-shadow: 0 12px 40px rgba(161, 140, 209, 0.3) !important;
 }
 
+/* ========================================================================== */
+/* Contact Panel (View) - Clean & Centered */
+/* ========================================================================== */
 
+.profilepanel-contact-panel--view {
+  padding: 24px;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.profilepanel-section-title--sm {
+  font-size: 1.3rem;
+  letter-spacing: 1px;
+}
+
+.profile-contact-list {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  padding-bottom: 10px;
+}
+
+.contact-item {
+  border-radius: 18px;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.contact-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 46px rgba(15, 23, 42, 0.12);
+}
+
+.contact-item--column {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+}
+
+.contact-item--link {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.profile-contact-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #999;
+  padding: 40px 0;
+  font-size: 1.05rem;
+}
+
+/* ========================================================================== */
+/* Edit Panel - Spacious, Centered, Less Clipping */
+/* ========================================================================== */
+
+.profilepanel-useredit-layout {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  width: 100%;
+  padding: 0 !important;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 16px;
+  overflow: hidden !important;
+}
+
+.profilepanel-edit-sidebar--tabs {
+  width: 112px;
+  flex: 0 0 112px;
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  background: rgba(249, 249, 249, 0.85);
+  padding: 12px 8px;
+}
+
+.edit-tab-item {
+  user-select: none;
+  padding: 12px 6px;
+  cursor: pointer;
+  text-align: center;
+  color: #4b5563;
+  font-size: 0.95rem;
+  font-weight: 650;
+  margin: 6px 4px;
+  border-radius: 12px;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.edit-tab-item:hover {
+  background: rgba(24, 144, 255, 0.10);
+  color: #1890ff;
+  transform: translateY(-1px);
+}
+
+.edit-tab-item.active {
+  background: rgba(24, 144, 255, 0.14);
+  color: #1890ff;
+  box-shadow: inset 0 0 0 1px rgba(24, 144, 255, 0.20);
+}
+
+.profilepanel-save-btn {
+  width: 100%;
+  padding: 10px 0;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  color: #fff;
+  font-size: 0.92rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+  box-shadow: 0 10px 24px rgba(24, 144, 255, 0.22);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.profilepanel-save-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 34px rgba(24, 144, 255, 0.28);
+}
+
+.profilepanel-save-btn:disabled {
+  background: #cbd5e1;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.profilepanel-edit-content {
+  flex: 1;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.profilepanel-edit-title {
+  margin: 0;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  color: #111827;
+  font-size: 1.25rem;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+.profilepanel-edit-form {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  width: 100%;
+}
+
+.profilepanel-edit-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding-right: 6px;
+  padding-bottom: 10px;
+}
+
+/* Contact tab (edit) */
+.profilepanel-edit-contact-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding-right: 6px;
+}
+
+.profilepanel-edit-contact-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+.profilepanel-edit-qr-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+@media (min-width: 420px) {
+  .profilepanel-edit-contact-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+
+  .profilepanel-edit-qr-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+}
+
+.qr-upload-box {
+  width: 100%;
+  max-width: 240px;
+  aspect-ratio: 1/1;
+  margin: 0 auto;
+  border: 2px dashed #d9d9d9;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: #fafafa;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+.qr-upload-box:hover {
+  border-color: #1890ff;
+  background: #f0f5ff;
+  transform: translateY(-2px);
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.10);
+}

@@ -101,21 +101,23 @@ export default function Welcome() {
           gender: profile?.gender,
           backgroundUrl: profile?.backgroundUrl,
         });
+
         if (rememberMe) {
-          localStorage.setItem('rememberLogin', JSON.stringify({ username: loginData.username, password: loginData.password }));
+          localStorage.setItem('rememberLogin', JSON.stringify(loginData));
         } else {
           localStorage.removeItem('rememberLogin');
         }
-        navigate('/home');
+
+        navigate('/');
       }
     } catch (err) {
-      if (err.response && err.response.data && err.response.data.message) {
-        setMessage(err.response.data.message);
-        setMessageType('error');
-      } else {
-        setMessage('服务器错误');
-        setMessageType('error');
-      }
+      const msg =
+        err?.response?.data?.message ||
+        err?.response?.data?.msg ||
+        err?.message ||
+        '登录失败';
+      setMessage(msg);
+      setMessageType('error');
     }
   };
 
@@ -194,7 +196,7 @@ export default function Welcome() {
           transition: 'top 0.1s ease-out, left 0.1s ease-out', // Smooth movement
         }}
       >
-        <source src="/background/34.mp4" type="video/mp4" />
+        <source src={resolveUrl('/background/video.mp4')} type="video/mp4" />
       </video>
       <div className="welcome-card">
         <div

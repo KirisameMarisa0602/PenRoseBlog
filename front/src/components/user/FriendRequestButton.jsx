@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuthState } from '@hooks/useAuthState';
 import { unfollow } from '@utils/api/followService';
-import { isFriend as fetchIsFriend } from '@utils/api/friendService';
+import { isFriend as fetchIsFriend, sendFriendRequest } from '@utils/api/friendService';
 
 export default function FriendRequestButton({ targetId, onSent, initialFriend = false }) {
   const [loading, setLoading] = useState(false);
@@ -16,7 +16,7 @@ export default function FriendRequestButton({ targetId, onSent, initialFriend = 
     if (initialFriend) return;
     fetchIsFriend(targetId)
       .then(j => { if (j && (j.code === 200 || j.status === 200)) setIsFriendFlag(!!j.data); })
-      .catch(() => {});
+      .catch(() => { });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [targetId, user?.id]);
 
@@ -39,14 +39,7 @@ export default function FriendRequestButton({ targetId, onSent, initialFriend = 
         }
       } else {
         // 发送好友申请
-        const token = typeof localStorage !== 'undefined' ? localStorage.getItem('token') : null;
-        const uid = user?.id ? String(user.id) : (typeof localStorage !== 'undefined' ? localStorage.getItem('userId') : null);
-        const headers = { 'Content-Type': 'application/json' };
-        if (token) headers.Authorization = `Bearer ${token}`;
-        if (uid) headers['X-User-Id'] = uid;
-
-        const res = await fetch(`/api/friends/request/${targetId}`, { method: 'POST', headers });
-        const j = await res.json();
+        const j = await sendFriendRequest(targetId, '');
         if (j && (j.code === 200 || j.status === 200)) {
           setSent(true);
           if (onSent) onSent(j.data);

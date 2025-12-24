@@ -40,11 +40,11 @@ export default function ConversationDetail({ embeddedOtherId, onConversationSele
 
     const [conversations, setConversations] = useState([]); // 左侧会话摘要列表
     const [searchTerm, setSearchTerm] = useState('');
-    
+
     const filteredConversations = useMemo(() => {
         if (!searchTerm) return conversations;
         const lower = searchTerm.toLowerCase();
-        return conversations.filter(c => 
+        return conversations.filter(c =>
             (c.nickname || '').toLowerCase().includes(lower) ||
             String(c.otherId).includes(lower)
         );
@@ -107,7 +107,7 @@ export default function ConversationDetail({ embeddedOtherId, onConversationSele
 
     // 表情选择器
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-    const emojiList = ['😀','😃','😄','😁','😆','😅','😂','🤣','😊','😇','🙂','🙃','😉','😌','😍','🥰','😘','😗','😙','😚','😋','😛','😝','😜','🤪','🤨','🧐','🤓','😎','🤩','🥳','😏','😒','😞','😔','😟','😕','🙁','☹️','😣','😖','😫','😩','🥺','😢','😭','😤','😠','😡','🤬','🤯','😳','🥵','🥶','😱','😨','😰','😥','😓','🤗','🤔','🤭','🤫','🤥','😶','😐','😑','😬','🙄','😯','😦','😧','😮','😲','🥱','😴','🤤','😪','😵','🤐','🥴','🤢','🤮','🤧','😷','🤒','🤕','🤑','🤠','😈','👿','👹','👺','🤡','💩','👻','💀','☠️','👽','👾','🤖','🎃','😺','😸','😹','😻','😼','😽','🙀','😿','😾'];
+    const emojiList = ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🤗', '🤔', '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄', '😯', '😦', '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵', '🤐', '🥴', '🤢', '🤮', '🤧', '😷', '🤒', '🤕', '🤑', '🤠', '😈', '👿', '👹', '👺', '🤡', '💩', '👻', '💀', '☠️', '👽', '👾', '🤖', '🎃', '😺', '😸', '😹', '😻', '😼', '😽', '🙀', '😿', '😾'];
 
     const onEmojiClick = (emoji) => {
         setText(prev => prev + emoji);
@@ -1130,9 +1130,11 @@ export default function ConversationDetail({ embeddedOtherId, onConversationSele
         if (!otherId || !userId) return;
         let es = null;
         let pollTimer = null;
+        const token = typeof localStorage !== 'undefined' ? localStorage.getItem('token') : null;
+        const tokenParam = token ? `&token=${encodeURIComponent(token)}` : `&token=`;
         const subscribeUrl = `/api/messages/subscribe/${otherId}?userId=${encodeURIComponent(
             userId
-        )}&_=${Date.now()}`;
+        )}${tokenParam}&_=${Date.now()}`;
         try {
             es = new EventSource(subscribeUrl);
         } catch (err) {
@@ -1282,10 +1284,10 @@ export default function ConversationDetail({ embeddedOtherId, onConversationSele
                 >
                     <div className="conversation-sidebar-header">
                         <div className="sidebar-search-wrapper">
-                            <input 
-                                type="text" 
-                                className="sidebar-search-input" 
-                                placeholder="Search conversations..." 
+                            <input
+                                type="text"
+                                className="sidebar-search-input"
+                                placeholder="Search conversations..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
@@ -1296,350 +1298,350 @@ export default function ConversationDetail({ embeddedOtherId, onConversationSele
                     </div>
                     <div className="conversation-sidebar-content" ref={leftScrollRef}>
                         {filteredConversations.map(c => (
-                        <button
-                            key={c.otherId}
-                            className={`conversation-sidebar-item${String(c.otherId) ===
-                                String(otherId)
-                                ? ' active'
-                                : ''}`}
-                            title={c.nickname || ''}
-                            onClick={() => gotoConversation(c.otherId)}
-                        >
-                            <img
-                                src={isValidAvatar(c.avatarUrl) ? toAbsUrl(c.avatarUrl) : getDefaultAvatar(c.otherId)}
-                                alt="avatar"
-                                className="conversation-sidebar-avatar"
-                                onError={(ev) => {
-                                    const target = ev.target;
-                                    target.onerror = null;
-                                    target.src = getDefaultAvatar(c.otherId);
-                                }}
-                                onContextMenu={async (e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    const blocked = await checkBlockStatus(c.otherId);
-                                    setSidebarMenu({
-                                        visible: true,
-                                        x: e.clientX,
-                                        y: e.clientY,
-                                        user: c,
-                                        blocked
-                                    });
-                                }}
-                            />
-                            <span className="conversation-sidebar-name">
-                                {c.nickname || `用户${c.otherId}`}
-                            </span>
-                            {c.unreadCount > 0 && (
-                                <span
-                                    className="conversation-sidebar-badge"
-                                    title={`未读 ${c.unreadCount}`}
-                                >
-                                    {c.unreadCount > 99 ? '99+' : c.unreadCount}
+                            <button
+                                key={c.otherId}
+                                className={`conversation-sidebar-item${String(c.otherId) ===
+                                    String(otherId)
+                                    ? ' active'
+                                    : ''}`}
+                                title={c.nickname || ''}
+                                onClick={() => gotoConversation(c.otherId)}
+                            >
+                                <img
+                                    src={isValidAvatar(c.avatarUrl) ? toAbsUrl(c.avatarUrl) : getDefaultAvatar(c.otherId)}
+                                    alt="avatar"
+                                    className="conversation-sidebar-avatar"
+                                    onError={(ev) => {
+                                        const target = ev.target;
+                                        target.onerror = null;
+                                        target.src = getDefaultAvatar(c.otherId);
+                                    }}
+                                    onContextMenu={async (e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        const blocked = await checkBlockStatus(c.otherId);
+                                        setSidebarMenu({
+                                            visible: true,
+                                            x: e.clientX,
+                                            y: e.clientY,
+                                            user: c,
+                                            blocked
+                                        });
+                                    }}
+                                />
+                                <span className="conversation-sidebar-name">
+                                    {c.nickname || `用户${c.otherId}`}
                                 </span>
-                            )}
-                            {c.blocked && (
-                                <span className="conversation-sidebar-blocked" title="你已拉黑此用户">
-                                    已拉黑
-                                </span>
-                            )}
-                        </button>
-                    ))}
+                                {c.unreadCount > 0 && (
+                                    <span
+                                        className="conversation-sidebar-badge"
+                                        title={`未读 ${c.unreadCount}`}
+                                    >
+                                        {c.unreadCount > 99 ? '99+' : c.unreadCount}
+                                    </span>
+                                )}
+                                {c.blocked && (
+                                    <span className="conversation-sidebar-blocked" title="你已拉黑此用户">
+                                        已拉黑
+                                    </span>
+                                )}
+                            </button>
+                        ))}
                     </div>
                 </aside>
 
                 <div className="conversation-main-content">
                     {!otherId ? (
-                        <div className="conversation-empty-state" style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',color:'#999'}}>
-                            <div style={{fontSize:'48px',marginBottom:'16px'}}>💬</div>
+                        <div className="conversation-empty-state" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#999' }}>
+                            <div style={{ fontSize: '48px', marginBottom: '16px' }}>💬</div>
                             <div>选择一个联系人开始聊天</div>
                         </div>
                     ) : (
                         <>
-                    {/* 顶部用户信息栏 - 补充 Header */}
-                    <div className="conversation-detail-header">
-                        <img 
-                            src={isValidAvatar(otherInfo.avatarUrl) ? resolveUrl(otherInfo.avatarUrl) : getDefaultAvatar(otherId)} 
-                            alt={otherInfo.nickname}
-                            className="conversation-header-avatar"
-                            onError={(e) => { e.target.onerror = null; e.target.src = getDefaultAvatar(otherId); }}
-                        />
-                        <span className="conversation-header-name">
-                            {otherInfo.nickname || `用户${otherId}`}
-                        </span>
-                    </div>
-
-                    {/* 右侧消息区 */}
-                    <div
-                        className="conversation-detail-list"
-                        ref={rightScrollRef}
-                        onScroll={handleScroll}
-                        style={{ ['--input-height']: inputHeight + 'px' }}
-                    >
-                        {isLoadingHistory && (
-                            <div
-                                style={{
-                                    textAlign: 'center',
-                                    padding: '10px',
-                                    color: '#999'
-                                }}
-                            >
-                                加载历史消息...
+                            {/* 顶部用户信息栏 - 补充 Header */}
+                            <div className="conversation-detail-header">
+                                <img
+                                    src={isValidAvatar(otherInfo.avatarUrl) ? resolveUrl(otherInfo.avatarUrl) : getDefaultAvatar(otherId)}
+                                    alt={otherInfo.nickname}
+                                    className="conversation-header-avatar"
+                                    onError={(e) => { e.target.onerror = null; e.target.src = getDefaultAvatar(otherId); }}
+                                />
+                                <span className="conversation-header-name">
+                                    {otherInfo.nickname || `用户${otherId}`}
+                                </span>
                             </div>
-                        )}
 
-                        {finalMessages.map(msg => {
-                            const isSelf = msg.senderId === Number(userId);
-                            const recalled = !!msg.__recalled;
+                            {/* 右侧消息区 */}
+                            <div
+                                className="conversation-detail-list"
+                                ref={rightScrollRef}
+                                onScroll={handleScroll}
+                                style={{ ['--input-height']: inputHeight + 'px' }}
+                            >
+                                {isLoadingHistory && (
+                                    <div
+                                        style={{
+                                            textAlign: 'center',
+                                            padding: '10px',
+                                            color: '#999'
+                                        }}
+                                    >
+                                        加载历史消息...
+                                    </div>
+                                )}
 
-                            if (recalled) {
-                                return (
-                                    <div className="conversation-detail-recall" key={msg.id}>
-                                        <span className="txt">
-                                            {isSelf ? '你撤回了一条消息' : '对方撤回了一条消息'}
-                                        </span>
-                                        {isSelf && msg.__originalText && (
-                                            <button
-                                                type="button"
-                                                className="reedit"
-                                                onClick={() => reEditMessage(msg)}
-                                                title="重新编辑并发送"
-                                            >
-                                                重新编辑
-                                            </button>
-                                        )}
-                                        <button
-                                            type="button"
-                                            className="recall-close"
-                                            onClick={() => deleteMessageAction(msg.id)}
-                                            title="删除这条记录"
+                                {finalMessages.map(msg => {
+                                    const isSelf = msg.senderId === Number(userId);
+                                    const recalled = !!msg.__recalled;
+
+                                    if (recalled) {
+                                        return (
+                                            <div className="conversation-detail-recall" key={msg.id}>
+                                                <span className="txt">
+                                                    {isSelf ? '你撤回了一条消息' : '对方撤回了一条消息'}
+                                                </span>
+                                                {isSelf && msg.__originalText && (
+                                                    <button
+                                                        type="button"
+                                                        className="reedit"
+                                                        onClick={() => reEditMessage(msg)}
+                                                        title="重新编辑并发送"
+                                                    >
+                                                        重新编辑
+                                                    </button>
+                                                )}
+                                                <button
+                                                    type="button"
+                                                    className="recall-close"
+                                                    onClick={() => deleteMessageAction(msg.id)}
+                                                    title="删除这条记录"
+                                                >
+                                                    ×
+                                                </button>
+                                            </div>
+                                        );
+                                    }
+
+                                    const hasPreview = msg.blogPreview && msg.blogPreview.blogId;
+                                    let blogIdFromText = null;
+                                    if (!hasPreview && msg.text) {
+                                        const match = msg.text.match(/\/post\/(\d+)/);
+                                        if (match) blogIdFromText = match[1];
+                                    }
+
+                                    return (
+                                        <div
+                                            key={msg.id}
+                                            className={`conversation-detail-msg${isSelf ? ' self' : ''}`}
+                                            onContextMenu={(e) => openContextMenu(e, msg)}
+                                            title="右键可撤回/删除"
                                         >
-                                            ×
-                                        </button>
-                                    </div>
-                                );
-                            }
-
-                            const hasPreview = msg.blogPreview && msg.blogPreview.blogId;
-                            let blogIdFromText = null;
-                            if (!hasPreview && msg.text) {
-                                const match = msg.text.match(/\/post\/(\d+)/);
-                                if (match) blogIdFromText = match[1];
-                            }
-
-                            return (
-                                <div
-                                    key={msg.id}
-                                    className={`conversation-detail-msg${isSelf ? ' self' : ''}`}
-                                    onContextMenu={(e) => openContextMenu(e, msg)}
-                                    title="右键可撤回/删除"
-                                >
-                                    <div className="conversation-detail-msg-meta">
-                                        <img
-                                            src={
-                                                isValidAvatar(msg.senderAvatarUrl)
-                                                    ? resolveUrl(msg.senderAvatarUrl)
-                                                    : (!isSelf && isValidAvatar(otherInfo.avatarUrl))
-                                                        ? resolveUrl(otherInfo.avatarUrl)
-                                                        : getDefaultAvatar(msg.senderId)
-                                            }
-                                            className={`conversation-detail-msg-avatar${!isSelf ? ' clickable' : ''}`}
-                                            title={!isSelf ? '查看主页' : undefined}
-                                            onClick={!isSelf ? () => openProfile(msg.senderId) : undefined}
-                                            onError={(ev) => {
-                                                const target = ev.target;
-                                                target.onerror = null;
-                                                target.src = getDefaultAvatar(msg.senderId);
-                                            }}
-                                        />
-                                        {/* 移除昵称显示 */}
-                                    </div>
-
-                                    {hasPreview ? (
-                                        <div className="pm-blog-preview-wrapper" style={{ width: '100%', maxWidth: '500px' }}>
-                                            <ArticleCardFetcher
-                                                blogId={msg.blogPreview.blogId}
-                                                fallback={{
-                                                    id: msg.blogPreview.blogId,
-                                                    title: msg.blogPreview.title,
-                                                    coverImageUrl: msg.blogPreview.coverImageUrl,
-                                                    authorAvatarUrl: msg.blogPreview.authorAvatarUrl,
-                                                    authorNickname: msg.blogPreview.authorNickname,
-                                                    authorId: msg.blogPreview.authorId,
-                                                    likeCount: msg.blogPreview.likeCount,
-                                                    commentCount: msg.blogPreview.commentCount,
-                                                    viewCount: msg.blogPreview.viewCount,
-                                                    favoriteCount: msg.blogPreview.favoriteCount,
-                                                    shareCount: msg.blogPreview.shareCount,
-                                                    createdAt: msg.blogPreview.createdAt
-                                                }}
-                                                mode="vertical"
-                                                className="chat-article-card"
-                                                style={{ margin: 0, background: '#fff', borderRadius: '12px' }}
-                                            />
-                                        </div>
-                                    ) : blogIdFromText ? (
-                                        <div className="pm-blog-preview-wrapper" style={{ width: '100%', maxWidth: '500px' }}>
-                                            <ArticleCardFetcher blogId={blogIdFromText} mode="vertical" className="chat-article-card" style={{ margin: 0, background: '#fff', borderRadius: '12px' }} />
-                                        </div>
-                                    ) : (
-                                        <div className="conversation-detail-msgtext">
-                                            {/* 文本 / 媒体 */}
-                                            {msg?.type === 'IMAGE' && msg?.mediaUrl ? (
+                                            <div className="conversation-detail-msg-meta">
                                                 <img
-                                                    className="conversation-detail-msgmedia"
-                                                    src={toAbsUrl(msg.mediaUrl)}
-                                                    alt="image"
+                                                    src={
+                                                        isValidAvatar(msg.senderAvatarUrl)
+                                                            ? resolveUrl(msg.senderAvatarUrl)
+                                                            : (!isSelf && isValidAvatar(otherInfo.avatarUrl))
+                                                                ? resolveUrl(otherInfo.avatarUrl)
+                                                                : getDefaultAvatar(msg.senderId)
+                                                    }
+                                                    className={`conversation-detail-msg-avatar${!isSelf ? ' clickable' : ''}`}
+                                                    title={!isSelf ? '查看主页' : undefined}
+                                                    onClick={!isSelf ? () => openProfile(msg.senderId) : undefined}
                                                     onError={(ev) => {
                                                         const target = ev.target;
                                                         target.onerror = null;
-                                                        target.src = '';
+                                                        target.src = getDefaultAvatar(msg.senderId);
                                                     }}
                                                 />
-                                            ) : msg?.type === 'VIDEO' && msg?.mediaUrl ? (
-                                                <video
-                                                    className="conversation-detail-msgmedia"
-                                                    src={toAbsUrl(msg.mediaUrl)}
-                                                    controls
-                                                    preload="metadata"
-                                                    playsInline
-                                                    controlsList="nodownload"
-                                                />
+                                                {/* 移除昵称显示 */}
+                                            </div>
+
+                                            {hasPreview ? (
+                                                <div className="pm-blog-preview-wrapper" style={{ width: '100%', maxWidth: '500px' }}>
+                                                    <ArticleCardFetcher
+                                                        blogId={msg.blogPreview.blogId}
+                                                        fallback={{
+                                                            id: msg.blogPreview.blogId,
+                                                            title: msg.blogPreview.title,
+                                                            coverImageUrl: msg.blogPreview.coverImageUrl,
+                                                            authorAvatarUrl: msg.blogPreview.authorAvatarUrl,
+                                                            authorNickname: msg.blogPreview.authorNickname,
+                                                            authorId: msg.blogPreview.authorId,
+                                                            likeCount: msg.blogPreview.likeCount,
+                                                            commentCount: msg.blogPreview.commentCount,
+                                                            viewCount: msg.blogPreview.viewCount,
+                                                            favoriteCount: msg.blogPreview.favoriteCount,
+                                                            shareCount: msg.blogPreview.shareCount,
+                                                            createdAt: msg.blogPreview.createdAt
+                                                        }}
+                                                        mode="vertical"
+                                                        className="chat-article-card"
+                                                        style={{ margin: 0, background: '#fff', borderRadius: '12px' }}
+                                                    />
+                                                </div>
+                                            ) : blogIdFromText ? (
+                                                <div className="pm-blog-preview-wrapper" style={{ width: '100%', maxWidth: '500px' }}>
+                                                    <ArticleCardFetcher blogId={blogIdFromText} mode="vertical" className="chat-article-card" style={{ margin: 0, background: '#fff', borderRadius: '12px' }} />
+                                                </div>
                                             ) : (
-                                                msg?.text ||
-                                                (msg?.type === 'IMAGE'
-                                                    ? '[图片]'
-                                                    : msg?.type === 'VIDEO'
-                                                        ? '[视频]'
-                                                        : '')
+                                                <div className="conversation-detail-msgtext">
+                                                    {/* 文本 / 媒体 */}
+                                                    {msg?.type === 'IMAGE' && msg?.mediaUrl ? (
+                                                        <img
+                                                            className="conversation-detail-msgmedia"
+                                                            src={toAbsUrl(msg.mediaUrl)}
+                                                            alt="image"
+                                                            onError={(ev) => {
+                                                                const target = ev.target;
+                                                                target.onerror = null;
+                                                                target.src = '';
+                                                            }}
+                                                        />
+                                                    ) : msg?.type === 'VIDEO' && msg?.mediaUrl ? (
+                                                        <video
+                                                            className="conversation-detail-msgmedia"
+                                                            src={toAbsUrl(msg.mediaUrl)}
+                                                            controls
+                                                            preload="metadata"
+                                                            playsInline
+                                                            controlsList="nodownload"
+                                                        />
+                                                    ) : (
+                                                        msg?.text ||
+                                                        (msg?.type === 'IMAGE'
+                                                            ? '[图片]'
+                                                            : msg?.type === 'VIDEO'
+                                                                ? '[视频]'
+                                                                : '')
+                                                    )}
+                                                </div>
                                             )}
+
+                                            {/* 移除时间显示 */}
+                                        </div>
+                                    );
+                                })}
+
+                                {newTip.visible && newTip.count > 0 && (
+                                    <button
+                                        type="button"
+                                        className="conversation-detail-sendbtn"
+                                        style={{
+                                            position: 'sticky',
+                                            float: 'right',
+                                            bottom: '12px',
+                                            right: '12px',
+                                            marginTop: '12px',
+                                            zIndex: 10
+                                        }}
+                                        onClick={jumpToLatest}
+                                        title="回到底部查看最新消息"
+                                    >
+                                        {newTip.count} 条新消息
+                                    </button>
+                                )}
+                            </div>
+
+                            {/* 右侧输入区 */}
+                            <form
+                                className="conversation-detail-form"
+                                onSubmit={handleSend}
+                                style={{ ['--input-height']: inputHeight + 'px' }}
+                            >
+                                <div
+                                    className="conversation-inputbox-resize"
+                                    title="拖动上边界可加长输入框"
+                                    onMouseDown={startResize}
+                                ></div>
+
+                                <div className="conversation-toolbar" style={{ position: 'relative' }}>
+                                    <button
+                                        type="button"
+                                        className="icon-btn emoji-btn"
+                                        title="表情"
+                                        disabled={uploading}
+                                        onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                                    >😊</button>
+                                    {showEmojiPicker && (
+                                        <div className="emoji-picker-popover">
+                                            {emojiList.map(emoji => (
+                                                <button
+                                                    key={emoji}
+                                                    type="button"
+                                                    className="emoji-item"
+                                                    onClick={() => onEmojiClick(emoji)}
+                                                >
+                                                    {emoji}
+                                                </button>
+                                            ))}
                                         </div>
                                     )}
-                                    
-                                    {/* 移除时间显示 */}
+                                    <button
+                                        type="button"
+                                        className="icon-btn icon-image"
+                                        onClick={onPickImageClick}
+                                        title="发送图片"
+                                        disabled={uploading}
+                                    ></button>
+                                    <button
+                                        type="button"
+                                        className="icon-btn icon-video"
+                                        onClick={onPickVideoClick}
+                                        title="发送视频"
+                                        disabled={uploading}
+                                    ></button>
                                 </div>
-                            );
-                        })}
 
-                        {newTip.visible && newTip.count > 0 && (
-                            <button
-                                type="button"
-                                className="conversation-detail-sendbtn"
-                                style={{
-                                    position: 'sticky',
-                                    float: 'right',
-                                    bottom: '12px',
-                                    right: '12px',
-                                    marginTop: '12px',
-                                    zIndex: 10
-                                }}
-                                onClick={jumpToLatest}
-                                title="回到底部查看最新消息"
-                            >
-                                {newTip.count} 条新消息
-                            </button>
-                        )}
-                    </div>
+                                <textarea
+                                    ref={inputRef}
+                                    value={text}
+                                    onChange={(e) => setText(e.target.value)}
+                                    onKeyDown={onInputKeyDown}
+                                    placeholder=""
+                                    className="conversation-detail-input"
+                                    disabled={uploading}
+                                />
 
-                    {/* 右侧输入区 */}
-                    <form
-                        className="conversation-detail-form"
-                        onSubmit={handleSend}
-                        style={{ ['--input-height']: inputHeight + 'px' }}
-                    >
-                        <div
-                            className="conversation-inputbox-resize"
-                            title="拖动上边界可加长输入框"
-                            onMouseDown={startResize}
-                        ></div>
+                                <div className="conversation-actions">
+                                    <span style={{ fontSize: '12px', color: '#999', marginRight: 'auto', marginLeft: '12px' }}>按 Enter 发送</span>
+                                    <button
+                                        type="submit"
+                                        className="conversation-detail-sendbtn"
+                                        disabled={uploading}
+                                    >
+                                        发送
+                                    </button>
+                                </div>
 
-                        <div className="conversation-toolbar" style={{position: 'relative'}}>
-                            <button
-                                type="button"
-                                className="icon-btn emoji-btn"
-                                title="表情"
-                                disabled={uploading}
-                                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                            >😊</button>
-                            {showEmojiPicker && (
-                                <div className="emoji-picker-popover">
-                                    {emojiList.map(emoji => (
-                                        <button
-                                            key={emoji}
-                                            type="button"
-                                            className="emoji-item"
-                                            onClick={() => onEmojiClick(emoji)}
-                                        >
-                                            {emoji}
-                                        </button>
-                                    ))}
+                                <input
+                                    ref={imageInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    style={{ display: 'none' }}
+                                    onChange={(e) => handleFileChosen(e, 'IMAGE')}
+                                />
+                                <input
+                                    ref={videoInputRef}
+                                    type="file"
+                                    accept="video/*"
+                                    style={{ display: 'none' }}
+                                    onChange={(e) => handleFileChosen(e, 'VIDEO')}
+                                />
+                            </form>
+
+                            {uploading && (
+                                <div
+                                    className="conversation-detail-uploadprogress"
+                                    aria-live="polite"
+                                >
+                                    <div
+                                        className="bar"
+                                        style={{ width: `${uploadProgress}%` }}
+                                    />
+                                    <span className="pct">{uploadProgress}%</span>
                                 </div>
                             )}
-                            <button
-                                type="button"
-                                className="icon-btn icon-image"
-                                onClick={onPickImageClick}
-                                title="发送图片"
-                                disabled={uploading}
-                            ></button>
-                            <button
-                                type="button"
-                                className="icon-btn icon-video"
-                                onClick={onPickVideoClick}
-                                title="发送视频"
-                                disabled={uploading}
-                            ></button>
-                        </div>
-
-                        <textarea
-                            ref={inputRef}
-                            value={text}
-                            onChange={(e) => setText(e.target.value)}
-                            onKeyDown={onInputKeyDown}
-                            placeholder=""
-                            className="conversation-detail-input"
-                            disabled={uploading}
-                        />
-
-                        <div className="conversation-actions">
-                            <span style={{ fontSize: '12px', color: '#999', marginRight: 'auto', marginLeft: '12px' }}>按 Enter 发送</span>
-                            <button
-                                type="submit"
-                                className="conversation-detail-sendbtn"
-                                disabled={uploading}
-                            >
-                                发送
-                            </button>
-                        </div>
-
-                        <input
-                            ref={imageInputRef}
-                            type="file"
-                            accept="image/*"
-                            style={{ display: 'none' }}
-                            onChange={(e) => handleFileChosen(e, 'IMAGE')}
-                        />
-                        <input
-                            ref={videoInputRef}
-                            type="file"
-                            accept="video/*"
-                            style={{ display: 'none' }}
-                            onChange={(e) => handleFileChosen(e, 'VIDEO')}
-                        />
-                    </form>
-
-                    {uploading && (
-                        <div
-                            className="conversation-detail-uploadprogress"
-                            aria-live="polite"
-                        >
-                            <div
-                                className="bar"
-                                style={{ width: `${uploadProgress}%` }}
-                            />
-                            <span className="pct">{uploadProgress}%</span>
-                        </div>
-                    )}
                         </>
                     )}
                 </div>
