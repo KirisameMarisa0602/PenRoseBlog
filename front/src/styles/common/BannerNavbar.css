@@ -664,3 +664,41 @@ body,
     box-shadow: 0 0 0 0 rgba(255, 77, 79, 0);
   }
 }
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 768px) {
+  .banner-navbar .nav-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px;
+    grid-template-columns: none;
+    /* Override grid */
+  }
+
+  /* Hide all children first */
+  .banner-navbar .nav-inner>* {
+    display: none;
+  }
+
+  /* Show Brand (Logo) */
+  .banner-navbar .nav-inner>.nav-brand {
+    display: flex;
+    width: auto;
+    grid-column: auto;
+  }
+
+  /* Show Avatar (User Profile) - Assuming it's the last child or has a specific class */
+  /* Based on BannerNavbar.jsx structure, usually the last item is the avatar */
+  .banner-navbar .nav-inner> :last-child {
+    display: flex;
+    width: auto;
+    grid-column: auto;
+  }
+
+  /* Optional: Show Edit Button if it exists and is important */
+  .banner-navbar .nav-inner>.nav-edit-blog-btn {
+    display: none;
+    /* Hide edit button on mobile to save space */
+  }
+}

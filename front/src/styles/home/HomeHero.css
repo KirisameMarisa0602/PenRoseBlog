@@ -101,6 +101,51 @@
     transform: rotate(180deg);
 }
 
+/* Mobile Responsive Adjustments */
+@media (max-width: 768px) {
+    .home-hero-section {
+        display: flex;
+        flex-direction: column;
+        height: auto;
+        gap: 16px;
+    }
+
+    .home-hero-carousel {
+        width: 100%;
+        height: 220px;
+        /* Fixed height for mobile carousel */
+    }
+
+    .home-hero-grid-container {
+        width: 100%;
+        height: auto;
+    }
+
+    /* Assuming .home-hero-grid is defined elsewhere or I can target it here if it's a child */
+    .home-hero-grid {
+        display: flex;
+        flex-direction: row;
+        overflow-x: auto;
+        gap: 12px;
+        padding-bottom: 12px;
+        /* Hide scrollbar for cleaner look */
+        -ms-overflow-style: none;
+        /* IE and Edge */
+        scrollbar-width: none;
+        /* Firefox */
+    }
+
+    .home-hero-grid::-webkit-scrollbar {
+        display: none;
+    }
+
+    .home-hero-card {
+        min-width: 260px;
+        /* Ensure cards have width in horizontal scroll */
+        width: 260px;
+    }
+}
+
 .home-hero-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -283,17 +328,18 @@
         grid-auto-rows: 200px;
     }
 }
+
 @media (max-width: 992px) {
     .home-hero-section {
         grid-template-columns: 1fr;
         height: auto;
         gap: 24px;
     }
-    
+
     .home-hero-carousel {
         height: 300px;
     }
-    
+
     .home-hero-grid-container {
         height: auto;
     }

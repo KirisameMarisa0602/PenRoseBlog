@@ -259,4 +259,14 @@ body.hide-scrollbar::-webkit-scrollbar {
     -webkit-line-clamp: 3;
     line-clamp: 3;
   }
+
+  /* Additional Mobile Tweaks */
+  .home-articles-container {
+    padding: 12px;
+    width: 96%;
+  }
+
+  .home-articles-list {
+    gap: 20px;
+  }
 }

@@ -9,7 +9,7 @@ import '../../styles/article/ArticleSidebars.css';
 
 export default function AuthorSidebar({ post, currentUserId }) {
     const authorId = post?.authorId || post?.userId || post?.authorUserId || post?.uid;
-    
+
     const [stats, setStats] = useState({
         articles: 0,
         following: 0,
@@ -24,7 +24,7 @@ export default function AuthorSidebar({ post, currentUserId }) {
 
     useEffect(() => {
         if (!authorId) return;
-        
+
         // Fetch user profile for background and bio
         fetchUserProfile(authorId).then(res => {
             if (res && res.code === 200 && res.data) {
@@ -61,7 +61,7 @@ export default function AuthorSidebar({ post, currentUserId }) {
         const y = e.clientY - rect.top;
         const centerX = rect.width / 2;
         const centerY = rect.height / 2;
-        
+
         const rotateX = ((y - centerY) / centerY) * -5; // Max 5 deg
         const rotateY = ((x - centerX) / centerX) * 5;
 
@@ -131,26 +131,29 @@ export default function AuthorSidebar({ post, currentUserId }) {
     return (
         <aside className="author-sidebar">
             <div className="author-card-container">
-                <div 
+                <div
                     className="author-card"
                     onMouseMove={handleMouseMove}
                     onMouseLeave={handleMouseLeave}
                     style={tiltStyle}
                 >
                     {/* Background Image Layer */}
-                    <div 
-                        className="author-card-bg" 
-                        style={{ 
-                            backgroundImage: backgroundUrl ? `url(${backgroundUrl})` : 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)' 
+                    <div
+                        className="author-card-bg"
+                        style={{
+                            backgroundImage: backgroundUrl ? `url(${backgroundUrl})` : 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)'
                         }}
                     ></div>
-                    
+
                     <div className="author-content-wrapper">
                         <div className="author-header">
                             <Link to={`/selfspace?userId=${authorId}`} className="author-avatar-link">
                                 <img src={avatarUrl} alt={nickname} className="author-avatar" />
                             </Link>
                             <Link to={`/selfspace?userId=${authorId}`} className="author-name">{nickname}</Link>
+                            <div className="author-username" style={{ fontSize: '12px', color: '#666', marginBottom: '8px' }}>
+                                @{authorProfile?.username || authorId}
+                            </div>
                             <div className="author-bio" title={authorProfile?.bio || '这个人很懒，什么都没写'}>
                                 {authorProfile?.bio || '这个人很懒，什么都没写'}
                             </div>
@@ -174,21 +177,21 @@ export default function AuthorSidebar({ post, currentUserId }) {
                         <div className="author-actions">
                             {String(currentUserId) !== String(authorId) && (
                                 <>
-                                    <button 
-                                        className={`action-btn follow-btn ${isFollowing ? 'following' : ''}`} 
+                                    <button
+                                        className={`action-btn follow-btn ${isFollowing ? 'following' : ''}`}
                                         onClick={handleFollow}
                                     >
                                         {isFollowing ? '已关注' : '关注'}
                                     </button>
                                     {isFriendStatus ? (
-                                        <button 
+                                        <button
                                             className="action-btn message-btn"
                                             onClick={() => window.location.href = `/conversation/${authorId}`}
                                         >
                                             私信
                                         </button>
                                     ) : (
-                                        <button 
+                                        <button
                                             className="action-btn friend-btn"
                                             onClick={handleAddFriend}
                                         >

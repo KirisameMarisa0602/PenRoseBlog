@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 
 public class UserProfileDTO {
     private Long id;
+    private String username;
 
     @NotBlank(message = "昵称不能为空")
     private String nickname;
@@ -26,6 +27,14 @@ public class UserProfileDTO {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getNickname() {

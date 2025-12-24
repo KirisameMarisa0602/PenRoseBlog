@@ -493,3 +493,62 @@
 .selfspace-search-box {
   margin-left: 20px;
 }
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 768px) {
+  .selfspace-page {
+    flex-direction: column;
+    height: auto;
+    overflow-y: auto;
+    padding-top: 0;
+  }
+
+  .selfspace-left-panel {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    top: 0;
+    z-index: 10;
+    overflow: visible;
+  }
+
+  .selfspace-left-panel-inner {
+    height: auto;
+  }
+
+  .selfspace-profilepanel-container {
+    height: auto !important;
+    min-height: auto !important;
+  }
+
+  /* Make accordion sections stack or collapse nicely */
+  .profilepanel-section {
+    height: auto !important;
+    min-height: 60px !important;
+  }
+
+  .selfspace-right-panel {
+    margin-left: 0;
+    width: 100%;
+    padding: 16px;
+    height: auto;
+    overflow: visible;
+  }
+
+  .selfspace-articles-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .selfspace-tabs {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .selfspace-search-box {
+    margin-left: 0;
+    width: 100%;
+  }
+}

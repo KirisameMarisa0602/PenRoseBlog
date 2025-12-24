@@ -9,7 +9,8 @@ import org.mapstruct.Mappings;
 @Mapper(componentModel = "spring")
 public interface UserProfileMapper {
     @Mappings({
-        @Mapping(source = "user.gender", target = "gender")
+        @Mapping(source = "user.gender", target = "gender"),
+        @Mapping(source = "user.username", target = "username")
     })
     UserProfileDTO toDTO(UserProfile userProfile);
 }

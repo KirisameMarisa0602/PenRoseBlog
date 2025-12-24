@@ -20,6 +20,7 @@ export function useAuthState() {
     const token = safeGetItem('token');
     const rawAvatar = safeGetItem('avatarUrl') || '';
     const nickname = safeGetItem('nickname') || '';
+    const username = safeGetItem('username') || '';
     const gender = safeGetItem('gender') || 'other';
     const rawBackground = safeGetItem('backgroundUrl') || '';
     const userId = safeGetItem('userId') || '';
@@ -29,6 +30,7 @@ export function useAuthState() {
       isLoggedIn: !!token,
       user: {
         id: userId,
+        username,
         avatar,
         nickname,
         gender,
@@ -41,7 +43,7 @@ export function useAuthState() {
 
   useEffect(() => {
     const onStorage = (e) => {
-      if (!e || (e.key !== null && !['token', 'avatarUrl', 'nickname', 'gender', 'backgroundUrl'].includes(e.key))) return;
+      if (!e || (e.key !== null && !['token', 'avatarUrl', 'nickname', 'username', 'gender', 'backgroundUrl'].includes(e.key))) return;
       setState(read());
     };
     const onAuthChanged = () => setState(read());
@@ -60,6 +62,7 @@ export function useAuthState() {
         localStorage.removeItem('token');
         localStorage.removeItem('avatarUrl');
         localStorage.removeItem('nickname');
+        localStorage.removeItem('username');
         localStorage.removeItem('gender');
         localStorage.removeItem('backgroundUrl');
         localStorage.removeItem('userId');
@@ -73,11 +76,12 @@ export function useAuthState() {
   return { isLoggedIn, user, logout };
 }
 
-export function setAuthState({ token, userId, avatarUrl, nickname, gender, backgroundUrl }) {
+export function setAuthState({ token, userId, username, avatarUrl, nickname, gender, backgroundUrl }) {
   if (typeof localStorage === 'undefined') return;
   try {
     if (token != null) localStorage.setItem('token', token);
     if (userId != null) localStorage.setItem('userId', String(userId));
+    if (username != null) localStorage.setItem('username', username || '');
     if (avatarUrl != null) localStorage.setItem('avatarUrl', avatarUrl || '');
     if (nickname != null) localStorage.setItem('nickname', nickname || '');
     if (gender != null) localStorage.setItem('gender', gender || 'other');

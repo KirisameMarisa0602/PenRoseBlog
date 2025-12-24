@@ -96,7 +96,7 @@ const FolderNode = ({ node, onSelect, selectedPath, level = 0, onDelete }) => {
   if (node.type === 'file') {
     return (
       <div className={`folder-file-node level-${level}`}>
-        <ArticleCard post={node.data} onDelete={onDelete} className="tree-article-card" />
+        <ArticleCard post={node.data} onDelete={onDelete} className="tree-article-card" mode="vertical" />
       </div>
     );
   }

@@ -581,6 +581,14 @@ export default function SelfspaceProfileAccordion({ panelWidth = '100%', panelHe
                     marginBottom: isActive ? 5 : 0,
                     transition: 'all 0.3s ease'
                   }}>{profile.nickname}</div>
+                  {isActive && (
+                    <div className="profile-username-large" style={{
+                      fontSize: '0.9rem',
+                      opacity: 0.8,
+                      marginBottom: 10,
+                      transition: 'all 0.3s ease'
+                    }}>@{profile.username || profile.id}</div>
+                  )}
                   {isActive && profile.signature && (
                     <div className="profile-signature-large" style={{
                       fontSize: '0.9rem',

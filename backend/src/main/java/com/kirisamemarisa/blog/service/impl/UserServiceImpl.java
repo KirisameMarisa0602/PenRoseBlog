@@ -111,6 +111,7 @@ public class UserServiceImpl implements UserService {
         LoginResponseDTO resp = new LoginResponseDTO();
         resp.setToken(token);
         resp.setUserId(dbUser.getId());
+        resp.setUsername(dbUser.getUsername());
         if (profile != null) {
             resp.setNickname(profile.getNickname());
             resp.setAvatarUrl(profile.getAvatarUrl());

@@ -96,10 +96,11 @@ export default function Welcome() {
         setAuthState({
           token,
           userId,
-          avatarUrl: profile?.avatarUrl,
-          nickname: profile?.nickname,
-          gender: profile?.gender,
-          backgroundUrl: profile?.backgroundUrl,
+          username: res.data.username || loginData.username,
+          avatarUrl: profile?.avatarUrl || res.data.avatarUrl,
+          nickname: profile?.nickname || res.data.nickname,
+          gender: profile?.gender || res.data.gender,
+          backgroundUrl: profile?.backgroundUrl || res.data.backgroundUrl,
         });
 
         if (rememberMe) {

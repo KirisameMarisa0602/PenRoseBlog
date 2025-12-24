@@ -419,10 +419,10 @@
 
 /* Adjust file node in horizontal list */
 .folder-files-horizontal-scroll .folder-file-node {
-    flex: 0 0 300px;
+    flex: 0 0 320px;
     /* Fixed width for cards */
     margin: 0;
-    width: 300px;
+    width: 320px;
 }
 
 .folder-files-horizontal-scroll .tree-article-card {
