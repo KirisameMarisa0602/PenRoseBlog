@@ -7,6 +7,7 @@ import NotificationBell from '@components/common/NotificationBell.jsx';
 import { useAuthState } from '@hooks/useAuthState';
 import { fetchUnreadTotal, markConversationRead } from '@utils/api/messageService';
 import { notificationApi } from '@utils/api/notificationApi';
+import { fetchPendingFriendRequests } from '@utils/api/friendService';
 import ExampleSpring from './examples/ExampleSpring.jsx';
 import ExampleAutumn from './examples/ExampleAutumn.jsx';
 import ExampleWinter from './examples/ExampleWinter.jsx';
@@ -391,7 +392,20 @@ export default function BannerNavbar({ bannerId }) {
     notificationApi.getUnreadCount()
       .then(res => {
         if (res && res.code === 200) {
-          setSysUnread(typeof res.data === 'number' ? res.data : (res.data?.count || 0));
+          const sysCount = typeof res.data === 'number' ? res.data : (res.data?.count || 0);
+          // 同时获取好友申请未读数
+          fetchPendingFriendRequests()
+            .then(friendRes => {
+              let friendCount = 0;
+              if (friendRes && (friendRes.code === 200 || friendRes.status === 200)) {
+                const list = friendRes.data || [];
+                friendCount = Array.isArray(list) ? list.length : 0;
+              }
+              setSysUnread(sysCount + friendCount);
+            })
+            .catch(() => {
+              setSysUnread(sysCount);
+            });
         }
       })
       .catch(() => { });

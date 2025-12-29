@@ -14,16 +14,29 @@ export default function MessageList({ isEmbedded }) {
   useEffect(() => {
     if (!userId) return;
     fetchConversations()
-      .then(j => { if (j && j.code === 200) setConversations(j.data.list || []); })
-      .catch(() => {});
+      .then(j => {
+        if (j && j.code === 200) {
+          const list = j.data.list || [];
+          // 过滤掉与自己的会话
+          const filtered = list.filter(c => String(c.otherId) !== String(userId));
+          setConversations(filtered);
+        }
+      })
+      .catch(() => { });
   }, [userId]);
 
   useEffect(() => {
     const refresh = () => {
       if (!userId) return;
       fetchConversations()
-        .then(j => { if (j && j.code === 200) setConversations(j.data.list || []); })
-        .catch(() => {});
+        .then(j => {
+          if (j && j.code === 200) {
+            const list = j.data.list || [];
+            const filtered = list.filter(c => String(c.otherId) !== String(userId));
+            setConversations(filtered);
+          }
+        })
+        .catch(() => { });
     };
     window.addEventListener('pm-event', refresh);
     window.addEventListener('pm-unread-refresh', refresh);
