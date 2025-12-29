@@ -432,6 +432,8 @@ export default function CommunicationPage() {
                 const seen = new Set();
                 const uniqLocal = localList.filter(c => {
                     if (!c || !c.otherId) return false;
+                    // 过滤掉自己
+                    if (String(c.otherId) === String(userId)) return false;
                     const k = String(c.otherId);
                     if (seen.has(k)) return false;
                     seen.add(k);
@@ -480,8 +482,12 @@ export default function CommunicationPage() {
                     };
                 });
 
+                // 再次过滤掉自己（防御性编程）
+                list = list.filter(item => String(item.otherId) !== String(userId));
+
                 const exists = list.some(x => String(x.otherId) === String(otherId));
-                if (!exists && otherId) {
+                // 只有当 otherId 存在且不是自己时，才尝试添加到列表
+                if (!exists && otherId && String(otherId) !== String(userId)) {
                     let profileNick = '';
                     let profileAvatar = '';
                     try {
